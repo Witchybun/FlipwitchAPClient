@@ -4,6 +4,6 @@ namespace FlipwitchAP
     {
         public const string PLUGIN_GUID = "FlipwitchAP";
         public const string PLUGIN_NAME = "My first plugin";
-        public const string PLUGIN_VERSION = "1.0.0";
+        public const string PLUGIN_VERSION = "0.0.1";
     }
 }

@@ -1,23 +1,33 @@
-﻿using BepInEx;
+﻿using System.Collections.Generic;
+using System.IO;
+using BepInEx;
 using BepInEx.Logging;
-using BepInEx5ArchipelagoPluginTemplate.templates.Archipelago;
-using BepInEx5ArchipelagoPluginTemplate.templates.Utils;
+using FlipwitchAP.Archipelago;
+using FlipwitchAP.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FlipwitchAP;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
-    public const string PluginGUID = "com.yourName.projectName";
-    public const string PluginName = "projectName";
-    public const string PluginVersion = "0.1.0";
-
+    public const string PluginGUID = "com.Albrekka.FlipwitchAP";
+    public const string PluginName = "FlipwitchAP";
+    public const string PluginVersion = "0.0.1";
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
-    internal static new ManualLogSource Logger;
+    public static ArchipelagoClient ArchipelagoClient {get; private set;}
+    public static bool IsInGame = false;
+    public static bool IsMovementDisabled = false;
 
-    public static ArchipelagoClient ArchipelagoClient;
+    internal static new ManualLogSource Logger;
+    public ItemHelper ItemHelper;
+    public LocationHelper LocationHelper;
+    public SaveHelper SaveHelper;
+    public ShopHelper ShopHelper;
+
 
     private void Awake()
     {
@@ -25,8 +35,30 @@ public class Plugin : BaseUnityPlugin
         Logger = base.Logger;
         ArchipelagoClient = new ArchipelagoClient();
         ArchipelagoConsole.Awake();
+        
+        ItemHelper = new ItemHelper();
+        LocationHelper = new LocationHelper();
+        SaveHelper = new SaveHelper();
+        ShopHelper = new ShopHelper();
+        
+    }
 
-        ArchipelagoConsole.LogMessage($"{ModDisplayInfo} loaded!");
+    private void Update()
+    {
+        if (IsInNormalGameState())
+        {
+            ItemHelper.HandleReceivedItems();
+        }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        IsInGame = scene.name != "MainMenu";
     }
 
     private void OnGUI()
@@ -72,4 +104,9 @@ public class Plugin : BaseUnityPlugin
         }
         // this is a good place to create and add a bunch of debug buttons
     }
+
+    public bool IsInNormalGameState()
+        {
+            return IsInGame && !IsMovementDisabled && ArchipelagoClient.Authenticated && SwitchDatabase.instance.playerMov.isGrounded();
+        }
 }

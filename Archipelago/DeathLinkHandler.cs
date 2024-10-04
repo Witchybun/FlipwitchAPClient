@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using BepInEx;
-using FlipwitchAP;
 
-namespace BepInEx5ArchipelagoPluginTemplate.templates.Archipelago;
+namespace FlipwitchAP.Archipelago;
 
 public class DeathLinkHandler
 {
