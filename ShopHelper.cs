@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Archipelago.MultiClient.Net.Enums;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
@@ -104,19 +106,60 @@ namespace FlipwitchAP
         private static bool UpdateSelectedItemInfo_UpdateArchipelagoItemInfo(StoreUI __instance, string itemName)
         {
             if (!FlipwitchLocations.ShopLocations.TryGetValue(itemName, out var location))
-                {
-                    Plugin.Logger.LogInfo($"Could not find location for {itemName}");
-                    return true;
-                }
-            var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[FlipwitchLocations.ShopLocations[itemName].APLocationID];
-
-            if (locationScout.Game == ArchipelagoClient.Game)
             {
-                var trueName = FlipwitchItems.APItemToGameName[locationScout.Name];
-                __instance.itemNameUI.setTranslationKeyAndUpdate("Item." + trueName + ".Name");
-                __instance.itemFlavourUI.setTranslationKeyAndUpdate("Item." + trueName + ".Flavour");
-                __instance.itemDescUI.setTranslationKeyAndUpdate("Item." + trueName + ".Description");
+                Plugin.Logger.LogInfo($"Could not find location for {itemName}");
+                return true;
             }
+            var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[FlipwitchLocations.ShopLocations[itemName].APLocationID];
+            var isOwnGame = locationScout.Game == ArchipelagoClient.Game;
+            var shopItemName = "";
+            var shopItemFlav = "";
+            var shopItemDesc = "";
+            if (isOwnGame)
+            {
+                if (FlipwitchItems.APItemToCustomDescription.TryGetValue(locationScout.Name, out var blurb))
+                {
+                    shopItemName = locationScout.Name;
+                    shopItemFlav = blurb;
+                    shopItemDesc = "UI.EquipItem.PlayerUpgrades";
+                }
+                else if (locationScout.Name.Contains(" Figure #"))
+                {
+                    shopItemName = locationScout.Name;
+                    shopItemFlav = "Its a gachapon from one of those machines in Spirit Town!";
+                    shopItemDesc = "UI.EquipItem.PlayerUpgrades";
+                }
+                else
+                {
+                    var trueName = FlipwitchItems.APItemToGameName[locationScout.Name];
+                    shopItemName = "Item." + trueName + ".Name";
+                    shopItemFlav = "Item." + trueName + ".Flavour";
+                    shopItemDesc = "Item." + trueName + ".Description";
+                }
+            }
+            else
+            {
+                shopItemName = locationScout.SlotName + "'s " + locationScout.Name;
+                shopItemFlav = $"An item from the world of {locationScout.Game}.";
+                var singleClassification = ItemFlags.None;
+
+                if (locationScout.Classification.HasFlag(ItemFlags.Trap))
+                {
+                    singleClassification = ItemFlags.Trap;
+                }
+                else if (locationScout.Classification.HasFlag(ItemFlags.Advancement))
+                {
+                    singleClassification = ItemFlags.Advancement;
+                }
+                else if (locationScout.Classification.HasFlag(ItemFlags.NeverExclude))
+                {
+                    singleClassification = ItemFlags.NeverExclude;
+                }
+                shopItemDesc = FlipwitchItems.ClassificationToUseBlurb[singleClassification];
+            }
+            __instance.itemNameUI.setTranslationKeyAndUpdate(shopItemName);
+            __instance.itemFlavourUI.setTranslationKeyAndUpdate(shopItemFlav);
+            __instance.itemDescUI.setTranslationKeyAndUpdate(shopItemDesc);
             return false;
         }
     }

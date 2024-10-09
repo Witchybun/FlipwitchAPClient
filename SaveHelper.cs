@@ -7,6 +7,9 @@ using FlipwitchAP.Archipelago;
 using HarmonyLib;
 using Newtonsoft.Json;
 using UnityEngine;
+using System.Linq;
+using System.Data;
+using BepInEx;
 
 namespace FlipwitchAP
 {
@@ -25,7 +28,8 @@ namespace FlipwitchAP
 
         [HarmonyPatch(typeof(SwitchDatabase), "loadGame")]
         [HarmonyPostfix]
-        private static void LoadGame_AlsoLoadArchipelagoState(int saveSlotIdx, bool storageOnly, Action onSceneLoadComplete = null, Action onSceneLoadStart = null)
+        private static void LoadGame_AlsoLoadArchipelagoState(int saveSlotIdx, bool storageOnly, Action onSceneLoadComplete = null,
+        Action onSceneLoadStart = null)
         {
             ReadSave(saveSlotIdx);
         }
@@ -39,24 +43,35 @@ namespace FlipwitchAP
             }
             var savePath = Path.Combine(dir, $"Save{saveSlot}.json");
             Plugin.Logger.LogInfo($"Saving to {savePath}...");
-
-            var newAPSaveData = new APSaveData()
+            var newGameVerification = 0;
+            if (File.Exists(savePath))
             {
-                Index = ArchipelagoClient.ServerData.Index,
-                CheckedLocations = ArchipelagoClient.ServerData.CheckedLocations,
-                ObtainedItems = ArchipelagoClient.ServerData.ReceivedItems,
-                ScoutedLocations = ArchipelagoClient.ServerData.ScoutedLocations,
-            };
+                using StreamReader reader = new StreamReader(savePath);
+                string text = reader.ReadToEnd();
+                var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
+                newGameVerification = loadedSave.Seed;
+            }
+            var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Index, ArchipelagoClient.ServerData.Seed,
+            ArchipelagoClient.ServerData.CheckedLocations, ArchipelagoClient.ServerData.CompletedGacha,
+            ArchipelagoClient.ServerData.BarrierCount);
+            Plugin.Logger.LogInfo(newAPSaveData.Seed);
             string json = JsonConvert.SerializeObject(newAPSaveData);
             File.WriteAllText(savePath, json);
             Plugin.Logger.LogInfo("Save complete!");
+            if (newGameVerification != newAPSaveData.Seed)
+            {
+                // We may be in a situation where this is a new save.  We should check.
+                GenericMethods.HandleLocationDifference();
+                GenericMethods.HandleReceivedItems();
+                Plugin.ArchipelagoClient.SaveQueueState();
+            }
         }
 
         public static void ReadSave(int Save_Slot)
         {
             try
             {
-                
+
                 if (ArchipelagoClient.IsInGame)
                 {
                     return; // Don't keep spam loading in situations it isn't relevant; causes data loss.
@@ -67,21 +82,16 @@ namespace FlipwitchAP
                 {
                     Directory.CreateDirectory(dir);
                 }
-                var savePath = Path.Combine(dir, $"Save{Save_Slot}.json");
-                if (File.Exists(savePath))
-                {
-                    using StreamReader reader = new StreamReader(savePath);
-                    string text = reader.ReadToEnd();
-                    var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
-                    ArchipelagoClient.ServerData.Index = loadedSave.Index;
-                    ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
-                    ArchipelagoClient.ServerData.ReceivedItems = loadedSave.ObtainedItems;
-                    ArchipelagoClient.ServerData.ScoutedLocations = loadedSave.ScoutedLocations;
-                    Plugin.ArchipelagoClient.SyncItemsReceivedOnLoad();
-                    return;
-                }
-
-                Plugin.Logger.LogError("SAVE not found");
+                var loadedSave = GrabSaveDataForSlot(Save_Slot);
+                ArchipelagoClient.ServerData.Index = loadedSave.Index;
+                ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
+                ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
+                ArchipelagoClient.ServerData.CompletedGacha = loadedSave.ObtainedGachas;
+                GenericMethods.HandleLocationDifference();
+                GenericMethods.allowingOutsideItems = false;
+                Plugin.ArchipelagoClient.LoadQueueState();
+                GenericMethods.SyncItemsOnLoad();
+                return;
 
             }
             catch (Exception ex)
@@ -90,13 +100,48 @@ namespace FlipwitchAP
                 Plugin.Logger.LogError($"{ex}");
             }
         }
+
+        public static APSaveData GrabSaveDataForSlot(int slot)
+        {
+            var dir = Application.absoluteURL + "ArchSaves/";
+            var savePath = Path.Combine(dir, $"Save{slot}.json");
+            Plugin.Logger.LogInfo($"State of file existence: {File.Exists(savePath)}");
+            if (!File.Exists(savePath))
+            {
+                Plugin.Logger.LogInfo($"Save Data: Index 0 | Seed: -1");
+                return new APSaveData();
+            }
+            using StreamReader reader = new StreamReader(savePath);
+            string text = reader.ReadToEnd();
+            var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
+            Plugin.Logger.LogInfo($"Save Data: Index {loadedSave.Index} | Seed: {loadedSave.Seed}");
+            return loadedSave;
+        }
     }
 
-    internal class APSaveData
+    public class APSaveData
     {
         public int Index;
+        public int Seed;
         public List<long> CheckedLocations;
-        public List<ReceivedItem> ObtainedItems;
-        public SortedDictionary<long, ArchipelagoItem> ScoutedLocations;
+        public Dictionary<GachaCollections, List<int>> ObtainedGachas;
+        public int BarrierCount;
+
+        public APSaveData()
+        {
+            Index = 0;
+            Seed = -1;
+            CheckedLocations = new();
+            ObtainedGachas = new();
+            BarrierCount = 0;
+        }
+        public APSaveData(int index, int seed, List<long> checkedLocations, Dictionary<GachaCollections, List<int>> obtainedGachas, int barrierCount)
+        {
+            Index = index;
+            Seed = seed;
+            CheckedLocations = checkedLocations;
+            ObtainedGachas = obtainedGachas;
+            BarrierCount = barrierCount;
+        }
     }
 }

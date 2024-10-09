@@ -7,6 +7,7 @@ namespace FlipwitchAP.Data
 { 
     public class ReceivedItem
     {
+        public int Index {get; }
         public string Game { get; }
         public string LocationName { get; }
         public string ItemName { get; }
@@ -16,22 +17,9 @@ namespace FlipwitchAP.Data
         public long PlayerId { get; }
         public ItemFlags Classification { get; }
 
-        [JsonConstructor]
-        public ReceivedItem(string gameName, string locationName, string itemName, string playerName, long locationId, long itemId,
-            long playerId, ItemFlags classification)
+        public ReceivedItem(ItemInfo item, int index)
         {
-            Game = gameName;
-            LocationName = locationName;
-            ItemName = itemName;
-            PlayerName = playerName;
-            LocationId = locationId;
-            ItemId = itemId;
-            PlayerId = playerId;
-            Classification = classification;
-        }
-
-        public ReceivedItem(ItemInfo item)
-        {
+            Index = index;
             var playerName = Plugin.ArchipelagoClient.GetPlayerNameFromSlot(item.Player);
             Game = item.ItemGame;
             LocationName = item.LocationName;

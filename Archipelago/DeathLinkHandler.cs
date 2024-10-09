@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using BepInEx;
+using FlipwitchAP.Utils;
 
 namespace FlipwitchAP.Archipelago;
 
@@ -11,6 +13,7 @@ public class DeathLinkHandler
     private string slotName;
     private readonly DeathLinkService service;
     private readonly Queue<DeathLink> deathLinks = new();
+    public bool killThatBitch = true;
 
     /// <summary>
     /// instantiates our death link handler, sets up the hook for receiving death links, and enables death link if needed
@@ -55,10 +58,6 @@ public class DeathLinkHandler
     private void DeathLinkReceived(DeathLink deathLink)
     {
         deathLinks.Enqueue(deathLink);
-
-        Plugin.Logger.LogDebug(deathLink.Cause.IsNullOrWhiteSpace()
-            ? $"Received Death Link from: {deathLink.Source}"
-            : deathLink.Cause);
     }
 
     /// <summary>
@@ -74,7 +73,7 @@ public class DeathLinkHandler
             var deathLink = deathLinks.Dequeue();
             var cause = deathLink.Cause.IsNullOrWhiteSpace() ? GetDeathLinkCause(deathLink) : deathLink.Cause;
 
-            //TODO kill the player
+            SwitchDatabase.instance.setPlayerHealth(0);
             Plugin.Logger.LogMessage(cause);
         }
         catch (Exception e)
@@ -104,8 +103,8 @@ public class DeathLinkHandler
 
             Plugin.Logger.LogMessage("sharing your death...");
 
-            // add the cause here
-            var linkToSend = new DeathLink(slotName);
+            var cause = $"fucked violently";
+            var linkToSend = new DeathLink(slotName, cause);
 
             service.SendDeathLink(linkToSend);
         }

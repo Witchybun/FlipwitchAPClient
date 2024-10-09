@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using BepInEx;
 using BepInEx.Logging;
@@ -15,10 +16,10 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.0.1";
+    public const string PluginVersion = "0.1.0";
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
-    public static ArchipelagoClient ArchipelagoClient {get; private set;}
+    public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
     public static bool IsMovementDisabled = false;
 
@@ -27,6 +28,8 @@ public class Plugin : BaseUnityPlugin
     public LocationHelper LocationHelper;
     public SaveHelper SaveHelper;
     public ShopHelper ShopHelper;
+    public GenericMethods GenericMethods;
+    public QuestFixer QuestFixer;
 
 
     private void Awake()
@@ -35,19 +38,31 @@ public class Plugin : BaseUnityPlugin
         Logger = base.Logger;
         ArchipelagoClient = new ArchipelagoClient();
         ArchipelagoConsole.Awake();
-        
+
         ItemHelper = new ItemHelper();
         LocationHelper = new LocationHelper();
         SaveHelper = new SaveHelper();
         ShopHelper = new ShopHelper();
-        
+        GenericMethods = new GenericMethods();
+        QuestFixer = new QuestFixer();
+
     }
 
     private void Update()
     {
-        if (IsInNormalGameState())
+        if (
+            !SwitchDatabase.instance.gamePaused &&
+            !SwitchDatabase.instance.dialogueManager.dialogueOrCutsceneOrIngameCutsceneInProgress() &&
+            !SwitchDatabase.instance.isItemPopupActive() &&
+            IsInGame
+            )
         {
-            ItemHelper.HandleReceivedItems();
+            ArchipelagoClient.ReceiveViolation();
+            GenericMethods.HandleReceivedItems();
+        }
+        if (SwitchDatabase.instance.dialogueManager.cutsceneInProgress() && SwitchDatabase.instance.playerMov.isDead())
+        {
+            ArchipelagoClient.KillEveryone();
         }
     }
 
@@ -59,6 +74,13 @@ public class Plugin : BaseUnityPlugin
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         IsInGame = scene.name != "MainMenu";
+        GenericMethods.PatchSceneSwitchTriggers(scene.name);
+        GenericMethods.SoftlockSparer(scene.name);
+        if (!IsInGame)
+        {
+            //ArchipelagoConsole.CreateArchipelagoMenu();
+            ArchipelagoClient.Cleanup();
+        }
     }
 
     private void OnGUI()
@@ -104,9 +126,4 @@ public class Plugin : BaseUnityPlugin
         }
         // this is a good place to create and add a bunch of debug buttons
     }
-
-    public bool IsInNormalGameState()
-        {
-            return IsInGame && !IsMovementDisabled && ArchipelagoClient.Authenticated && SwitchDatabase.instance.playerMov.isGrounded();
-        }
 }

@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>FlipwitchAP</AssemblyName>
-    <Product>My first plugin</Product>
-    <Version>0.0.1</Version>
+    <Product>FlipwitchAP</Product>
+    <Version>0.1.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -39,6 +39,9 @@
     </Reference>
     <Reference Include="AK.Wwise.Unity.API">
       <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.InputSystem.dll</HintPath>
     </Reference>
   </ItemGroup>  
 </Project>
