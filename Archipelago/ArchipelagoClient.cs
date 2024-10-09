@@ -32,7 +32,6 @@ public class ArchipelagoClient
 
     public static ArchipelagoData ServerData = new();
     private DeathLinkHandler DeathLinkHandler;
-    private DeathLinkService DeathLinkService;
     private ArchipelagoSession session;
     public static Queue<ReceivedItem> ItemsToProcess = new();
     public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
