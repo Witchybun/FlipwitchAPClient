@@ -60,6 +60,10 @@ namespace FlipwitchAP.Data
             {
                 return "RoseCutters";
             }
+            else if (itemName.Contains("Triforce"))
+            {
+                return "ChaosPiece1";
+            }
             else if (itemName.Contains("Bunny Hood"))
             {
                 return "BunnyCostume";
