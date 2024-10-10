@@ -91,7 +91,7 @@ namespace FlipwitchAP
             {"Deed to Fungal Forest", "FungalForestDeed"},
             {"Forgotten Fungal Door Key", "ForgottenFungalDoorKey"},
             {"Slime Citadel Key", "SlimeCitadelKey"},
-            {"Goblin Boss Key", "GoblinBossKey"},
+            {"Goblin Queen Key", "GoblinBossKey"},
             {"Silky Slime", "SilkySlime"},
             {"Chaos Sanctum Key", "ChaosSanctumKey"},
             {"Ghost Form", "GhostTransform"},
