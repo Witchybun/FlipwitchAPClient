@@ -59,15 +59,6 @@ namespace FlipwitchAP
             return false;
         }
 
-        // Changes how text looks when opening a chest
-        [HarmonyPatch(typeof(ItemCollectPopup), "popUpItem")]
-        [HarmonyPrefix]
-        private static bool PopUpItem_ChangeToArchipelagoScoutWhenRelevant(ItemCollectPopup __instance, string itemNameId, string itemDescId, string howToUseId, RuntimeAnimatorController animator, Action onPopupCloseCallback = null)
-        {
-            Plugin.Logger.LogInfo($"We have {itemNameId}, {itemDescId}, {howToUseId}");
-            return true;
-        }
-
         // Handles case where you open a Coin Chest.  There's a weird case where chests in slime sewers use the same switch name.
         [HarmonyPatch(typeof(ChestLootDrop), "spawnItem")]
         [HarmonyPrefix]
@@ -211,6 +202,7 @@ namespace FlipwitchAP
                 return true;
             }
             SendLocationGivenLocationDataSendingGift(location);
+            CreateItemNotification(location, null);
             __instance.nextPhase.gameObject.SetActive(value: true);
             __instance.gameObject.SetActive(value: false);
             return false;
@@ -301,6 +293,7 @@ namespace FlipwitchAP
                     var animation = gachaCollection.gachas[remainingGachasIndexes[index]].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
                     SendLocationGivenLocationDataSendingGift(gachaLocation);
+                    CreateItemNotification(gachaLocation, null);
                     var currentCollectionType = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
                     if (ArchipelagoClient.ServerData.CompletedGacha[currentCollectionType] is null)
                     {
@@ -348,6 +341,7 @@ namespace FlipwitchAP
                 anim.Play("HeartContainer_collect");
                 var location = FlipwitchLocations.StatLocations[switchName];
                 SendLocationGivenLocationDataSendingGift(location);
+                CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_hpup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
                 SwitchDatabase.instance.healPlayer(SwitchDatabase.instance.getPlayerHealthCap());
@@ -372,6 +366,7 @@ namespace FlipwitchAP
                 anim.Play("ManaContainer_collect");
                 var location = FlipwitchLocations.StatLocations[switchName];
                 SendLocationGivenLocationDataSendingGift(location);
+                CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_mpup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
                 SwitchDatabase.instance.healPlayer(SwitchDatabase.instance.getPlayerHealthCap());
