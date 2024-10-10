@@ -12,7 +12,7 @@ namespace FlipwitchAP
 {
     public class GenericMethods
     {
-        public static bool allowingOutsideItems = false;
+        public static bool allowingOutsideItems = true;
         public const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
 
         public GenericMethods()
@@ -115,6 +115,7 @@ namespace FlipwitchAP
         {
             if (Plugin.ArchipelagoClient.IsThereIndexMismatch(out var items))
             {
+                allowingOutsideItems = false;
                 HandleMissingItems(items);
             }
             allowingOutsideItems = true;

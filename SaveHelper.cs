@@ -63,6 +63,7 @@ namespace FlipwitchAP
                 // We may be in a situation where this is a new save.  We should check.
                 GenericMethods.HandleLocationDifference();
                 GenericMethods.HandleReceivedItems();
+                GenericMethods.allowingOutsideItems = false;
                 Plugin.ArchipelagoClient.SaveQueueState();
             }
         }
