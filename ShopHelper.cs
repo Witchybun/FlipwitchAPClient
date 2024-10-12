@@ -35,11 +35,17 @@ namespace FlipwitchAP
                     Plugin.Logger.LogInfo($"Could not find location for {itemListings[i].itemNameID}");
                     continue;
                 }
-                var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[FlipwitchLocations.ShopLocations[itemListings[i].itemNameID].APLocationID];
+                var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
+                itemListings[i].listingName.textObject.text = locationScout.Name;
                 itemListings[i].listingName.translationKey = locationScout.Name;
-                var priceSetup = int.Parse(itemListings[i].listingCost.text)*ArchipelagoClient.ServerData.ShopPrices;
-                itemListings[i].listingCost.text = Math.Max(1, priceSetup/100).ToString();
-                itemListings[i].listingName.forceUpdate();
+                
+                if (int.TryParse(itemListings[i].listingCost.text, out var _))
+                {
+                    var priceSetup = int.Parse(itemListings[i].listingCost.text)*ArchipelagoClient.ServerData.ShopPrices;
+                    itemListings[i].listingCost.text = Math.Max(1, priceSetup/100).ToString();
+                    itemListings[i].listingName.forceUpdate();
+                }
+                
             }
         }
 
