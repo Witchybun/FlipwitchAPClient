@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ namespace FlipwitchAP
         {
             Harmony.CreateAndPatchAll(typeof(ShopHelper));
         }
+
         [HarmonyPatch(typeof(StoreUI), "OnEnable")]
         [HarmonyPostfix]
         private static void OnEnable_WriteArchipelagoInfoInstead(StoreUI __instance)
@@ -35,6 +37,8 @@ namespace FlipwitchAP
                 }
                 var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[FlipwitchLocations.ShopLocations[itemListings[i].itemNameID].APLocationID];
                 itemListings[i].listingName.translationKey = locationScout.Name;
+                var priceSetup = int.Parse(itemListings[i].listingCost.text)*ArchipelagoClient.ServerData.ShopPrices;
+                itemListings[i].listingCost.text = Math.Max(1, priceSetup/100).ToString();
                 itemListings[i].listingName.forceUpdate();
             }
         }

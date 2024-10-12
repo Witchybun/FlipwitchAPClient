@@ -7,6 +7,7 @@ namespace FlipwitchAP.Data
     public static class FlipwitchLocations
     {
         public const long LOCATION_INIT_ID = 0;
+        public static Dictionary<string, LocationData> NameToLocation = new();
         public static Dictionary<string, LocationData> ChestLocations = new();
         public static Dictionary<string, LocationData> CoinChestLocations = new();
         public static Dictionary<string, LocationData> CutsceneLocations = new();
@@ -97,21 +98,20 @@ namespace FlipwitchAP.Data
             CreateLocation(30, "WW: Post Fight Coin", "ww_goblinqueenexit", GACHA),
             CreateLocation(31, "WW: Flying Fairy Chest", "MagneticHairpin", CHEST),
             CreateLocation(32, "WW: Hidden Spring Room Coin", "ww_gacha_fairy_secret", GACHA),
-            CreateLocation(33, "WW: Sexual Experience Reward 1", "4", SEX),
-            CreateLocation(34, "WW: Sexual Experience Reward 2", "8", SEX),
-            CreateLocation(35, "WW: Sexual Experience Reward 3", "8", SEX),
-            CreateLocation(36, "WW: Sexual Experience Reward 4", "12", SEX),
-            CreateLocation(37, "WW: Sexual Experience Reward 5", "16", SEX),
-            CreateLocation(38, "WW: Sexual Experience Reward 6", "16", SEX),
-            CreateLocation(39, "WW: Sexual Experience Reward 7", "20", SEX),
-            CreateLocation(40, "WW: Sexual Experience Reward 8", "24", SEX),
-            CreateLocation(41, "WW: Sexual Experience Reward 9", "24", SEX),
-            CreateLocation(42, "WW: Sexual Experience Reward 10", "28", SEX),
-            CreateLocation(43, "WW: Sexual Experience Reward 11", "32", SEX),
-            CreateLocation(44, "WW: Sexual Experience Reward 12", "32", SEX),
-            CreateLocation(45, "WW: Sexual Experience Reward 13", "36", SEX),
-            CreateLocation(46, "WW: Sexual Experience Reward 14", "40", SEX),
-            CreateLocation(47, "WW: Sexual Experience Reward 15", "40", SEX),
+            CreateLocation(33, "WW: Sexual Experience Reward - Peach Charge 1", "4", SEX),
+            CreateLocation(34, "WW: Sexual Experience Reward - Peach Charge 2", "8", SEX),
+            CreateLocation(35, "WW: Sexual Experience Reward - Wand Upgrade 1", "8", SEX),
+            CreateLocation(36, "WW: Sexual Experience Reward - Peach Charge 3", "12", SEX),
+            CreateLocation(37, "WW: Sexual Experience Reward - Peach Charge 4", "16", SEX),
+            CreateLocation(38, "WW: Sexual Experience Reward - Peach Upgrade 1", "16", SEX),
+            CreateLocation(39, "WW: Sexual Experience Reward - Peach Charge 5", "20", SEX),
+            CreateLocation(40, "WW: Sexual Experience Reward - Peach Charge 6", "24", SEX),
+            CreateLocation(41, "WW: Sexual Experience Reward - Wand Upgrade 2", "24", SEX),
+            CreateLocation(42, "WW: Sexual Experience Reward - Peach Charge 7", "28", SEX),
+            CreateLocation(43, "WW: Sexual Experience Reward - Peach Charge 8", "32", SEX),
+            CreateLocation(44, "WW: Sexual Experience Reward - Peach Upgrade 2", "32", SEX),
+            CreateLocation(45, "WW: Sexual Experience Reward - Peach Charge 9", "36", SEX),
+            CreateLocation(46, "WW: Sexual Experience Reward - Peach Charge 10", "40", SEX),
             CreateLocation(48, "WW: Great Fairy's Reward", "Dummy2", QUEST, secondaryCallName: "FairyCostume"),
             CreateLocation(49, "WW: Before Great Fairy", "ww_gacha_goblincamp", GACHA),
             CreateLocation(50, "WW: Gobliana's Headshot", "", QUEST, secondaryCallName: "GoblinHeadshot"),
@@ -165,8 +165,8 @@ namespace FlipwitchAP.Data
 
             CreateLocation(151, "GC: Below Entrance Chest", "gc_crypt_coins", COINCHEST),
             CreateLocation(152, "GC: Slime Form Room Chest 1", "gc_slime_secret_coins_1", COINCHEST), // All three chests have the same switchName?
-            CreateLocation(153, "GC: Slime Form Room Chest 2", "gc_slime_secret_coins_2", COINCHEST), // All three chests have the same switchName?
-            CreateLocation(154, "GC: Slime Form Room Chest 3", "gc_slime_secret_coins_3", COINCHEST), // All three chests have the same switchName?
+            CreateLocation(153, "GC: Slime Form Room Chest 2", "gc_slime_secret_coins", COINCHEST), // All three chests have the same switchName?
+            CreateLocation(154, "GC: Slime Form Room Chest 3", "gc_slime_secret_coins2", COINCHEST), // All three chests have the same switchName?
             CreateLocation(155, "GC: Giant Room, Flip Magic Platform", "RoseGardenKey", CHEST),
             CreateLocation(156, "GC: Giant Room, Blind Jump Coin", "gc_middleplatform_gacha", GACHA),
             CreateLocation(157, "GC: Up the Ladder", "gc_angel_jump_gacha", GACHA),
@@ -424,6 +424,7 @@ namespace FlipwitchAP.Data
         private static LocationData CreateLocation(int id, string locationName, string primaryCallName, string type, string switchToFlip = "", string secondaryCallName = "")
         {
             var location = new LocationData(id, locationName, primaryCallName, type, secondaryCallName: secondaryCallName, switchToFlip: switchToFlip);
+            NameToLocation[location.APLocationName] = location;
             IDToLocation[id] = location;
             if (secondaryCallName != "")
             {

@@ -13,20 +13,20 @@ public class ArchipelagoData
     public string SlotName;
     public string Password;
     public int Index;
+    public int InitialIndex;
     public Queue<ReceivedItem> StoredQueue = new();
-    public Dictionary<GachaCollections, List<int>> CompletedGacha = new();
-    public int BarrierCount = 0;
-
     public List<long> CheckedLocations;
 
     private string CLIENT_KEY = "client_version";
     private string SEED_KEY = "seed";
     private string DEATH_KEY = "death_link";
     private string GENDER_KEY = "starting_gender";
+    private string PRICE_KEY = "shop_prices";
     private string GACHA_KEY = "gachapon";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
     public Gender StartingGender { get; set; }
+    public int ShopPrices {get; set;}
     public bool GachaOn {get; set;}
     public bool DeathLink { get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
@@ -56,6 +56,7 @@ public class ArchipelagoData
         ClientVersion = GetSlotSetting(CLIENT_KEY, "");
         DeathLink = GetSlotSetting(DEATH_KEY, false);
         StartingGender = GetSlotSetting(GENDER_KEY, Gender.Woman);
+        ShopPrices = GetSlotSetting(PRICE_KEY, 100);
         GachaOn = GetSlotSetting(GACHA_KEY, false);
         StoredQueue = ArchipelagoClient.ItemsToProcess;
     }

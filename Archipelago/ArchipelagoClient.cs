@@ -119,13 +119,13 @@ public class ArchipelagoClient
             }
             var seedBeforeSetup = ServerData.Seed;
             ServerData.SetupSession(success.SlotData);
-            Authenticated = true;
 
             BuildLocations(seedBeforeSetup);
 
             DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
             session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
+            Authenticated = true;
         }
         else
         {
@@ -310,7 +310,7 @@ public class ArchipelagoClient
     public bool IsThereIndexMismatch(out List<ItemInfo> items)
     {
         var serverIndex = session.Items.Index;
-        if (serverIndex != ServerData.Index)
+        if (serverIndex != ServerData.InitialIndex)
         {
             items = session.Items.AllItemsReceived.ToList();
             GenericMethods.allowingOutsideItems = false;
@@ -334,6 +334,12 @@ public class ArchipelagoClient
     public bool IsLocationChecked(long locationID)
     {
         return ServerData.CheckedLocations.Contains(locationID);
+    }
+
+    public bool IsLocationChecked(string locationName)
+    {
+        var locationID = FlipwitchLocations.NameToLocation[locationName].APLocationID;
+        return IsLocationChecked(locationID);
     }
 
     public List<long> AllLocationsCompletedNotedByServer()

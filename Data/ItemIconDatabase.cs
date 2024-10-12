@@ -12,6 +12,7 @@ namespace FlipwitchAP.Data
             {"Woods Crystal Blockade Removal", "GoblinCrystal"},
             {"City Crystal Blockade Removal", "GoblinCrystal"},
             {"Loose Change", "GoblinModelLuggage"},
+            {"Protective Barrier Upgrade", "StarBracelet"},
             {"Health Upgrade", "HeartGem"},
             {"Mana Upgrade", "StarGem"},
             {"Wand Upgrade", "GlassWand"},
@@ -20,6 +21,7 @@ namespace FlipwitchAP.Data
             {"Peachy Peach Recharge", "PeachyPeach"},
             {"Sexual Thoughts", "GlassWand"},
             {"Peachy Peach Upgrade", "PeachyPeach"},
+            {"Peachy Peach Charge", "PeachyPeach"},
         };
 
         private static readonly List<string> Rings = new()
@@ -102,7 +104,7 @@ namespace FlipwitchAP.Data
             }
             else if (itemName.Contains("Potion"))
             {
-                return "SlimeSentry";
+                return "SlimySentry";
             }
             else if (itemName.Contains("Bottle"))
             {
@@ -178,7 +180,7 @@ namespace FlipwitchAP.Data
             }
             else if (itemName.Contains("Soul"))
             {
-                return "GhostForm";
+                return "GhostTransform";
             }
             else if (itemName.Contains("Hairpin"))
             {

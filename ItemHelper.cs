@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Archipelago.MultiClient.Net.Enums;
 using System;
+using System.Diagnostics;
 
 namespace FlipwitchAP
 {
@@ -28,7 +29,9 @@ namespace FlipwitchAP
                     }
                 case "Protective Barrier Upgrade":
                     {
-                        ArchipelagoClient.ServerData.BarrierCount = Math.Min(2, ArchipelagoClient.ServerData.BarrierCount + 1);
+                        var currentBarrier = SwitchDatabase.instance.getInt("APBarrier");
+                        var additional = Math.Min(2, 1 + currentBarrier);
+                        SwitchDatabase.instance.setInt("APBarrier", additional);
                         return;
                     }
                 case "Lucky Coin":
@@ -46,7 +49,7 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APCityCrystalDestroyed", 1);
                         return;
                     }
-                case "Peachy Peach Upgrade":
+                case "Peachy Peach Charge":
                     {
                         var peachGiven = SwitchDatabase.instance.getInt("PeachGiven");
                         if (peachGiven < 1)
@@ -63,6 +66,12 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
                         return;
                     }
+                case "Peachy Peach Upgrade":
+                    {
+                        var newUpgradeAmount = Math.Min(2, SwitchDatabase.instance.getInt("HealStrengthLevel") + 1);
+                        SwitchDatabase.instance.setInt("HealStrengthUpgrade", newUpgradeAmount);
+                        break;
+                    }
                 case "Health Upgrade":
                     {
                         SwitchDatabase.instance.upgradeHPLevel();
@@ -75,17 +84,17 @@ namespace FlipwitchAP
                     }
                 case "Wand Upgrade":
                     {
-                        if (SwitchDatabase.instance.getInt("playerWandLevel") < 3)
-                        {
-                            SwitchDatabase.instance.setInt("playerWandLevel", SwitchDatabase.instance.getInt("playerWandLevel") + 1);
-                            SwitchDatabase.instance.playerMov.refreshWandLevel();
-                        }
+                        var newUpgradeAmount = Math.Min(2, SwitchDatabase.instance.getInt("playerWandLevel") + 1);
+                        SwitchDatabase.instance.setInt("playerWandLevel", newUpgradeAmount);
+                        SwitchDatabase.instance.playerMov.refreshWandLevel();
+                        
+                        SwitchDatabase.instance.setInt("APPlayerWand", newUpgradeAmount);
                         return;
                     }
                 case "Loose Change":
                     {
                         var random = new Random(ArchipelagoClient.ServerData.Seed + DateTime.Now.Millisecond);
-                        var amount = random.Next(0, 100);
+                        var amount = random.Next(20, 200);
                         SwitchDatabase.instance.addToCoinCoint(amount);
                         return;
                     }
@@ -146,7 +155,7 @@ namespace FlipwitchAP
                 }
                 return;
             }
-            else if (name == "Chaos Piece")
+            else if (name == "Chaos Key Piece")
             {
                 var keyItems = SwitchDatabase.instance.keyItems;
                 var count = 0;

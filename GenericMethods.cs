@@ -29,21 +29,25 @@ namespace FlipwitchAP
 
         [HarmonyPatch(typeof(BeginCutsceneIngame), "OnEnable")]
         [HarmonyPostfix]
-        private static void OnEnable_TransUrGender(BeginCutsceneIngame __instance)
+        private static void OnEnable_DoAdditionalThings(BeginCutsceneIngame __instance)
         {
-            if (__instance.transform.parent.name == "Intro Cutscene")
+            switch (__instance.transform.parent.name)
             {
-                if (ArchipelagoClient.ServerData.StartingGender == ArchipelagoData.Gender.Man)
-                {
-                    SwitchDatabase.instance.playerMov.GetType().GetMethod("flipGender", Flags).Invoke(SwitchDatabase.instance.playerMov, null);
-                }
-                return;
-            }
-            else if (__instance.transform.parent.name == "Chaos Witch Defeated For Real")
-            {
-                Plugin.ArchipelagoClient.SendVictory();
-            }
+                case "Intro Cutscene":
+                    {
+                        if (ArchipelagoClient.ServerData.StartingGender == ArchipelagoData.Gender.Man)
+                        {
+                            SwitchDatabase.instance.playerMov.GetType().GetMethod("flipGender", Flags).Invoke(SwitchDatabase.instance.playerMov, null);
+                        }
+                        return;
+                    }
+                case "Chaos Witch Defeated For Real":
+                    {
+                        Plugin.ArchipelagoClient.SendVictory();
+                        return;
+                    }
 
+            }
         }
 
         [HarmonyPatch(typeof(SaveSlotSelection), "Update")]
@@ -101,11 +105,11 @@ namespace FlipwitchAP
             return true;
         }
 
-        [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: new System.Type[]{typeof(int), typeof(Transform)})]
+        [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: new System.Type[] { typeof(int), typeof(Transform) })]
         [HarmonyPrefix]
         private static void InflictDamage_ReduceDamageBasedOnBarrier(ref int damage, Transform enemy)
         {
-            for (var i = 0; i < ArchipelagoClient.ServerData.BarrierCount; i++)
+            for (var i = 0; i < SwitchDatabase.instance.getInt("APBarrier"); i++)
             {
                 damage /= 2;
             }
@@ -151,7 +155,7 @@ namespace FlipwitchAP
 
         public static void HandleMissingItems(List<ItemInfo> items)
         {
-            var num = -1;
+            var num = 0;
             foreach (var item in items)
             {
                 num++;
@@ -195,10 +199,12 @@ namespace FlipwitchAP
                         peachCutsceneData.switchName = "APPeachItemGiven";
                         var crystalCutsceneData = world.Find("16_FairyRuins").Find("LevelData").GetChild(1).GetComponent<LevelStateManagerSingleSwitch>();
                         crystalCutsceneData.switchName = "APGreatFairyStory";
+                        /*var crystalBlowupCutscene = world.Find("18_FairyEntrance").Find("LevelData").GetChild(0).GetComponent<LevelStateManagerSingleSwitch>();
+                        crystalBlowupCutscene.switchName = "APGreatFairyStory";
                         if (SwitchDatabase.instance.getInt("APGreatFairyStory") > 0)
                         {
                             crystalCutsceneData.gameObject.SetActive(false);
-                        }
+                        }*/
                         break;
                     }
                 case "Spirit_City_Final":
@@ -236,7 +242,7 @@ namespace FlipwitchAP
                         var firstBounce = GameObject.Instantiate(bouncy);
                         firstBounce.transform.parent = firstDrop;
                         firstBounce.transform.position = new Vector3(-87.1152f, -38.395f, 0f);
-                        firstBounce.GetComponent<BouncyHoney>().force = 35;
+                        firstBounce.GetComponent<BouncyHoney>().force = 40;
 
                         var orangeRoom = world.Find("ClubDemon").Find("53_OrangeStairs").Find("LevelData");
                         orangeRoom.Find("Bouncy_Honey (33)").gameObject.GetComponent<BouncyHoney>().force = 50;

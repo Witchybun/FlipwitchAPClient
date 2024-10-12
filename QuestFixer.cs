@@ -385,6 +385,48 @@ namespace FlipwitchAP
                         }
                         return;
                     }
+                case "Flipwitch_Sensei":
+                    {
+                        var areWeOnMiniBridge = GameObject.Find("WitchyWoods").transform.Find("Grid").Find("World").Find("2_MiniBridge").Find("LevelData").gameObject.activeSelf;
+                        if (areWeOnMiniBridge)
+                        {
+                            return;
+                        }
+                        var senseiGroups = __instance.dialogueGroups;
+                        var receivedNoWandUpgrade = new NPCDialogueAdvanced.SwitchRequirement()
+                        {
+                            switchName = "APPlayerWand",
+                            switchValue = 1,
+                            comparisonOperator = ComparisonOperators.IS_LESS_THAN
+                        };
+                        var receivedFirstWandNotSecond = new NPCDialogueAdvanced.SwitchRequirement()
+                        {
+                            switchName = "APPlayerWand",
+                            switchValue = 2,
+                            comparisonOperator = ComparisonOperators.IS_LESS_THAN
+                        };
+                        if (senseiGroups[4].switches.Any(x => x.switchName == "APPlayerWand"))
+                        {
+                            senseiGroups[4].switches[1] = receivedNoWandUpgrade;
+                        }
+                        if (senseiGroups[5].switches.Any(x => x.switchName == "APPlayerWand"))
+                        {
+                            senseiGroups[5].switches[1] = receivedNoWandUpgrade;
+                        }
+                        if (senseiGroups[6].switches.Any(x => x.switchName == "APPlayerWand"))
+                        {
+                            senseiGroups[6].switches[1] = receivedFirstWandNotSecond;
+                        }
+                        if (senseiGroups[7].switches.Any(x => x.switchName == "APPlayerWand"))
+                        {
+                            senseiGroups[7].switches[1] = receivedFirstWandNotSecond;
+                        }
+                        // 4 is first wand upgrade but wrong
+                        // 5 is first wand upgrade
+                        // 6 is second but you're a woman
+                        // 7 is second but you're a man
+                        return;
+                    }
             }
         }
     }

@@ -52,8 +52,8 @@ namespace FlipwitchAP
                 newGameVerification = loadedSave.Seed;
             }
             var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Index, ArchipelagoClient.ServerData.Seed,
-            ArchipelagoClient.ServerData.CheckedLocations, ArchipelagoClient.ServerData.CompletedGacha,
-            ArchipelagoClient.ServerData.BarrierCount);
+            ArchipelagoClient.ServerData.CheckedLocations);
+            ArchipelagoClient.ServerData.InitialIndex = ArchipelagoClient.ServerData.Index;
             Plugin.Logger.LogInfo(newAPSaveData.Seed);
             string json = JsonConvert.SerializeObject(newAPSaveData);
             File.WriteAllText(savePath, json);
@@ -85,9 +85,9 @@ namespace FlipwitchAP
                 }
                 var loadedSave = GrabSaveDataForSlot(Save_Slot);
                 ArchipelagoClient.ServerData.Index = loadedSave.Index;
+                ArchipelagoClient.ServerData.InitialIndex = loadedSave.Index;
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
-                ArchipelagoClient.ServerData.CompletedGacha = loadedSave.ObtainedGachas;
                 GenericMethods.HandleLocationDifference();
                 GenericMethods.allowingOutsideItems = false;
                 Plugin.ArchipelagoClient.LoadQueueState();
@@ -125,24 +125,18 @@ namespace FlipwitchAP
         public int Index;
         public int Seed;
         public List<long> CheckedLocations;
-        public Dictionary<GachaCollections, List<int>> ObtainedGachas;
-        public int BarrierCount;
 
         public APSaveData()
         {
             Index = 0;
             Seed = -1;
             CheckedLocations = new();
-            ObtainedGachas = new();
-            BarrierCount = 0;
         }
-        public APSaveData(int index, int seed, List<long> checkedLocations, Dictionary<GachaCollections, List<int>> obtainedGachas, int barrierCount)
+        public APSaveData(int index, int seed, List<long> checkedLocations)
         {
             Index = index;
             Seed = seed;
             CheckedLocations = checkedLocations;
-            ObtainedGachas = obtainedGachas;
-            BarrierCount = barrierCount;
         }
     }
 }

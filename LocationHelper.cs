@@ -35,6 +35,7 @@ namespace FlipwitchAP
                 SendLocationGivenLocationDataSendingGift(gachaLocation);
                 AkSoundEngine.PostEvent("ui_gacha_coin_pickup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
+                CreateItemNotification(gachaLocation, null);
                 __instance.gameObject.SetActive(value: false);
             }
             return false;
@@ -65,28 +66,15 @@ namespace FlipwitchAP
         private static bool SpawnItem_GiveAnItemInsteadOfCoins(ChestLootDrop __instance)
         {
             var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
+            Plugin.Logger.LogInfo($"Opened coin chest with switch {switchName}");
             SwitchDatabase.instance.setInt(switchName, 1);
             var chestName = switchName;
             if (switchName == "gc_slime_secret_coins")
             {
                 var objectName = __instance.name;
-                switch (objectName)
+                if (objectName == "Drop Coins Chest")
                 {
-                    case "Drop Coins Chest":
-                        {
-                            chestName = switchName + "_1";
-                            break;
-                        }
-                    case "Drop Coins Chest (2)":
-                        {
-                            chestName = switchName + "_2";
-                            break;
-                        }
-                    case "Drop Coins Chest (3)":
-                        {
-                            chestName = switchName + "_3";
-                            break;
-                        }
+                    chestName = switchName + "_1";
                 }
             }
             if (!FlipwitchLocations.CoinChestLocations.TryGetValue(chestName, out var location))
@@ -157,6 +145,7 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APMomoGavePassword", 1);
                         return;
                     }
+                
 
             }
         }
@@ -184,7 +173,7 @@ namespace FlipwitchAP
         {
             var ints = (Dictionary<string, int>)SwitchDatabase.instance.GetType().GetField("ints", GenericMethods.Flags).GetValue(SwitchDatabase.instance);
             ints["PeachGiven"] -= 1;
-            SwitchDatabase.instance.addInt("APPeachItemGiven", 0);
+            SwitchDatabase.instance.setInt("APPeachItemGiven", 1);
             SwitchDatabase.instance.GetType().GetField("ints", GenericMethods.Flags).SetValue(SwitchDatabase.instance, ints);
             var peachyLocation = FlipwitchLocations.CutsceneLocations["PeachGiven"];
             SendLocationGivenLocationDataSendingGift(peachyLocation);
@@ -203,6 +192,11 @@ namespace FlipwitchAP
             }
             SendLocationGivenLocationDataSendingGift(location);
             CreateItemNotification(location, null);
+            if (location.APLocationName == "WW: Rescue Great Fairy")
+            {
+                SwitchDatabase.instance.setInt("WW_CrystalBreakTriggered", 1);
+                // Normally this is set from the ruins crystal being destroyed.  We do this to avoid doing it so this stops spamming.
+            }
             __instance.nextPhase.gameObject.SetActive(value: true);
             __instance.gameObject.SetActive(value: false);
             return false;
@@ -223,18 +217,14 @@ namespace FlipwitchAP
                 {
                     continue;
                 }
-                var initialBalls = collection == GachaCollections.Promotion ? 1 : 10;
+                var initialBalls = gachaCollection.gachas.Count;
                 __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, initialBalls);
                 __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, new List<int>());
                 int num = 0;
                 __instance.sticker.sprite = gachaCollection.gachaSticker;
-                if (!ArchipelagoClient.ServerData.CompletedGacha.ContainsKey(collection))
-                {
-                    ArchipelagoClient.ServerData.CompletedGacha[collection] = new();
-                }
                 foreach (Gacha gacha in gachaCollection.gachas)
                 {
-                    if (ArchipelagoClient.ServerData.CompletedGacha[collection].Contains(gacha.number))
+                    if (SwitchDatabase.instance.getInt("AP" + gacha.animationName) > 0)
                     {
                         var currentBalls = (int)__instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).GetValue(__instance);
                         __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, currentBalls - 1);
@@ -276,11 +266,6 @@ namespace FlipwitchAP
             }
             __instance.gachaMachineAnim.SetInteger("BallCount", ballsRemaining);
             var remainingGachasIndexes = (List<int>)__instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).GetValue(__instance);
-            foreach (var mrow in remainingGachasIndexes)
-            {
-                Plugin.Logger.LogInfo($"{mrow}");
-            }
-            Plugin.Logger.LogInfo($"{remainingGachasIndexes.Count}");
             int index = UnityEngine.Random.Range(0, remainingGachasIndexes.Count);
             var currentCollection = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
             var closeGachaMethod = __instance.GetType().GetMethod("closeGachaScreen", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -288,18 +273,14 @@ namespace FlipwitchAP
             {
                 if (gachaCollection.collection == currentCollection)
                 {
-                    SwitchDatabase.instance.setBool($"{gachaCollection.collection}_{gachaCollection.gachas[remainingGachasIndexes[index]].number}", value: true);
-                    __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, gachaCollection.gachas[remainingGachasIndexes[index]]);
+                    var chosenGacha = gachaCollection.gachas[remainingGachasIndexes[index]];
+                    SwitchDatabase.instance.setBool($"{gachaCollection.collection}_{chosenGacha.number}", value: true);
+                    __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
                     var animation = gachaCollection.gachas[remainingGachasIndexes[index]].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
                     SendLocationGivenLocationDataSendingGift(gachaLocation);
-                    CreateItemNotification(gachaLocation, null);
                     var currentCollectionType = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
-                    if (ArchipelagoClient.ServerData.CompletedGacha[currentCollectionType] is null)
-                    {
-                        ArchipelagoClient.ServerData.CompletedGacha[currentCollectionType] = new();
-                    }
-                    ArchipelagoClient.ServerData.CompletedGacha[currentCollectionType].Add(index);
+                    SwitchDatabase.instance.setInt("AP" + chosenGacha.animationName, 1);
                     remainingGachasIndexes.Remove(remainingGachasIndexes[index]);
                     __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, remainingGachasIndexes);
                     return false;
@@ -381,14 +362,46 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool HandleAllPendingUpgrades_SendOutChecksInstead(SwitchDatabase __instance)
         {
-            var amountOfSex = __instance.getInt("SexualExperienceCount");
-            foreach (var location in FlipwitchLocations.SexExperienceLocations)
+            var playerWandLocationCount = __instance.getInt("APPlayerWand");
+            if (__instance.getInt("APPlayerWand") < __instance.getInt("PendingWandLevel"))
             {
-                if (amountOfSex >= int.Parse(location.Value.PrimaryCallName))
+                var firstWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
+                if (playerWandLocationCount > 0 && Plugin.ArchipelagoClient.IsLocationChecked(firstWandLocation.APLocationID))
                 {
-                    SendLocationGivenLocationDataSendingGift(location.Value);
+                    SendLocationGivenLocationDataSendingGift(firstWandLocation);
+                    __instance.setInt("APPlayerWand", playerWandLocationCount + 1);
+                }
+                playerWandLocationCount = __instance.getInt("APPlayerWand");
+                var secondWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 2"];
+                if (playerWandLocationCount > 1)
+                {
+                    SendLocationGivenLocationDataSendingGift(secondWandLocation);
+                    __instance.setInt("APPlayerWand", playerWandLocationCount + 1);
                 }
             }
+            if (__instance.getInt("SexualExperienceCount") >= 16)
+            {
+                var firstPeachyPower = SexExperienceLocations["WW: Sexual Experience Reward - Peach Upgrade 1"];
+                SendLocationGivenLocationDataSendingGift(firstPeachyPower);
+            }
+            if (__instance.getInt("SexualExperienceCount") >= 32)
+            {
+                var secondPeachyPower = SexExperienceLocations["WW: Sexual Experience Reward - Peach Upgrade 2"];
+                SendLocationGivenLocationDataSendingGift(secondPeachyPower);
+            }
+            var pendingPeachCharges = __instance.getInt("PendingPeachCharges");
+            var totalChargesObtained = __instance.getInt("APTotalPeachCharges");
+            var newChargeCount = Math.Min(10, pendingPeachCharges + totalChargesObtained);
+            __instance.setInt("APTotalPeachCharges", newChargeCount);
+            for (var i = 0; i <= totalChargesObtained; i++)
+            {
+                var pickedLocationName = $"WW: Sexual Experience Reward - Peach Charge {i + 1}";
+                var pickedLocation = SexExperienceLocations[pickedLocationName];
+                SendLocationGivenLocationDataSendingGift(pickedLocation);
+            }
+
+            __instance.setInt("PendingPeachCharges", 0);
+            __instance.upgradePendingPopup.updatePendingPopupSymbol();
             return false;
         }
 
@@ -474,7 +487,7 @@ namespace FlipwitchAP
             if (scoutedInformation.IsOwnItem)
             {
                 var isShrimple = !FlipwitchItems.SkipPopupItems.Contains(scoutedInformation.Name);
-                if (isShrimple && !scoutedInformation.Name.Contains (" Figure #"))
+                if (isShrimple && !scoutedInformation.Name.Contains(" Figure #"))
                 {
                     var inGameName = FlipwitchItems.APItemToGameName[scoutedInformation.Name];
                     CustomInternalPopUpItem(inGameName, onItemPopupClosedCallback);

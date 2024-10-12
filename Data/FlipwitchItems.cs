@@ -9,7 +9,7 @@ namespace FlipwitchAP
         {
             "Lucky Coin", "Woods Crystal Blockade Removal", "City Crystal Blockade Removal", "Loose Change",
             "Healing Surge", "Mana Surge", "Peachy Peach Recharge", "Sexual Thoughts", "Mana Upgrade", "Health Upgrade", 
-            "Wand Upgrade", "Protective Barrier Upgrade", "Peachy Peach Upgrade"
+            "Wand Upgrade", "Protective Barrier Upgrade", "Peachy Peach Charge", "Peachy Peach Upgrade"
         };
 
         public static readonly Dictionary<string, string> APItemToGameName = new()
@@ -21,7 +21,7 @@ namespace FlipwitchAP
             {"Demonic Cuff", "DemonicCuff"},
             {"Magical Mushroom", "MagicalMushroom"},
             {"Harpy Feather", "HarpyFeather"},
-            {"Slime Sentry", "SlimeSentry"},
+            {"Slime Sentry", "SlimySentry"},
             {"Frilly Panties", "FrillyPanties"},
             {"Yellow Frog Talisman", "FirstFrogTalisman"},
             {"Blue Frog Talisman", "SecondFrogTalisman"},
@@ -46,11 +46,11 @@ namespace FlipwitchAP
             {"Miko Costume", "MikoCostume"},
             {"Nun Costume", "NunCostume"},
             {"Nurse Costume", "NurseCostume"},
-            {"Police Costume", "PoliceCostume"},
+            {"Dominating Costume", "PoliceCostume"},
             {"Angler Costume", "AnglerCostume"},
             {"Farmer Costume", "FarmerCostume"},
             {"Goblin Costume", "GoblinCostume"},
-            {"Pig Costume", "PigCostume"},
+            {"Pigman Costume", "PigCostume"},
             {"Postman Costume", "PostmanCostume"},
             {"Rat Costume", "RatCostume"},
             {"Priest Costume", "PriestCostume"},
@@ -77,6 +77,7 @@ namespace FlipwitchAP
             {"Slime Boss Key", "SlimeBossKey"},
             {"Collapsed Temple Key", "CollapsedTempleKey"},
             {"Demon Boss Key", "DemonBossKey"},
+            {"The Beast's Key", "DemonSubBossKey"},
             {"Demon Club Door Key", "ClubDoor1Key"},
             {"Secret Club Door Key", "ClubDoor2Key"},
             {"Angel Letter", "AngelLetter"},
@@ -102,7 +103,7 @@ namespace FlipwitchAP
             {"Slimy Sub Boss Key", "SlimySubBossKey"},
             {"Portable Portal", "PortablePortal"},
             {"Flutterknife Garter", "FlutterknifeGarter"},
-            {"Chaos Piece", "ChaosPiece1"},
+            {"Chaos Key Piece", "ChaosPiece1"},
             {"Summon Stone", "SummonStone1"},
             {"Soul Fragment", "SoulFragment1"},
         };
@@ -120,7 +121,8 @@ namespace FlipwitchAP
             {"Healing Surge", "My wounds are completely healed!"},
             {"Mana Surge", "I can cast my magicks once again!"},
             {"Peachy Peach Recharge", "My Peachy Peach was fully restored!"},
-            {"Peachy Peach Upgrade", "My Peachy Peach has gained another charge!"},
+            {"Peachy Peach Charge", "My Peachy Peach has gained another charge!"},
+            {"Peachy Peach Upgrade", "My Peachy Peach is even more powerful!"},
             {"Sexual Thoughts", "I really can't stop thinking about that one time..."},
             {"Protective Barrier Upgrade", "I can feel a lustful aura surround me!"},
         };
