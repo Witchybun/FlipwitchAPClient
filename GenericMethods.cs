@@ -199,12 +199,6 @@ namespace FlipwitchAP
                         peachCutsceneData.switchName = "APPeachItemGiven";
                         var crystalCutsceneData = world.Find("16_FairyRuins").Find("LevelData").GetChild(1).GetComponent<LevelStateManagerSingleSwitch>();
                         crystalCutsceneData.switchName = "APGreatFairyStory";
-                        /*var crystalBlowupCutscene = world.Find("18_FairyEntrance").Find("LevelData").GetChild(0).GetComponent<LevelStateManagerSingleSwitch>();
-                        crystalBlowupCutscene.switchName = "APGreatFairyStory";
-                        if (SwitchDatabase.instance.getInt("APGreatFairyStory") > 0)
-                        {
-                            crystalCutsceneData.gameObject.SetActive(false);
-                        }*/
                         break;
                     }
                 case "Spirit_City_Final":
