@@ -103,7 +103,7 @@ namespace FlipwitchAP
             {"Slimy Sub Boss Key", "SlimySubBossKey"},
             {"Portable Portal", "PortablePortal"},
             {"Flutterknife Garter", "FlutterknifeGarter"},
-            {"Chaos Key Piece", "ChaosPiece1"},
+            {"Chaos Key Piece", "ChaosKey1"},
             {"Summon Stone", "SummonStone1"},
             {"Soul Fragment", "SoulFragment1"},
         };
