@@ -64,7 +64,7 @@ namespace FlipwitchAP.Data
             }
             else if (itemName.Contains("Triforce"))
             {
-                return "ChaosPiece1";
+                return "ChaosKey1";
             }
             else if (itemName.Contains("Bunny Hood"))
             {
