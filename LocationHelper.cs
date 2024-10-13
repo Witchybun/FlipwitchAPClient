@@ -120,6 +120,11 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APGoblianaGaveHeadshot", 1);
                         return;
                     }
+                case "WW: Legs' Business Offer":
+                    {
+                        SwitchDatabase.instance.setInt("APLegsGaveCard", 1);
+                        return;
+                    }
                 case "ST: Cabaret Cafe Delicious Milk":
                     {
                         SwitchDatabase.instance.setInt("APBelleGaveMilk", 1);

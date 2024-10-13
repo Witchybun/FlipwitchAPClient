@@ -64,6 +64,10 @@ namespace FlipwitchAP
                         {
                             goblianaGroups[2].switches.Add(wasGivenBusinessCard);
                         }
+                        var firstState = goblianaGroups[1];
+                        var secondState = goblianaGroups[2];
+                        goblianaGroups[1] = secondState;
+                        goblianaGroups[2] = firstState;
                         return;
                     }
                 case "Seedy Goblin Quest 1":
@@ -86,11 +90,11 @@ namespace FlipwitchAP
                             switchValue = 1,
                             comparisonOperator = ComparisonOperators.IS_EQUAL_TO
                         };
-                        var introSpecialCase = new NPCDialogueAdvanced.SwitchRequirement()
+                        var neverMetLegs = new NPCDialogueAdvanced.SwitchRequirement()
                         {
-                            switchName = "APGoblianaGaveHeadshot",
-                            switchValue = 2,
-                            comparisonOperator = ComparisonOperators.IS_LESS_THAN
+                            switchName = "GoblinModelQuest1",
+                            switchValue = 0,
+                            comparisonOperator = ComparisonOperators.IS_EQUAL_TO
                         };
                         var introModifiedQuestCheck = new NPCDialogueAdvanced.SwitchRequirement()
                         {
@@ -103,8 +107,6 @@ namespace FlipwitchAP
                         {
                             legsGroups[0].itemRequirements.Clear();
                             legsGroups[0].switches.Add(wasNotGivenBusinessCard);
-                            legsGroups[0].switches.Add(introSpecialCase);
-                            legsGroups[0].switches[1] = introModifiedQuestCheck;
                         }
                         if (!legsGroups[1].switches.Any(x => x.switchName == "APGoblianaGaveHeadshot"))
                         {
@@ -112,9 +114,7 @@ namespace FlipwitchAP
                         }
                         if (legsGroups[2].itemRequirements.Any())
                         {
-                            legsGroups[2].itemRequirements.Clear();
-                            legsGroups[2].switches.Add(wasGivenBusinessCard);
-                            legsGroups[2].switches.Add(wasGivenHeadshot);
+                            legsGroups[2].itemRequirements.RemoveAt(1);
                         }
                         if (!legsGroups[3].switches.Any(x => x.switchName == "APGoblianaGaveHeadshot"))
                         {
@@ -125,6 +125,21 @@ namespace FlipwitchAP
                             legsGroups[4].itemRequirements.Clear();
                             legsGroups[4].switches.Add(wasGivenBusinessCard);
                         }
+                        //0 -> legs says hi first time.
+                        //1 -> legs says hi, but you have the headshot already
+                        //2 -> legs reminds the player to find someone
+                        //3 -> player has the headshot; doesn't check if they met legs yet
+                        //4 -> legs notes that the player should give the card
+                        /*var firstState = legsGroups[0];
+                        var secondState = legsGroups[1];
+                        var thirdState = legsGroups[2];
+                        var fourthState = legsGroups[3];
+                        var lastState = legsGroups[4];
+                        legsGroups[0] = lastState;
+                        legsGroups[1] = fourthState;
+                        legsGroups[2] = firstState;
+                        legsGroups[3] = secondState;
+                        legsGroups[4] = thirdState;*/
                         return;
                     }
                 case "CowGirl - Quest 2":

@@ -70,7 +70,7 @@ namespace FlipwitchAP
                     {
                         var newUpgradeAmount = Math.Min(2, SwitchDatabase.instance.getInt("HealStrengthLevel") + 1);
                         SwitchDatabase.instance.setInt("HealStrengthUpgrade", newUpgradeAmount);
-                        break;
+                        return;
                     }
                 case "Health Upgrade":
                     {
@@ -84,11 +84,19 @@ namespace FlipwitchAP
                     }
                 case "Wand Upgrade":
                     {
-                        var newUpgradeAmount = Math.Min(2, SwitchDatabase.instance.getInt("playerWandLevel") + 1);
-                        SwitchDatabase.instance.setInt("playerWandLevel", newUpgradeAmount);
-                        SwitchDatabase.instance.playerMov.refreshWandLevel();
-                        
-                        SwitchDatabase.instance.setInt("APPlayerWand", newUpgradeAmount);
+                        var currentLevel = SwitchDatabase.instance.getInt("playerWandLevel");
+                        if (currentLevel == 0)
+                        {
+                            SwitchDatabase.instance.setInt("playerWandLevel", 1);
+                            SwitchDatabase.instance.playerMov.refreshWandLevel();
+                            SwitchDatabase.instance.setInt("APPlayerWand", 1);
+                        }
+                        else if (currentLevel == 1)
+                        {
+                            SwitchDatabase.instance.setInt("playerWandLevel", 2);
+                            SwitchDatabase.instance.playerMov.refreshWandLevel();
+                            SwitchDatabase.instance.setInt("APPlayerWand", 2);
+                        }
                         return;
                     }
                 case "Loose Change":
@@ -118,7 +126,7 @@ namespace FlipwitchAP
                         // Figure out how to play moan sound effects.
                         return;
                     }
-                
+
             }
             if (name.Contains(" Figure #"))
             {
@@ -134,22 +142,22 @@ namespace FlipwitchAP
                         }
                     case "Animal Girls":
                         {
-                            SwitchDatabase.instance.gachaCollections[0].gachas[number -1].unlocked = true;
+                            SwitchDatabase.instance.gachaCollections[0].gachas[number - 1].unlocked = true;
                             return;
                         }
                     case "Bunny Girls":
                         {
-                            SwitchDatabase.instance.gachaCollections[1].gachas[number -1].unlocked = true;
+                            SwitchDatabase.instance.gachaCollections[1].gachas[number - 1].unlocked = true;
                             return;
                         }
                     case "Angels & Demons":
                         {
-                            SwitchDatabase.instance.gachaCollections[2].gachas[number -1].unlocked = true;
+                            SwitchDatabase.instance.gachaCollections[2].gachas[number - 1].unlocked = true;
                             return;
                         }
                     case "Monster Girls":
                         {
-                            SwitchDatabase.instance.gachaCollections[3].gachas[number -1].unlocked = true;
+                            SwitchDatabase.instance.gachaCollections[3].gachas[number - 1].unlocked = true;
                             return;
                         }
                 }
@@ -163,7 +171,7 @@ namespace FlipwitchAP
                 {
                     if (key.Contains("ChaosKey"))
                     {
-                        count +=1;
+                        count += 1;
                     }
                 }
                 if (count >= 6)
@@ -181,7 +189,7 @@ namespace FlipwitchAP
                 {
                     if (key.Contains("SoulFragment"))
                     {
-                        count +=1;
+                        count += 1;
                     }
                 }
                 if (count >= 3)
@@ -201,7 +209,7 @@ namespace FlipwitchAP
                 {
                     if (key.Contains("SummonStone"))
                     {
-                        count +=1;
+                        count += 1;
                     }
                 }
                 if (count >= 3)
@@ -226,7 +234,7 @@ namespace FlipwitchAP
                 return;
             }
             Plugin.Logger.LogError($"Item {name} was not caught by any of the cases.  Doing nothing.");
-            
+
         }
 
         public static void GiveFlipwitchItem(ReceivedItem item)

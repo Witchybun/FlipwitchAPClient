@@ -216,7 +216,7 @@ public class ArchipelagoClient
         {
             Disconnect();
         }
-
+        
     }
 
     public void SendMessage(string message)
@@ -331,9 +331,18 @@ public class ArchipelagoClient
         session.Locations.CompleteLocationChecks(locationID);
     }
 
+    // Have a fallback.
     public bool IsLocationChecked(long locationID)
     {
-        return ServerData.CheckedLocations.Contains(locationID);
+        if (ServerData.CheckedLocations.Contains(locationID))
+        {
+            return true;
+        }
+        else if (session.Locations.AllLocationsChecked.Contains(locationID))
+        {
+            return true;
+        }
+        return false;
     }
 
     public bool IsLocationChecked(string locationName)
