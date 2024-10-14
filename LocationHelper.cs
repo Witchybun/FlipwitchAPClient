@@ -150,8 +150,6 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APMomoGavePassword", 1);
                         return;
                     }
-                
-
             }
         }
 
@@ -166,6 +164,10 @@ namespace FlipwitchAP
                 var location = SecondaryCallLocations[itemName];
                 SendLocationGivenLocationDataSendingGift(location);
                 CreateItemNotification(location, onPopupCloseCallback);
+                if (location.APLocationName == "WW: Gobliana's Luggage")
+                {
+                    SwitchDatabase.instance.setInt("APExGaveLuggage", 1);
+                }
                 return false;
             }
             return true;
