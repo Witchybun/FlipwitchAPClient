@@ -240,6 +240,8 @@ namespace FlipwitchAP
                             cemeterySwitches.GetChild(0).gameObject.SetActive(false);
                             cemeterySwitches.GetChild(1).gameObject.SetActive(false);
                         }
+                        var bestGirlSwitch = GameObject.Find("World").transform.Find("CabaretCafe").Find("LevelData").Find("Cabaret Owner Complete Manager");
+                        bestGirlSwitch.GetComponent<SetGameObjectEnabledOnSwitch>().switchName = "APCabaretComplete";
                         return;
                     }
             }
