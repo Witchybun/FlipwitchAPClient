@@ -115,6 +115,32 @@ namespace FlipwitchAP
             }
         }
 
+        [HarmonyPatch(typeof(Cutscene), "calculateUnlockedRewards")]
+        [HarmonyPrefix]
+        private static bool CalculateUnlockedRewards_CalculateUsingOwnUnlockCount(Cutscene __instance)
+        {
+            int playerPeachChargesCap = SwitchDatabase.instance.getInt("APTotalPeachCharges");
+            int num = SwitchDatabase.instance.getInt("SexualExperienceCount") / 4;
+            int @int = SwitchDatabase.instance.getInt("PendingPeachCharges");
+            SwitchDatabase.instance.setInt("AppliedAndPendingPeaches", playerPeachChargesCap + num);
+            SwitchDatabase.instance.setInt("PendingPeachCharges", num - playerPeachChargesCap);
+            Debug.Log("SexualExperienceCount: " + SwitchDatabase.instance.getInt("SexualExperienceCount"));
+            if (num >= 2)
+            {
+                SwitchDatabase.instance.setInt("PendingWandLevel", 1);
+            }
+            if (num >= 6)
+            {
+                SwitchDatabase.instance.setInt("PendingWandLevel", 2);
+            }
+            if (@int < SwitchDatabase.instance.getInt("PendingPeachCharges"))
+            {
+                SwitchDatabase.instance.triggerUpgradePendingPopup();
+            }
+            SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
+            return false;
+        }
+
         public static void SyncItemsOnLoad()
         {
             if (Plugin.ArchipelagoClient.IsThereIndexMismatch(out var items))
