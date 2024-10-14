@@ -276,6 +276,25 @@ namespace FlipwitchAP
                         purpleOrangeBouncy.gameObject.GetComponent<BouncyHoney>().force = 55;
                         return;
                     }
+                case "FungalForest_Main":
+                    {
+                        var world = GameObject.Find("World").transform;
+                        var freeBouncy = world.Find("19_MushroomClimb").Find("LevelData").Find("Bouncy_Honey (8)");
+                        var plummetBouncy = GameObject.Instantiate(freeBouncy);
+                        var plummet = world.Find("18_Plummet").Find("LevelData");
+                        plummetBouncy.transform.parent = plummet;
+                        plummetBouncy.transform.position = new Vector3(339.0535f, -49.2658f, 0f);
+                        plummetBouncy.GetComponent<BouncyHoney>().force = 80;
+                        return;
+                    }
+                case "UmiUmi_Main":
+                    {
+                        var world = GameObject.Find("World").transform;
+                        var rewardDropBounce = world.Find("38_RewardDrop").Find("LevelData").Find("Bouncy_Honey (10)");
+                        rewardDropBounce.GetComponent<BouncyHoney>().force = 60;
+                        world.Find("30_DangerDrop").Find("LevelData").Find("Bouncy_Honey (14)").GetComponent<BouncyHoney>().force = 70;
+                        return;
+                    }
             }
         }
     }
