@@ -372,19 +372,20 @@ namespace FlipwitchAP
             var playerWandLocationCount = __instance.getInt("APPlayerWand");
             if (__instance.getInt("APPlayerWand") < __instance.getInt("PendingWandLevel"))
             {
-                var firstWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
-                if (playerWandLocationCount > 0 && Plugin.ArchipelagoClient.IsLocationChecked(firstWandLocation.APLocationID))
-                {
-                    SendLocationGivenLocationDataSendingGift(firstWandLocation);
-                    __instance.setInt("APPlayerWand", playerWandLocationCount + 1);
-                }
-                playerWandLocationCount = __instance.getInt("APPlayerWand");
                 var secondWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 2"];
-                if (playerWandLocationCount > 1)
+                if (playerWandLocationCount == 1)
                 {
                     SendLocationGivenLocationDataSendingGift(secondWandLocation);
                     __instance.setInt("APPlayerWand", playerWandLocationCount + 1);
                 }
+                playerWandLocationCount = __instance.getInt("APPlayerWand");
+                var firstWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
+                if (playerWandLocationCount == 0 && !Plugin.ArchipelagoClient.IsLocationChecked(firstWandLocation.APLocationID))
+                {
+                    SendLocationGivenLocationDataSendingGift(firstWandLocation);
+                    __instance.setInt("APPlayerWand", 1);
+                }
+
             }
             if (__instance.getInt("SexualExperienceCount") >= 16)
             {
