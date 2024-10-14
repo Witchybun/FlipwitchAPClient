@@ -425,6 +425,49 @@ namespace FlipwitchAP
 
         private static void CustomInternalPopUpItem(string itemName, Action onItemPopupClosedCallback = null)
         {
+            switch (itemName)
+            {
+                case "ChaosKey1":
+                    {
+                        var chaosCount = SwitchDatabase.instance.getInt("APChaosKeyCount");
+                        if (chaosCount == 0)
+                        {
+                            Plugin.Logger.LogError("Total count claims you have 0 keys, but you're being sent one?");
+                        }
+                        else
+                        {
+                            itemName = "ChaosKey" + chaosCount.ToString();
+                        }
+                        break;
+                    }
+                case "SummonStone1":
+                    {
+                        var stoneCount = SwitchDatabase.instance.getInt("APSummonStoneCount");
+                        if (stoneCount == 0)
+                        {
+                            Plugin.Logger.LogError("Total count claims you have 0 stones, but you're being sent one?");
+                        }
+                        else
+                        {
+                            itemName = "SummonStone" + stoneCount.ToString();
+                        }
+                        break;
+                    }
+                case "SoulFragment1":
+                    {
+                        var soulCount = SwitchDatabase.instance.getInt("APSoulFragmentCount");
+                        if (soulCount == 0)
+                        {
+                            Plugin.Logger.LogError("Total count claims you have 0 souls, but you're being sent one?");
+                        }
+                        else
+                        {
+                            itemName = "SoulFragment" + soulCount.ToString();
+                        }
+                        break;
+                    }
+            }
+
             Item item2 = SwitchDatabase.instance.itemDictionary[itemName];
             string howToUseId = item2.itemType switch
             {

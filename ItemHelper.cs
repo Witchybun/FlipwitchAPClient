@@ -178,6 +178,7 @@ namespace FlipwitchAP
                 {
                     return;
                 }
+                SwitchDatabase.instance.setInt("APChaosKeyCount", count + 1);
                 SwitchDatabase.instance.givePlayerItem("ChaosKey" + (count + 1).ToString());
                 return;
             }
@@ -196,6 +197,7 @@ namespace FlipwitchAP
                 {
                     return;
                 }
+                SwitchDatabase.instance.setInt("APSoulFragmentCount", count + 1);
                 var soulName = "SoulFragment" + (count + 1).ToString();
                 var soulItem = SwitchDatabase.instance.itemDictionary[soulName];
                 CustomGiveItemIfMethodIsOnUpdate(soulItem, soulName);
@@ -216,6 +218,7 @@ namespace FlipwitchAP
                 {
                     return;
                 }
+                SwitchDatabase.instance.setInt("APSummonStoneCount", count + 1);
                 var stoneName = "SummonStone" + (count + 1).ToString();
                 var stoneItem = SwitchDatabase.instance.itemDictionary[stoneName];
                 CustomGiveItemIfMethodIsOnUpdate(stoneItem, stoneName);
