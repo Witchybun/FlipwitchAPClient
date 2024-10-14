@@ -402,8 +402,12 @@ namespace FlipwitchAP
                     }
                 case "Flipwitch_Sensei":
                     {
-                        var areWeOnMiniBridge = GameObject.Find("WitchyWoods").transform.Find("Grid").Find("World").Find("2_MiniBridge").Find("LevelData").gameObject.activeSelf;
-                        if (areWeOnMiniBridge)
+                        if (__instance.gameObject.scene.name != "WitchyWoods_Final")
+                        {
+                            return;
+                        }
+                        var areWeInMainSpot = GameObject.Find("WitchyWoods").transform.Find("Grid").Find("World").Find("1_EntranceSpawn").Find("LevelData").gameObject.activeSelf;
+                        if (!areWeInMainSpot)
                         {
                             return;
                         }
