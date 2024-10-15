@@ -10,6 +10,7 @@ using System.Linq;
 using System.Diagnostics;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Exceptions;
+using UnityEngine.Rendering;
 
 namespace FlipwitchAP
 {
@@ -204,100 +205,20 @@ namespace FlipwitchAP
                 SwitchDatabase.instance.setInt("WW_CrystalBreakTriggered", 1);
                 // Normally this is set from the ruins crystal being destroyed.  We do this to avoid doing it so this stops spamming.
             }
+            if (location.APLocationName == "WW: Great Fairy's Reward")
+            {
+                if (!Plugin.ArchipelagoClient.IsLocationChecked("WW: Rescue Great Fairy"))
+                {
+                    var rescueLocation = FlipwitchLocations.CutsceneLocations["WW_CrystalBreakTriggered"];
+                    SendLocationGivenLocationDataSendingGift(rescueLocation);
+                }
+            }
             __instance.nextPhase.gameObject.SetActive(value: true);
             __instance.gameObject.SetActive(value: false);
             return false;
         }
 
-        // Code for loading machine based on archipelago-based rolls, not what you actually have.
-        [HarmonyPatch(typeof(GachaSceneManager), "loadMachine")]
-        [HarmonyPostfix]
-        private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection)
-        {
-            if (!ArchipelagoClient.ServerData.GachaOn)
-            {
-                return;
-            }
-            foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
-            {
-                if (gachaCollection.collection != collection)
-                {
-                    continue;
-                }
-                var initialBalls = gachaCollection.gachas.Count;
-                __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, initialBalls);
-                __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, new List<int>());
-                int num = 0;
-                __instance.sticker.sprite = gachaCollection.gachaSticker;
-                foreach (Gacha gacha in gachaCollection.gachas)
-                {
-                    if (SwitchDatabase.instance.getInt("AP" + gacha.animationName) > 0)
-                    {
-                        var currentBalls = (int)__instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).GetValue(__instance);
-                        __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, currentBalls - 1);
-                    }
-                    else
-                    {
-                        var currentIndexes = (List<int>)__instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).GetValue(__instance);
-                        var newIndexes = new List<int>();
-                        foreach (var index in currentIndexes)
-                        {
-                            Plugin.Logger.LogInfo($"Index {index} is in the collection.");
-                            newIndexes.Add(index);
-                        }
-                        newIndexes.Add(num);
-                        __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, newIndexes);
-                    }
-                    num++;
-                }
-                var ballsRemaining = (int)__instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).GetValue(__instance);
-                __instance.gachaMachineAnim.SetInteger("BallCount", ballsRemaining);
-                __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
-            }
-        }
-
-        // Code for patching the gacha obtaining system
-        [HarmonyPatch(typeof(GachaSceneManager), "ejectGacha")]
-        [HarmonyPrefix]
-        private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance)
-        {
-            if (!ArchipelagoClient.ServerData.GachaOn)
-            {
-                return true;
-            }
-            var ballsRemaining = (int)__instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).GetValue(__instance) - 1;
-            __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, ballsRemaining--);
-            if (ballsRemaining < 0)
-            {
-                __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, 0);
-            }
-            __instance.gachaMachineAnim.SetInteger("BallCount", ballsRemaining);
-            var remainingGachasIndexes = (List<int>)__instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).GetValue(__instance);
-            int index = UnityEngine.Random.Range(0, remainingGachasIndexes.Count);
-            var currentCollection = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
-            var closeGachaMethod = __instance.GetType().GetMethod("closeGachaScreen", BindingFlags.Instance | BindingFlags.NonPublic);
-            foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
-            {
-                if (gachaCollection.collection == currentCollection)
-                {
-                    var chosenGacha = gachaCollection.gachas[remainingGachasIndexes[index]];
-                    SwitchDatabase.instance.setBool($"{gachaCollection.collection}_{chosenGacha.number}", value: true);
-                    __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
-                    var animation = gachaCollection.gachas[remainingGachasIndexes[index]].animationName;
-                    var gachaLocation = FlipwitchLocations.GachaLocations[animation];
-                    SendLocationGivenLocationDataSendingGift(gachaLocation);
-                    var currentCollectionType = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
-                    SwitchDatabase.instance.setInt("AP" + chosenGacha.animationName, 1);
-                    remainingGachasIndexes.Remove(remainingGachasIndexes[index]);
-                    __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, remainingGachasIndexes);
-                    return false;
-                }
-            }
-            Plugin.Logger.LogError($"Unable to find a matching gacha collection for {currentCollection}.");
-            SwitchDatabase.instance.addTokenToTokenCount(1);
-            closeGachaMethod.Invoke(__instance, null);
-            return false;
-        }
+        
 
         // Handles the case where you complete a quest.
         [HarmonyPatch(typeof(QuestUpdatedPopup), "completeQuest")]
@@ -535,7 +456,7 @@ namespace FlipwitchAP
         public static void CreateItemNotification(LocationData location, Action onItemPopupClosedCallback)
         {
             var scoutedInformation = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
-            if (scoutedInformation.IsOwnItem)
+            if (scoutedInformation.IsOwnItem || scoutedInformation.Game == ArchipelagoClient.Game)
             {
                 var isShrimple = !FlipwitchItems.SkipPopupItems.Contains(scoutedInformation.Name);
                 if (isShrimple && !scoutedInformation.Name.Contains(" Figure #"))

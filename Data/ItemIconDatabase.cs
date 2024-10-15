@@ -8,7 +8,11 @@ namespace FlipwitchAP.Data
     public class ItemIconDatabase
     {
         public static readonly Dictionary<string, string> CustomItemToRealItem = new(){
-            {"Lucky Coin", "FortuneCat"}, 
+            {"Animal Coin", "CatCostume"},
+            {"Bunny Coin", "BunnyCostume"}, 
+            {"Monster Coin", "GoblinCostume"}, 
+            {"Angel & Demon Coin", "NurseCostume"}, 
+            {"Promotional Coin", "PriestCostume"}, 
             {"Woods Crystal Blockade Removal", "GoblinCrystal"},
             {"City Crystal Blockade Removal", "GoblinCrystal"},
             {"Loose Change", "GoblinModelLuggage"},

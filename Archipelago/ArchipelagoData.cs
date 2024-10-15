@@ -23,12 +23,20 @@ public class ArchipelagoData
     private string GENDER_KEY = "starting_gender";
     private string PRICE_KEY = "shop_prices";
     private string GACHA_KEY = "gachapon";
+    private string ANIMAL_KEY = "animal_order";
+    private string BUNNY_KEY = "bunny_order";
+    private string MONSTER_KEY = "monster_order";
+    private string ANGEL_KEY = "angel_order";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
     public Gender StartingGender { get; set; }
     public int ShopPrices {get; set;}
     public bool GachaOn {get; set;}
     public bool DeathLink { get; private set; }
+    public List<int> AnimalGachaOrder {get; private set; }
+    public List<int> BunnyGachaOrder {get; private set; }
+    public List<int> MonsterGachaOrder {get; private set; }
+    public List<int> AngelGachaOrder {get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
 
     private Dictionary<string, object> slotData;
@@ -58,6 +66,14 @@ public class ArchipelagoData
         StartingGender = GetSlotSetting(GENDER_KEY, Gender.Woman);
         ShopPrices = GetSlotSetting(PRICE_KEY, 100);
         GachaOn = GetSlotSetting(GACHA_KEY, false);
+        var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
+        AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
+        var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
+        BunnyGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(bunnyOrderData));
+        var monsterOrderData = GetSlotSetting(MONSTER_KEY, "");
+        MonsterGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(monsterOrderData));
+        var angelOrderData = GetSlotSetting(ANGEL_KEY, "");
+        AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
         StoredQueue = ArchipelagoClient.ItemsToProcess;
     }
 
@@ -120,6 +136,17 @@ public class ArchipelagoData
     {
         Plugin.Logger.LogWarning($"SlotData did not contain expected key: \"{key}\"");
         return defaultValue;
+    }
+
+    private static List<int> ProcessGachaList(List<string> givenList)
+    {
+        var numList = new List<int>();
+        foreach (var gacha in givenList)
+        {
+            var num = int.Parse(gacha.Split('#')[1]);
+            numList.Add(num);
+        }
+        return numList;
     }
 
     public enum Gender

@@ -9,7 +9,8 @@ namespace FlipwitchAP
         {
             "Lucky Coin", "Woods Crystal Blockade Removal", "City Crystal Blockade Removal", "Loose Change",
             "Healing Surge", "Mana Surge", "Peachy Peach Recharge", "Sexual Thoughts", "Mana Upgrade", "Health Upgrade", 
-            "Wand Upgrade", "Protective Barrier Upgrade", "Peachy Peach Charge", "Peachy Peach Upgrade"
+            "Wand Upgrade", "Protective Barrier Upgrade", "Peachy Peach Charge", "Peachy Peach Upgrade",
+            "Animal Coin", "Bunny Coin", "Monster Coin", "Angel & Demon Coin", "Promotional COin"
         };
 
         public static readonly Dictionary<string, string> APItemToGameName = new()
@@ -113,7 +114,11 @@ namespace FlipwitchAP
             {"Woods Crystal Blockade Removal", "The energies of the Great Fairy!  I can sense a crystal shatter."},
             {"City Crystal Blockade Removal", "The power of the Queen Goblin!  I can sense several crystals shattering."},
             {"Special Promotion #1", "Its a lewd gachapon."},
-            {"Lucky Coin", "I can use this on the gacha machines!"},
+            {"Animal Coin", "I can use this on the gacha machines!"},
+            {"Bunny Coin", "I can use this on the gacha machines!"},
+            {"Monster Coin", "I can use this on the gacha machines!"},
+            {"Angel & Demon Coin", "I can use this on the gacha machines!"},
+            {"Promotional Coin", "I can use this on the gacha machines!"},
             {"Loose Change", "Its quite a bit of gold!"},
             {"Health Upgrade", "I feel a lot tougher!"},
             {"Mana Upgrade", "I feel a lot smarter!"},

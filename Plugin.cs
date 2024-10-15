@@ -16,7 +16,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.1.5";
+    public const string PluginVersion = "0.1.6";
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
@@ -30,6 +30,7 @@ public class Plugin : BaseUnityPlugin
     public ShopHelper ShopHelper;
     public GenericMethods GenericMethods;
     public QuestFixer QuestFixer;
+    public GachaHelper GachaHelper;
 
 
     private void Awake()
@@ -45,6 +46,7 @@ public class Plugin : BaseUnityPlugin
         ShopHelper = new ShopHelper();
         GenericMethods = new GenericMethods();
         QuestFixer = new QuestFixer();
+        GachaHelper = new GachaHelper();
 
     }
 

@@ -34,9 +34,34 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APBarrier", additional);
                         return;
                     }
-                case "Lucky Coin":
+                case "Animal Coin":
                     {
-                        SwitchDatabase.instance.addTokenToTokenCount(1);
+                        var currentCount = SwitchDatabase.instance.getInt("APAnimalCoin");
+                        SwitchDatabase.instance.setInt("APAnimalCoin", currentCount + 1);
+                        return;
+                    }
+                case "Bunny Coin":
+                    {
+                        var currentCount = SwitchDatabase.instance.getInt("APBunnyCoin");
+                        SwitchDatabase.instance.setInt("APBunnyCoin", currentCount + 1);
+                        return;
+                    }
+                case "Monster Coin":
+                    {
+                        var currentCount = SwitchDatabase.instance.getInt("APMonsterCoin");
+                        SwitchDatabase.instance.setInt("APMonsterCoin", currentCount + 1);
+                        return;
+                    }
+                case "Angel & Demon Coin":
+                    {
+                        var currentCount = SwitchDatabase.instance.getInt("APAngelDemonCoin");
+                        SwitchDatabase.instance.setInt("APAngelDemonCoin", currentCount + 1);
+                        return;
+                    }
+                case "Promotional Coin":
+                    {
+                        var currentCount = SwitchDatabase.instance.getInt("APPromotionalCoin");
+                        SwitchDatabase.instance.setInt("APPromotionalCoin", currentCount + 1);
                         return;
                     }
                 case "Woods Crystal Blockade Removal":
