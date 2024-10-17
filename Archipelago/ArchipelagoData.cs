@@ -68,6 +68,7 @@ public class ArchipelagoData
         GachaOn = GetSlotSetting(GACHA_KEY, false);
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
+        Plugin.Logger.LogInfo($"We have AnimalGacha with set [{string.Join(", ", AnimalGachaOrder)}]");
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
         BunnyGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(bunnyOrderData));
         var monsterOrderData = GetSlotSetting(MONSTER_KEY, "");
@@ -75,6 +76,20 @@ public class ArchipelagoData
         var angelOrderData = GetSlotSetting(ANGEL_KEY, "");
         AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
         StoredQueue = ArchipelagoClient.ItemsToProcess;
+    }
+
+    // Why...?
+    public void RegenerateGachaOrder()
+    {
+        var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
+        AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
+        Plugin.Logger.LogInfo($"We have AnimalGacha with set [{string.Join(", ", AnimalGachaOrder)}]");
+        var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
+        BunnyGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(bunnyOrderData));
+        var monsterOrderData = GetSlotSetting(MONSTER_KEY, "");
+        MonsterGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(monsterOrderData));
+        var angelOrderData = GetSlotSetting(ANGEL_KEY, "");
+        AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
     }
 
     public override string ToString()
@@ -146,6 +161,8 @@ public class ArchipelagoData
             var num = int.Parse(gacha.Split('#')[1]);
             numList.Add(num);
         }
+        var listedItems = string.Join(", ", numList);
+        Plugin.Logger.LogInfo(listedItems);
         return numList;
     }
 
