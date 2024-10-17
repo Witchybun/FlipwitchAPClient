@@ -52,7 +52,7 @@ namespace FlipwitchAP
         [HarmonyPatch(typeof(GachaSceneManager), "loadMachine")]
         [HarmonyPostfix]
         private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection, 
-        ref int ___ballsRemaining, ref List<int> ___remainingGachaIndexes)
+        ref int ___ballsRemaining, ref List<int> ___remainingGachasIndexes)
         {
             if (!ArchipelagoClient.ServerData.GachaOn)
             {
@@ -71,7 +71,7 @@ namespace FlipwitchAP
                 var currentGachaName = thisCollection.ToString();
                 var currentGachaState = SwitchDatabase.instance.getInt(currentGachaName);
                 var initialBalls = gachaCollection.gachas.Count;
-                ___remainingGachaIndexes = currentGachaList;
+                ___remainingGachasIndexes = currentGachaList;
                 __instance.sticker.sprite = gachaCollection.gachaSticker;
 
                 ___ballsRemaining = initialBalls - currentGachaState;
