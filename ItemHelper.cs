@@ -7,6 +7,7 @@ using System.Reflection;
 using Archipelago.MultiClient.Net.Enums;
 using System;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace FlipwitchAP
 {
@@ -38,30 +39,35 @@ namespace FlipwitchAP
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAnimalCoin");
                         SwitchDatabase.instance.setInt("APAnimalCoin", currentCount + 1);
+                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Bunny Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APBunnyCoin");
                         SwitchDatabase.instance.setInt("APBunnyCoin", currentCount + 1);
+                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Monster Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APMonsterCoin");
                         SwitchDatabase.instance.setInt("APMonsterCoin", currentCount + 1);
+                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Angel & Demon Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAngelDemonCoin");
                         SwitchDatabase.instance.setInt("APAngelDemonCoin", currentCount + 1);
+                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Promotional Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APPromotionalCoin");
                         SwitchDatabase.instance.setInt("APPromotionalCoin", currentCount + 1);
+                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Woods Crystal Blockade Removal":
@@ -126,7 +132,7 @@ namespace FlipwitchAP
                     }
                 case "Loose Change":
                     {
-                        var random = new Random(ArchipelagoClient.ServerData.Seed + DateTime.Now.Millisecond);
+                        var random = new System.Random(ArchipelagoClient.ServerData.Seed + DateTime.Now.Millisecond);
                         var amount = random.Next(20, 200);
                         SwitchDatabase.instance.addToCoinCoint(amount);
                         return;
