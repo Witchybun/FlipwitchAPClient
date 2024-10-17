@@ -276,6 +276,15 @@ namespace FlipwitchAP
                         purpleOrangeBouncy.gameObject.GetComponent<BouncyHoney>().force = 55;
                         return;
                     }
+                case "Tengoku_Final":
+                    {
+                        var world = GameObject.Find("World").transform.Find("Tengoku");
+                        var freeBouncy = world.Find("4_CloudUp").Find("LevelData").Find("Bouncy_Honey (2)");
+                        var extraCloudBouncy = GameObject.Instantiate(freeBouncy);
+                        extraCloudBouncy.transform.parent = world.Find("4_CloudUp").Find("LevelData");
+                        extraCloudBouncy.transform.position = new Vector3(23.0589f, 203.6128f, 0f);
+                        return;
+                    }
                 case "FungalForest_Main":
                     {
                         var world = GameObject.Find("World").transform;
