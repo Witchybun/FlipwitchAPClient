@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
@@ -50,7 +51,8 @@ namespace FlipwitchAP
         // Code for loading machine based on archipelago-based rolls, not what you actually have.
         [HarmonyPatch(typeof(GachaSceneManager), "loadMachine")]
         [HarmonyPostfix]
-        private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection)
+        private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection, 
+        ref int ___ballsRemaining, ref List<int> ___remainingGachaIndexes)
         {
             if (!ArchipelagoClient.ServerData.GachaOn)
             {
@@ -68,21 +70,12 @@ namespace FlipwitchAP
                 var thisCollection = collection;
                 var currentGachaName = thisCollection.ToString();
                 var currentGachaState = SwitchDatabase.instance.getInt(currentGachaName);
-                var removeBalls = 0;
-                for (var k = 0; k < currentGachaState; k++)
-                {
-                    removeBalls += 1;
-                    currentGachaList.RemoveAt(0);
-                }
                 var initialBalls = gachaCollection.gachas.Count;
-                __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, initialBalls);
-                __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, new List<int>());
+                ___remainingGachaIndexes = currentGachaList;
                 __instance.sticker.sprite = gachaCollection.gachaSticker;
 
-
-                __instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).SetValue(__instance, currentGachaList);
-                var ballsRemaining = initialBalls - removeBalls;
-                __instance.gachaMachineAnim.SetInteger("BallCount", ballsRemaining);
+                ___ballsRemaining = initialBalls - currentGachaState;
+                __instance.gachaMachineAnim.SetInteger("BallCount", ___ballsRemaining);
                 __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
             }
         }
@@ -90,33 +83,39 @@ namespace FlipwitchAP
         // Code for patching the gacha obtaining system
         [HarmonyPatch(typeof(GachaSceneManager), "ejectGacha")]
         [HarmonyPrefix]
-        private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance)
+        private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance, ref GachaCollections ___currentCollection, 
+        ref int ___ballsRemaining)
         {
             if (!ArchipelagoClient.ServerData.GachaOn)
             {
                 return true;
             }
-            var ballsRemaining = (int)__instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).GetValue(__instance) - 1;
-            __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, ballsRemaining--);
-            if (ballsRemaining < 0)
+            Plugin.Logger.LogInfo($"Balls Remaining: {___ballsRemaining}");
+            ___ballsRemaining--;
+            if (___ballsRemaining < 0)
             {
-                __instance.GetType().GetField("ballsRemaining", GenericMethods.Flags).SetValue(__instance, 0);
+                Plugin.Logger.LogInfo("It was negative, setting to zero.");
+                ___ballsRemaining = 0;
             }
             var ballCountAnimParam = (string)__instance.GetType().GetField("ballCountAnimParam", GenericMethods.Flags).GetValue(__instance);
-            __instance.gachaMachineAnim.SetInteger(ballCountAnimParam, ballsRemaining);
-            var remainingGachasIndexes = (List<int>)__instance.GetType().GetField("remainingGachasIndexes", GenericMethods.Flags).GetValue(__instance);
-            var currentCollection = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
-            var chosenGachaName = currentCollection.ToString();
-            var currentGachaState = SwitchDatabase.instance.getInt(chosenGachaName);
+            Plugin.Logger.LogInfo($"BallCountAnimParam: {ballCountAnimParam}");
+            Plugin.Logger.LogInfo($"Setting gacha machine anim {ballCountAnimParam} to {___ballsRemaining}");
+            __instance.gachaMachineAnim.SetInteger(ballCountAnimParam, ___ballsRemaining);
+            Plugin.Logger.LogInfo($"Current Collection: {___currentCollection.ToString()}");
+            var chosenGachaName = ___currentCollection.ToString();
+            var currentGachaState = SwitchDatabase.instance.getInt("AP" + chosenGachaName);
+            Plugin.Logger.LogInfo($"Current Gacha State: {currentGachaState}");
             int randomIndex = currentGachaState;
             var closeGachaMethod = __instance.GetType().GetMethod("closeGachaScreen", GenericMethods.Flags);
             foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
             {
-                if (gachaCollection.collection == currentCollection)
+                if (gachaCollection.collection == ___currentCollection)
                 {
-                    var PickedGachaList = ObtainRandomOrderList(currentCollection);
-                    Plugin.Logger.LogInfo($"Chose {PickedGachaList.ToString()} with size {PickedGachaList.Count}");
-                    int index = PickedGachaList[randomIndex] - 1;
+                    var PickedGachaList = ObtainRandomOrderList(___currentCollection);
+                    var elementsInList = string.Join(", ", PickedGachaList);
+                    Plugin.Logger.LogInfo($"Chose {elementsInList} with size {PickedGachaList.Count}");
+                    int index = PickedGachaList.ElementAt(randomIndex);
+                    index -= 1;
                     Plugin.Logger.LogInfo($"From {randomIndex}, we pull {index}");
                     var chosenGacha = gachaCollection.gachas[index];
                     Plugin.Logger.LogInfo($"This gets us {chosenGacha.animationName}");
@@ -125,11 +124,12 @@ namespace FlipwitchAP
                     var animation = gachaCollection.gachas[index].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
                     LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
-                    SwitchDatabase.instance.setInt(chosenGachaName, currentGachaState + 1);
+                    SwitchDatabase.instance.setInt("AP" + chosenGachaName, currentGachaState + 1);
+                    __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
                     return false;
                 }
             }
-            Plugin.Logger.LogError($"Unable to find a matching gacha collection for {currentCollection}.");
+            Plugin.Logger.LogError($"Unable to find a matching gacha collection for {___currentCollection}.");
             SwitchDatabase.instance.addTokenToTokenCount(1);
             closeGachaMethod.Invoke(__instance, null);
             return false;
@@ -138,7 +138,7 @@ namespace FlipwitchAP
         //Update the update...eugh.
         [HarmonyPatch(typeof(GachaSceneManager), "Update")]
         [HarmonyPrefix]
-        private static bool Update_AlterGachaBasedOnNewCoinSystem(GachaSceneManager __instance)
+        private static bool Update_AlterGachaBasedOnNewCoinSystem(GachaSceneManager __instance, ref float ___closePrizeCooldown)
         {
             switch (apPhase)
             {
@@ -162,6 +162,7 @@ namespace FlipwitchAP
                             if (!SwitchDatabase.instance.DEBUG_infiniteGachaCoins)
                             {
                                 RemoveTokenGivenCollection(currentCollection);
+                                SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                             }
                             var updateTokenDisplay = __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags);
                             updateTokenDisplay.Invoke(__instance, null);
@@ -193,17 +194,15 @@ namespace FlipwitchAP
                     }
                     break;
                 case GachaPhase.PRIZE_OPENING:
-                    var closePrizeCooldown = (float)__instance.GetType().GetField("closePrizeCooldown", GenericMethods.Flags).GetValue(__instance);
-                    if (closePrizeCooldown > 0f)
+                    if (___closePrizeCooldown > 0f)
                     {
-                        closePrizeCooldown -= Time.unscaledDeltaTime;
-                        if (!(closePrizeCooldown > 0f))
+                        ___closePrizeCooldown -= Time.unscaledDeltaTime;
+                        if (!(___closePrizeCooldown > 0f))
                         {
-                            closePrizeCooldown = 0f;
+                            ___closePrizeCooldown = 0f;
                             apPhase = GachaPhase.INPUT_CLOSE_PRIZE;
                         }
                     }
-                    __instance.GetType().GetField("closePrizeCooldown", GenericMethods.Flags).SetValue(__instance, closePrizeCooldown);
                     break;
                 case GachaPhase.INPUT_CLOSE_PRIZE:
                     if (NewInputManager.instance.anyKeyPressed())
@@ -223,28 +222,101 @@ namespace FlipwitchAP
             return false;
         }
 
+        [HarmonyPatch(typeof(KeyItemScreen), "initialiseDisplay")]
+        [HarmonyPostfix]
+        private static void InitializeDisplay_WriteSpecialGachaInstead(KeyItemScreen __instance)
+        {
+            var animalCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAnimalCoin"));
+            var bunnyCount = GetStringFromInt(SwitchDatabase.instance.getInt("APBunnyCoin"));
+            var monsterCount = GetStringFromInt(SwitchDatabase.instance.getInt("APMonsterCoin"));
+            var angelCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAngelDemonCoin"));
+            var promotionCount = GetStringFromInt(SwitchDatabase.instance.getInt("APPromotionalCoin"));
+            var constructedString = animalCount + bunnyCount + monsterCount + angelCount + promotionCount;
+            __instance.gachaCoinCount.text = constructedString;
+        }
+
+        [HarmonyPatch(typeof(SwitchDatabase), "refreshGachaTokenCount")]
+        [HarmonyPostfix]
+        private static void RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase __instance)
+        {
+            var animalCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAnimalCoin"));
+            var bunnyCount = GetStringFromInt(SwitchDatabase.instance.getInt("APBunnyCoin"));
+            var monsterCount = GetStringFromInt(SwitchDatabase.instance.getInt("APMonsterCoin"));
+            var angelCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAngelDemonCoin"));
+            var promotionCount = GetStringFromInt(SwitchDatabase.instance.getInt("APPromotionalCoin"));
+            var constructedString = animalCount + bunnyCount + monsterCount + angelCount + promotionCount;
+            __instance.gachaToken_text.text = constructedString;
+        }
+
+        private static string GetStringFromInt(int count)
+        {
+            if (count > 9)
+            {
+                return "A";
+            }
+            if (count < 1)
+            {
+                return "-";
+            }
+            return count.ToString();
+        }
+
         private static List<int> ObtainRandomOrderList(GachaCollections currentCollection)
         {
             switch (currentCollection)
             {
                 case GachaCollections.AnimalGirls:
                     {
-                        return ArchipelagoClient.ServerData.AnimalGachaOrder;
+                        var gachaOrder = ArchipelagoClient.ServerData.AnimalGachaOrder;
+                        if (gachaOrder.Count < 10 || gachaOrder.Contains(0))
+                        {
+                            ArchipelagoClient.ServerData.RegenerateGachaOrder();
+                            gachaOrder = ArchipelagoClient.ServerData.AnimalGachaOrder;
+                        }
+                        return gachaOrder;
                     }
                 case GachaCollections.Bunnys:
                     {
-                        return ArchipelagoClient.ServerData.AnimalGachaOrder;
+                        var gachaOrder = ArchipelagoClient.ServerData.BunnyGachaOrder;
+                        if (gachaOrder.Count < 10 || gachaOrder.Contains(0))
+                        {
+                            ArchipelagoClient.ServerData.RegenerateGachaOrder();
+                            gachaOrder = ArchipelagoClient.ServerData.BunnyGachaOrder;
+                        }
+                        return gachaOrder;
                     }
                 case GachaCollections.Monsters:
                     {
-                        return ArchipelagoClient.ServerData.MonsterGachaOrder;
+                        var gachaOrder = ArchipelagoClient.ServerData.MonsterGachaOrder;
+                        if (gachaOrder.Count < 10 || gachaOrder.Contains(0))
+                        {
+                            ArchipelagoClient.ServerData.RegenerateGachaOrder();
+                            gachaOrder = ArchipelagoClient.ServerData.MonsterGachaOrder;
+                        }
+                        return gachaOrder;
                     }
                 case GachaCollections.AngelsAndDemons:
                     {
-                        return ArchipelagoClient.ServerData.AngelGachaOrder;
+                        var gachaOrder = ArchipelagoClient.ServerData.AngelGachaOrder;
+                        if (gachaOrder.Count < 10 || gachaOrder.Contains(0))
+                        {
+                            ArchipelagoClient.ServerData.RegenerateGachaOrder();
+                            gachaOrder = ArchipelagoClient.ServerData.AngelGachaOrder;
+                        }
+                        return gachaOrder;
+                    }
+                case GachaCollections.Promotion:
+                    {
+                        var gachaOrder = new List<int>() { 1 };
+                        if (gachaOrder.Count < 1 || gachaOrder.Contains(0))
+                        {
+                            ArchipelagoClient.ServerData.RegenerateGachaOrder();
+                            gachaOrder = new List<int>() { 1 };
+                        }
+                        return gachaOrder;
                     }
             }
-            return new List<int>() { 0 };
+            throw new ArgumentOutOfRangeException();
         }
 
         private static string ObtainCoinName(GachaCollections currentCollection)
@@ -297,7 +369,6 @@ namespace FlipwitchAP
 
         private static void RemoveTokenGivenCollection(GachaCollections collection)
         {
-            Plugin.Logger.LogInfo($"Removing coin from {collection.ToString()}");
             switch (collection)
             {
                 case GachaCollections.AnimalGirls:
