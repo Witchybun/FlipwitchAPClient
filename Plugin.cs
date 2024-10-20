@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BepInEx;
@@ -84,6 +84,13 @@ public class Plugin : BaseUnityPlugin
             ArchipelagoClient.Cleanup();
             ArchipelagoClient.ServerData.Index = 0;
             ArchipelagoClient.ServerData.CheckedLocations = new();
+        }
+        else
+        {
+            if (GenericInformation.SceneToAreaName.TryGetValue(scene.name, out var trueName))
+            {
+                ArchipelagoClient.SendCurrentScene(trueName);
+            }
         }
     }
 

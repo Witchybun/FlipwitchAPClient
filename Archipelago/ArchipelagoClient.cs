@@ -356,6 +356,11 @@ public class ArchipelagoClient
         return session.Locations.AllLocationsChecked.ToList();
     }
 
+    public void SendCurrentScene(string sceneName)
+    {
+        session.DataStorage["FlipwitchZone"] = sceneName;
+    }
+
     public void ReceiveViolation()
     {
         DeathLinkHandler.KillPlayer();
