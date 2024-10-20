@@ -140,11 +140,14 @@ namespace FlipwitchAP
             return false;
         }
 
-        [HarmonyPatch(typeof(Cutscene), "endCutscene")]
+        [HarmonyPatch(typeof(Cutscene), "startCutscene")]
         [HarmonyPostfix]
         private static void EndCutscene_AddExtraEffects(ref CutsceneMetaData ___currentData)
         {
-            Plugin.Logger.LogInfo($"This cutscene was {___currentData.cutsceneUnlockedID}");
+            if (___currentData.cutsceneUnlockedID.Contains("GameOver_"))
+            {
+                Plugin.ArchipelagoClient.KillEveryone();
+            }
         }
 
         public static void SyncItemsOnLoad()

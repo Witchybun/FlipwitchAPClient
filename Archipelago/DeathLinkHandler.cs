@@ -103,10 +103,11 @@ public class DeathLinkHandler
 
             Plugin.Logger.LogMessage("sharing your death...");
 
-            var cause = $"fucked violently";
+            var cause = $"{slotName} was caught by the Chaos Witch and was fucked violently.";
             var linkToSend = new DeathLink(slotName, cause);
 
             service.SendDeathLink(linkToSend);
+            
         }
         catch (Exception e)
         {
