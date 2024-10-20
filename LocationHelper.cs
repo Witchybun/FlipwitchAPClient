@@ -297,7 +297,7 @@ namespace FlipwitchAP
                 if (playerWandLocationCount == 1)
                 {
                     SendLocationGivenLocationDataSendingGift(secondWandLocation);
-                    __instance.setInt("APPlayerWand", playerWandLocationCount + 1);
+                    __instance.setInt("APPlayerWand", 2);
                 }
                 playerWandLocationCount = __instance.getInt("APPlayerWand");
                 var firstWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
@@ -332,6 +332,18 @@ namespace FlipwitchAP
             __instance.setInt("PendingPeachCharges", 0);
             __instance.upgradePendingPopup.updatePendingPopupSymbol();
             return false;
+        }
+
+        [HarmonyPatch(typeof(SwitchDatabase), "setInt")]
+        [HarmonyPostfix]
+        private static void SetInt_AlsoSendLocationForGoblinQueen(string intName, int value)
+        {
+            if (intName == "GoblinBossDefeated" && value != 0)
+            {
+                var location = CutsceneLocations[intName];
+                SendLocationGivenLocationDataSendingGift(location);
+                CreateItemNotification(location, null);
+            }
         }
 
         public static void SendLocationGivenLocationDataSendingGift(LocationData locationData)
