@@ -100,7 +100,7 @@ namespace FlipwitchAP
                 case "Peachy Peach Upgrade":
                     {
                         var newUpgradeAmount = Math.Min(2, SwitchDatabase.instance.getInt("HealStrengthLevel") + 1);
-                        SwitchDatabase.instance.setInt("HealStrengthUpgrade", newUpgradeAmount);
+                        SwitchDatabase.instance.setInt("HealStrengthLevel", newUpgradeAmount);
                         return;
                     }
                 case "Health Upgrade":
@@ -115,18 +115,18 @@ namespace FlipwitchAP
                     }
                 case "Wand Upgrade":
                     {
-                        var currentLevel = SwitchDatabase.instance.getInt("playerWandLevel");
-                        if (currentLevel == 0)
+                        var currentReceivedCount = SwitchDatabase.instance.getInt("APReceivedWands");
+                        if (currentReceivedCount == 0)
                         {
                             SwitchDatabase.instance.setInt("playerWandLevel", 1);
                             SwitchDatabase.instance.playerMov.refreshWandLevel();
-                            SwitchDatabase.instance.setInt("APPlayerWand", 1);
+                            SwitchDatabase.instance.setInt("APReceivedWands", 1);
                         }
-                        else if (currentLevel == 1)
+                        else if (currentReceivedCount == 1)
                         {
                             SwitchDatabase.instance.setInt("playerWandLevel", 2);
                             SwitchDatabase.instance.playerMov.refreshWandLevel();
-                            SwitchDatabase.instance.setInt("APPlayerWand", 2);
+                            SwitchDatabase.instance.setInt("APReceivedWands", 2);
                         }
                         return;
                     }
