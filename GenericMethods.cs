@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -109,10 +110,8 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static void InflictDamage_ReduceDamageBasedOnBarrier(ref int damage, Transform enemy)
         {
-            for (var i = 0; i < SwitchDatabase.instance.getInt("APBarrier"); i++)
-            {
-                damage /= 2;
-            }
+            var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
+            damage -=  amount*damage/4;
         }
 
         [HarmonyPatch(typeof(Cutscene), "calculateUnlockedRewards")]
@@ -139,6 +138,13 @@ namespace FlipwitchAP
             }
             SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
             return false;
+        }
+
+        [HarmonyPatch(typeof(Cutscene), "endCutscene")]
+        [HarmonyPostfix]
+        private static void EndCutscene_AddExtraEffects(ref CutsceneMetaData ___currentData)
+        {
+            Plugin.Logger.LogInfo($"This cutscene was {___currentData.cutsceneUnlockedID}");
         }
 
         public static void SyncItemsOnLoad()
