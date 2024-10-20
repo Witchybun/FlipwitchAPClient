@@ -89,7 +89,7 @@ namespace FlipwitchAP
                             ints["PeachGiven"] += 1;
                             SwitchDatabase.instance.GetType().GetField("ints", GenericMethods.Flags).SetValue(SwitchDatabase.instance, ints);
                             SwitchDatabase.instance.updatePeachyPeachUI();
-                            SwitchDatabase.instance.givePlayerItem("PeachyPeach", false);
+                            SwitchDatabase.instance.givePlayerItem("PeachyPeach", true);
                             return;
                         }
                         var peachCharges = (int)SwitchDatabase.instance.GetType().GetField("playerPeachCharges", GenericMethods.Flags).GetValue(SwitchDatabase.instance);
@@ -210,7 +210,7 @@ namespace FlipwitchAP
                     return;
                 }
                 SwitchDatabase.instance.setInt("APChaosKeyCount", count + 1);
-                SwitchDatabase.instance.givePlayerItem("ChaosKey" + (count + 1).ToString());
+                SwitchDatabase.instance.givePlayerItem("ChaosKey" + (count + 1).ToString(), true);
                 return;
             }
             else if (name == "Soul Fragment")
@@ -264,7 +264,7 @@ namespace FlipwitchAP
             }
             if (FlipwitchItems.APItemToGameName.TryGetValue(name, out var trueName))
             {
-                SwitchDatabase.instance.givePlayerItem(trueName, skipPopup);
+                SwitchDatabase.instance.givePlayerItem(trueName, true);
                 return;
             }
             Plugin.Logger.LogError($"Item {name} was not caught by any of the cases.  Doing nothing.");
