@@ -156,13 +156,14 @@ public class ArchipelagoData
     private static List<int> ProcessGachaList(List<string> givenList)
     {
         var numList = new List<int>();
+        var name = givenList[0].Split('#')[0];
         foreach (var gacha in givenList)
         {
             var num = int.Parse(gacha.Split('#')[1]);
             numList.Add(num);
         }
         var listedItems = string.Join(", ", numList);
-        Plugin.Logger.LogInfo(listedItems);
+        Plugin.Logger.LogInfo($"{name}: {listedItems}");
         return numList;
     }
 
