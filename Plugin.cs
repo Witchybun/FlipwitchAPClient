@@ -1,9 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BepInEx;
 using BepInEx.Logging;
 using FlipwitchAP.Archipelago;
+using FlipwitchAP.Data;
 using FlipwitchAP.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.1.7";
+    public const string PluginVersion = "0.1.10";
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
@@ -62,7 +63,7 @@ public class Plugin : BaseUnityPlugin
             ArchipelagoClient.ReceiveViolation();
             GenericMethods.HandleReceivedItems();
         }
-        if (SwitchDatabase.instance.dialogueManager.cutsceneInProgress() && SwitchDatabase.instance.playerMov.isDead())
+        if (SwitchDatabase.instance.playerMov.isDead())
         {
             ArchipelagoClient.KillEveryone();
         }
