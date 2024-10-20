@@ -213,6 +213,11 @@ namespace FlipwitchAP
                             angelGroups[3].itemRequirements.Clear();
                             angelGroups[3].switches.Add(wasGivenAngelLetter);
                         }
+                        if (!angelGroups[4].switches.Any(x => x.switchName == "APDemonGaveLetter"))
+                        {
+                            angelGroups[4].switches.Add(wasGivenAngelLetter);
+                            angelGroups[4].switches.Add(wasGivenDemonLetter);
+                        }
                         return;
                     }
                 case "Bad Boy":
@@ -424,22 +429,24 @@ namespace FlipwitchAP
                             switchValue = 2,
                             comparisonOperator = ComparisonOperators.IS_LESS_THAN
                         };
-                        if (senseiGroups[4].switches.Any(x => x.switchName == "APPlayerWand"))
+                        
+                        if (!senseiGroups[4].switches.Any(x => x.switchName == "APPlayerWand"))
                         {
                             senseiGroups[4].switches[1] = receivedNoWandUpgrade;
                         }
-                        if (senseiGroups[5].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (!senseiGroups[5].switches.Any(x => x.switchName == "APPlayerWand"))
                         {
                             senseiGroups[5].switches[1] = receivedNoWandUpgrade;
                         }
-                        if (senseiGroups[6].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (!senseiGroups[6].switches.Any(x => x.switchName == "APPlayerWand"))
                         {
                             senseiGroups[6].switches[1] = receivedFirstWandNotSecond;
                         }
-                        if (senseiGroups[7].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (!senseiGroups[7].switches.Any(x => x.switchName == "APPlayerWand"))
                         {
                             senseiGroups[7].switches[1] = receivedFirstWandNotSecond;
                         }
+                        
                         // 4 is first wand upgrade but wrong
                         // 5 is first wand upgrade
                         // 6 is second but you're a woman
