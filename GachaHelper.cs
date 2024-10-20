@@ -54,10 +54,6 @@ namespace FlipwitchAP
         private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection, 
         ref int ___ballsRemaining, ref List<int> ___remainingGachasIndexes)
         {
-            if (!ArchipelagoClient.ServerData.GachaOn)
-            {
-                return;
-            }
             apPhase = GachaPhase.INPUT_PAY;
             foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
             {
@@ -86,10 +82,6 @@ namespace FlipwitchAP
         private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance, ref GachaCollections ___currentCollection, 
         ref int ___ballsRemaining)
         {
-            if (!ArchipelagoClient.ServerData.GachaOn)
-            {
-                return true;
-            }
             Plugin.Logger.LogInfo($"Balls Remaining: {___ballsRemaining}");
             ___ballsRemaining--;
             if (___ballsRemaining < 0)
@@ -123,7 +115,10 @@ namespace FlipwitchAP
                     __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
                     var animation = gachaCollection.gachas[index].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
-                    LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
+                    if (ArchipelagoClient.ServerData.GachaOn)
+                    {
+                        LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
+                    }
                     SwitchDatabase.instance.setInt("AP" + chosenGachaName, currentGachaState + 1);
                     __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
                     return false;
