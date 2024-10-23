@@ -237,7 +237,6 @@ public class ArchipelagoClient
 
         var receivedItem = new ReceivedItem(item, helper.Index);
         ItemsToProcess.Enqueue(receivedItem);
-        SaveQueueState();
         Plugin.Logger.LogInfo($"Queued {item.ItemName}.");
         MaxReceivedCount++;
     }
@@ -297,27 +296,9 @@ public class ArchipelagoClient
         return false;
     }
 
-    public void SaveQueueState()
+    public List<ItemInfo> GetAllSentItems()
     {
-        ServerData.StoredQueue = ItemsToProcess;
-    }
-
-    public void LoadQueueState()
-    {
-        ItemsToProcess = ServerData.StoredQueue;
-    }
-
-    public bool IsThereIndexMismatch(out List<ItemInfo> items)
-    {
-        var serverIndex = session.Items.Index;
-        if (serverIndex != ServerData.InitialIndex)
-        {
-            items = session.Items.AllItemsReceived.ToList();
-            GenericMethods.allowingOutsideItems = false;
-            return true;
-        }
-        items = null;
-        return false;
+        return session.Items.AllItemsReceived.ToList();
     }
 
 

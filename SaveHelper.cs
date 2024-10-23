@@ -63,8 +63,7 @@ namespace FlipwitchAP
                 // We may be in a situation where this is a new save.  We should check.
                 GenericMethods.HandleLocationDifference();
                 GenericMethods.HandleReceivedItems();
-                GenericMethods.allowingOutsideItems = false;
-                Plugin.ArchipelagoClient.SaveQueueState();
+                GenericMethods.allowingOutsideItems = true;
             }
         }
 
@@ -72,26 +71,25 @@ namespace FlipwitchAP
         {
             try
             {
-
-                if (ArchipelagoClient.IsInGame)
-                {
-                    return; // Don't keep spam loading in situations it isn't relevant; causes data loss.
-                }
                 Plugin.Logger.LogInfo($"Reading save {Save_Slot}");
                 var dir = Application.absoluteURL + "ArchSaves/";
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
                 }
+                GenericMethods.allowingOutsideItems = false;
                 var loadedSave = GrabSaveDataForSlot(Save_Slot);
                 ArchipelagoClient.ServerData.Index = loadedSave.Index;
                 ArchipelagoClient.ServerData.InitialIndex = loadedSave.Index;
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
+                
                 GenericMethods.HandleLocationDifference();
-                GenericMethods.allowingOutsideItems = false;
-                Plugin.ArchipelagoClient.LoadQueueState();
-                GenericMethods.SyncItemsOnLoad();
+                if (GenericMethods.hasDied)
+                {
+                    GenericMethods.SyncItemsOnLoad();
+                }
+                GenericMethods.allowingOutsideItems = true;
                 return;
 
             }
@@ -109,7 +107,7 @@ namespace FlipwitchAP
             Plugin.Logger.LogInfo($"State of file existence: {File.Exists(savePath)}");
             if (!File.Exists(savePath))
             {
-                Plugin.Logger.LogInfo($"Save Data: Index 0 | Seed: -1");
+                Plugin.Logger.LogInfo($"Save Data: Index 1 | Seed: -1");
                 return new APSaveData();
             }
             using StreamReader reader = new StreamReader(savePath);

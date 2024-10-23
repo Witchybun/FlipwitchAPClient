@@ -14,7 +14,6 @@ public class ArchipelagoData
     public string Password;
     public int Index;
     public int InitialIndex;
-    public Queue<ReceivedItem> StoredQueue = new();
     public List<long> CheckedLocations;
 
     private string CLIENT_KEY = "client_version";
@@ -75,7 +74,6 @@ public class ArchipelagoData
         MonsterGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(monsterOrderData));
         var angelOrderData = GetSlotSetting(ANGEL_KEY, "");
         AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
-        StoredQueue = ArchipelagoClient.ItemsToProcess;
     }
 
     // Why...?

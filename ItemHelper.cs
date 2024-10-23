@@ -22,6 +22,9 @@ namespace FlipwitchAP
 
         public static void GiveFlipwitchItem(string name, bool skipPopup = false)
         {
+            var switchName = $"AP" + name.Replace(" ", "") + "ItemCount";
+            var currentValue = SwitchDatabase.instance.getInt(switchName);
+            SwitchDatabase.instance.setInt(switchName, currentValue + 1);
             switch (name)
             {
                 case "Nothing":

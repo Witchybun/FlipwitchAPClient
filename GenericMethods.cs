@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
@@ -155,13 +156,25 @@ namespace FlipwitchAP
 
         public static void SyncItemsOnLoad()
         {
-            if (Plugin.ArchipelagoClient.IsThereIndexMismatch(out var items))
-            {
-                allowingOutsideItems = false;
-                HandleMissingItems(items);
-            }
-            allowingOutsideItems = true;
+            var items = Plugin.ArchipelagoClient.GetAllSentItems();
+            HandleMissingItems(items);
+            hasDied = false;
         }
+
+        private static void PlaySoundBasedOnClassification(ItemFlags flags)
+    {
+        var playerObject = SwitchDatabase.instance.playerMov.gameObject;
+        if (flags.HasFlag(ItemFlags.Trap))
+        {
+            AkSoundEngine.PostEvent("boss_crystal_fall", playerObject);
+            return;
+        }
+        else if (flags.HasFlag(ItemFlags.Advancement))
+        {
+            AkSoundEngine.PostEvent("purchase", playerObject);
+            return;
+        }
+    }
 
         public static void HandleReceivedItems()
         {
@@ -186,6 +199,10 @@ namespace FlipwitchAP
                 {
                     continue;
                 }
+                if (item.PlayerName != ArchipelagoClient.ServerData.SlotName)
+                {
+                    PlaySoundBasedOnClassification(item.Classification); 
+                }
                 ItemHelper.GiveFlipwitchItem(item);
                 ArchipelagoClient.ServerData.Index++;
             }
@@ -193,17 +210,27 @@ namespace FlipwitchAP
 
         public static void HandleMissingItems(List<ItemInfo> items)
         {
-            var num = 0;
+            var switchDictionary = new Dictionary<string, int>();
             foreach (var item in items)
             {
-                num++;
-                if (num < ArchipelagoClient.ServerData.Index)
+                var switchName = "AP" + item.ItemName.Replace(" ", "") + "ItemCount";
+                var currentAmount = SwitchDatabase.instance.getInt(switchName);
+                if (!switchDictionary.ContainsKey(switchName))
                 {
+                    switchDictionary[switchName] = 0;
+                }
+                Plugin.Logger.LogInfo($"{switchDictionary[switchName]} vs {currentAmount}");
+                if (switchDictionary[switchName] < currentAmount)
+                {
+                    switchDictionary[switchName] += 1;
                     continue;
                 }
-                var receivedItem = new ReceivedItem(item, num);
-                ArchipelagoClient.ItemsToProcess.Enqueue(receivedItem);
-                Plugin.Logger.LogInfo($"{item.ItemName} wasn't in the Queue, adding it back.");
+                switchDictionary[switchName] += 1;
+                SwitchDatabase.instance.setInt(switchName, currentAmount + 1);
+                ItemHelper.GiveFlipwitchItem(item.ItemName, false);
+                ArchipelagoClient.ServerData.Index++;
+                Plugin.Logger.LogInfo($"Gave back {item.ItemName}");
+                continue;
             }
         }
 
