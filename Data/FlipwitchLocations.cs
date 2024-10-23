@@ -344,7 +344,7 @@ namespace FlipwitchAP.Data
             CreateLocation(607, "Bunny Club: The Bunny Club", "The Bunny Club", QUEST),  
             CreateLocation(608, "Bunny Club: Find the Silky Slime", "Find the Silky Slime", QUEST),    
             CreateLocation(609, "Milk & Cream: Panty Raid", "Panty Raid", QUEST),  
-            CreateLocation(610, "Unlucky Cat Statue: Unlucky Cat", "Unlucky Cat", QUEST), 
+            CreateLocation(610, "Unlucky Cat Statue: Unlucky Cat Statue", "Unlucky Cat Statue", QUEST), 
             CreateLocation(611, "Annahell: Harvest Season", "Harvest Season", QUEST),   
             CreateLocation(612, "Gabrielle: Long Distance Relationship", "Long Distance Relationship", QUEST), 
             CreateLocation(613, "Natasha: Summoning Stones", "Summoning Stones", QUEST),  
@@ -488,6 +488,14 @@ namespace FlipwitchAP.Data
 
         public static readonly List<string> UpdateWhitelist = new(){
             "GoblinModelLuggage", "SoulFragment1", "SoulFragment2", "SoulFragment3", "SummonStone1", "SummonStone2", "SummonStone3"
+        };
+
+        public static readonly List<string> CatStatueLocations = new(){
+            "CD: Cat Shrine", "JG: Nearby Cat Shrine", "JG: Northern Cat Shrine"
+        };
+
+        public static readonly List<string> SummongStoneLocations = new(){
+            "SC: Silky Slime Summoning Stone", "SC: Secret Room Past Spring Summoning Stone", "SC: Slurp Summoning Stone"
         };
     }
 }

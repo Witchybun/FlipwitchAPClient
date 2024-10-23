@@ -169,6 +169,16 @@ namespace FlipwitchAP
                 {
                     SwitchDatabase.instance.setInt("APExGaveLuggage", 1);
                 }
+                if (FlipwitchLocations.CatStatueLocations.Contains(location.APLocationName))
+                {
+                    var kittyCount = SwitchDatabase.instance.getInt("APCatStatueCount");
+                    SwitchDatabase.instance.setInt("APCatStatueCount", kittyCount + 1);
+                }
+                if (FlipwitchLocations.SummongStoneLocations.Contains(location.APLocationName))
+                {
+                    var summonStoneCount = SwitchDatabase.instance.getInt("APSummonStoneCount");
+                    SwitchDatabase.instance.setInt("APSummonStoneCount", summonStoneCount + 1);
+                }
                 return false;
             }
             return true;

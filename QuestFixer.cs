@@ -393,7 +393,6 @@ namespace FlipwitchAP
                         {
                             goblianaGroups[4].itemRequirements.Clear();
                             goblianaGroups[4].switches.Add(wasNotGivenKey);
-                            goblianaGroups[4].switches.Add(wasNotGivenLuggage);
                         }
                         if (goblianaGroups[5].itemRequirements.Any())
                         {
@@ -451,6 +450,36 @@ namespace FlipwitchAP
                         // 5 is first wand upgrade
                         // 6 is second but you're a woman
                         // 7 is second but you're a man
+                        return;
+                    }
+                case "Lucky Cat Dialogue":
+                    {
+                        var receivedSouls = new NPCDialogueAdvanced.SwitchRequirement()
+                        {
+                            switchName = "APCatStatueCount",
+                            switchValue = 2,
+                            comparisonOperator = ComparisonOperators.IS_MORE_THAN
+                        };
+                        var catGroups = __instance.dialogueGroups;
+                        if (!catGroups[1].switches.Any(x => x.switchName == "APCatStatueCount"))
+                        {
+                            catGroups[1].switches.Add(receivedSouls);
+                        }
+                        return;
+                    }
+                case "Philosopher's Stone Dialogue":
+                    {
+                        var receivedStones = new NPCDialogueAdvanced.SwitchRequirement()
+                        {
+                            switchName = "APSummonStoneCount",
+                            switchValue = 2,
+                            comparisonOperator = ComparisonOperators.IS_MORE_THAN
+                        };
+                        var stoneGroups = __instance.dialogueGroups;
+                        if (!stoneGroups[1].switches.Any(x => x.switchName == "APSummonStoneCount"))
+                        {
+                            stoneGroups[1].switches.Add(receivedStones);
+                        }
                         return;
                     }
             }
