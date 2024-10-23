@@ -332,16 +332,24 @@ namespace FlipwitchAP
             var totalChargesObtained = __instance.getInt("APTotalPeachCharges");
             var newChargeCount = Math.Min(10, pendingPeachCharges + totalChargesObtained);
             __instance.setInt("APTotalPeachCharges", newChargeCount);
-            for (var i = 0; i <= totalChargesObtained; i++)
+
+            SendPeachyLocations(__instance.getInt("SexualExperienceCount"));
+
+            __instance.setInt("PendingPeachCharges", 0);
+            __instance.upgradePendingPopup.updatePendingPopupSymbol();
+            return false;
+        }
+
+        private static void SendPeachyLocations(int sexExperience)
+        {
+            var totalCharges = sexExperience / 4;
+            for (var i = 0; i < totalCharges; i++)
             {
                 var pickedLocationName = $"WW: Sexual Experience Reward - Peach Charge {i + 1}";
                 var pickedLocation = SexExperienceLocations[pickedLocationName];
                 SendLocationGivenLocationDataSendingGift(pickedLocation);
             }
-
-            __instance.setInt("PendingPeachCharges", 0);
-            __instance.upgradePendingPopup.updatePendingPopupSymbol();
-            return false;
+            
         }
 
         [HarmonyPatch(typeof(SwitchDatabase), "setInt")]
