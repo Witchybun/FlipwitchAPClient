@@ -113,7 +113,7 @@ namespace FlipwitchAP
         private static void InflictDamage_ReduceDamageBasedOnBarrier(ref int damage, Transform enemy)
         {
             var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
-            damage -=  amount*damage/4;
+            damage -= amount * damage / 4;
         }
 
         [HarmonyPatch(typeof(Cutscene), "calculateUnlockedRewards")]
