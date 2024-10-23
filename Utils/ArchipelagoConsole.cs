@@ -80,60 +80,6 @@ public static class ArchipelagoConsole
         }
     }
 
-    public static void CreateArchipelagoMenu()
-    {
-        if (SceneManager.GetActiveScene().name != "MainMenu")
-        {
-            return;
-        }
-        var mainMenuUi = GameObject.Find("MainMenuUi");
-        ArchipelagoMenu.transform.parent = mainMenuUi.transform;
-        var mainMenu = mainMenuUi.transform.Find("Menu").Find("SettingsMenu");
-        ArchipelagoMenu = GameObject.Instantiate(mainMenu.gameObject);
-        ArchipelagoMenu.name = "ArchipelagoMenu";
-        GameObject.Destroy(ArchipelagoMenu.GetComponent<SettingsMenu>());
-        GameObject.Destroy(ArchipelagoMenu.transform.Find("ControlsPanel"));
-        ArchipelagoMenu.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = "Archipelago";
-        ArchipelagoMenu.transform.Find("OptionsPanel").name = "ArchipelagoPanel";
-        var host = ArchipelagoMenu.transform.Find("ArchipelagoPanel").Find("MasterRow");
-        CreateInputField(host, "Host", "ScrollArea", "HostInput", "localhost:38281");
-        var slot = ArchipelagoMenu.transform.Find("ArchipelagoPanel").Find("MusicRow");
-        CreateInputField(slot, "Slot", "ScrollArea", "SlotInput", "Player1");
-        var password = ArchipelagoMenu.transform.Find("ArchipelagoPanel").Find("AmbienceRow");
-        CreateInputField(password, "Password", "ScrollArea", "PasswordInput", "");
-        
-
-    }
-
-    private static void CreateInputField(Transform mainTransform, string mainName,  string transformToFind, string transformedTitle, string placeholderText)
-    {
-        mainTransform.name = mainName + "Row";
-        mainTransform.Find("Name").Find("Text").GetComponent<TextMeshProUGUI>().text = mainName;
-        var transformToTransform = mainTransform.Find(transformToFind);
-        transformToTransform.name = transformedTitle;
-        foreach (Transform child in transformToTransform)
-        {
-            GameObject.Destroy(child);
-        }
-        transformToTransform.gameObject.AddComponent<TMP_InputField>();
-        transformToTransform.gameObject.AddComponent<TextMeshProUGUI>();
-
-        var hostInput = transformToTransform.GetComponent<TMP_InputField>();
-        hostInput.caretColor = new Color (1f, 1f, 1f, 1f);
-        Plugin.Logger.LogInfo($"State of nullity: {mainTransform.Find("Name").Find("Text").GetComponent<TextMeshProUGUI>().font is null}");
-        hostInput.SetGlobalFontAsset(mainTransform.Find("Name").Find("Text").GetComponent<TextMeshProUGUI>().font);
-        hostInput.textViewport = transformToTransform.GetComponent<RectTransform>();
-        hostInput.textComponent = transformToTransform.GetComponent<TextMeshProUGUI>();
-
-        var placeholder = new GameObject();
-        placeholder.transform.position = transformToTransform.position;
-        placeholder.transform.parent = transformToTransform;
-        placeholder.AddComponent<TextMeshProUGUI>();
-        placeholder.AddComponent<RectTransform>();
-        hostInput.placeholder = placeholder.GetComponent<TextMeshProUGUI>();
-        placeholder.GetComponent<TextMeshProUGUI>().text = placeholderText;
-    }
-
     public static void UpdateWindow()
     {
         scrollText = "";
