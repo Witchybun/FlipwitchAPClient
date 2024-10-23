@@ -14,6 +14,7 @@ namespace FlipwitchAP
     public class GenericMethods
     {
         public static bool allowingOutsideItems = true;
+        public static bool hasDied = false;
         public const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
 
         public GenericMethods()
@@ -140,14 +141,16 @@ namespace FlipwitchAP
             return false;
         }
 
-        [HarmonyPatch(typeof(Cutscene), "startCutscene")]
+        [HarmonyPatch(typeof(GameOverManager), "updateAnim")]
         [HarmonyPostfix]
-        private static void EndCutscene_AddExtraEffects(ref CutsceneMetaData ___currentData)
+        private static void EndCutscene_AddExtraEffects()
         {
-            if (___currentData.cutsceneUnlockedID.Contains("GameOver_"))
+            if (ArchipelagoClient.ServerData.DeathLink)
             {
                 Plugin.ArchipelagoClient.KillEveryone();
             }
+            hasDied = true;
+
         }
 
         public static void SyncItemsOnLoad()

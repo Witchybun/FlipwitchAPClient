@@ -23,6 +23,7 @@ public class Plugin : BaseUnityPlugin
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
     public static bool IsMovementDisabled = false;
+    public static int notifCounter = 0;
 
     internal static new ManualLogSource Logger;
     public ItemHelper ItemHelper;
@@ -63,9 +64,17 @@ public class Plugin : BaseUnityPlugin
             ArchipelagoClient.ReceiveViolation();
             GenericMethods.HandleReceivedItems();
         }
-        if (SwitchDatabase.instance.playerMov.isDead())
+        SendMessageOnTimer(30);
+        
+    }
+
+    private void SendMessageOnTimer(int time)
+    {
+        notifCounter += 1;
+        if (notifCounter == time)
         {
-            ArchipelagoClient.KillEveryone();
+            notifCounter = 0;
+            // Use to bugtest.
         }
     }
 
