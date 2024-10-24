@@ -43,7 +43,7 @@ namespace FlipwitchAP
             }
             var savePath = Path.Combine(dir, $"Save{saveSlot}.json");
             Plugin.Logger.LogInfo($"Saving to {savePath}...");
-            var newGameVerification = 0;
+            var newGameVerification = -1;
             if (File.Exists(savePath))
             {
                 using StreamReader reader = new StreamReader(savePath);
@@ -54,7 +54,6 @@ namespace FlipwitchAP
             var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Index, ArchipelagoClient.ServerData.Seed,
             ArchipelagoClient.ServerData.CheckedLocations);
             ArchipelagoClient.ServerData.InitialIndex = ArchipelagoClient.ServerData.Index;
-            Plugin.Logger.LogInfo(newAPSaveData.Seed);
             string json = JsonConvert.SerializeObject(newAPSaveData);
             File.WriteAllText(savePath, json);
             Plugin.Logger.LogInfo("Save complete!");
@@ -63,8 +62,8 @@ namespace FlipwitchAP
                 // We may be in a situation where this is a new save.  We should check.
                 GenericMethods.HandleLocationDifference();
                 GenericMethods.HandleReceivedItems();
-                GenericMethods.allowingOutsideItems = true;
             }
+            GenericMethods.allowingOutsideItems = true;
         }
 
         public static void ReadSave(int Save_Slot)
@@ -107,8 +106,7 @@ namespace FlipwitchAP
             Plugin.Logger.LogInfo($"State of file existence: {File.Exists(savePath)}");
             if (!File.Exists(savePath))
             {
-                Plugin.Logger.LogInfo($"Save Data: Index 1 | Seed: -1");
-                return new APSaveData();
+                return new APSaveData(1, ArchipelagoClient.ServerData.Seed, new List<long>());
             }
             using StreamReader reader = new StreamReader(savePath);
             string text = reader.ReadToEnd();
