@@ -161,21 +161,6 @@ namespace FlipwitchAP
             hasDied = false;
         }
 
-        private static void PlaySoundBasedOnClassification(ItemFlags flags)
-    {
-        var playerObject = SwitchDatabase.instance.playerMov.gameObject;
-        if (flags.HasFlag(ItemFlags.Trap))
-        {
-            AkSoundEngine.PostEvent("boss_crystal_fall", playerObject);
-            return;
-        }
-        else if (flags.HasFlag(ItemFlags.Advancement))
-        {
-            AkSoundEngine.PostEvent("purchase", playerObject);
-            return;
-        }
-    }
-
         public static void HandleReceivedItems()
         {
             if (!allowingOutsideItems)
@@ -198,10 +183,6 @@ namespace FlipwitchAP
                 if (item.Index < ArchipelagoClient.ServerData.Index)
                 {
                     continue;
-                }
-                if (item.PlayerName != ArchipelagoClient.ServerData.SlotName)
-                {
-                    PlaySoundBasedOnClassification(item.Classification); 
                 }
                 ItemHelper.GiveFlipwitchItem(item);
                 ArchipelagoClient.ServerData.Index++;
