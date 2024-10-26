@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FlipwitchAP.Data;
 using Newtonsoft.Json;
@@ -66,7 +66,6 @@ public class ArchipelagoData
         GachaOn = GetSlotSetting(GACHA_KEY, false);
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
-        Plugin.Logger.LogInfo($"We have AnimalGacha with set [{string.Join(", ", AnimalGachaOrder)}]");
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
         BunnyGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(bunnyOrderData));
         var monsterOrderData = GetSlotSetting(MONSTER_KEY, "");
@@ -80,7 +79,6 @@ public class ArchipelagoData
     {
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
-        Plugin.Logger.LogInfo($"We have AnimalGacha with set [{string.Join(", ", AnimalGachaOrder)}]");
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
         BunnyGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(bunnyOrderData));
         var monsterOrderData = GetSlotSetting(MONSTER_KEY, "");
@@ -106,15 +104,6 @@ public class ArchipelagoData
 
     public int GetSlotSetting(string key, int defaultValue)
     {
-        Plugin.Logger.LogInfo($"Do we have {key} in the data?  {slotData.ContainsKey(key)}");
-        if (slotData.ContainsKey(key))
-        {
-            Plugin.Logger.LogInfo($"Value is {(int)(long)slotData[key]}");
-        }
-        else
-        {
-            Plugin.Logger.LogInfo($"Value is zeroed out.");
-        }
         return slotData.ContainsKey(key) ? (int)(long)slotData[key] : GetSlotDefaultValue(key, defaultValue);
     }
 
@@ -153,14 +142,11 @@ public class ArchipelagoData
     private static List<int> ProcessGachaList(List<string> givenList)
     {
         var numList = new List<int>();
-        var name = givenList[0].Split('#')[0];
         foreach (var gacha in givenList)
         {
             var num = int.Parse(gacha.Split('#')[1]);
             numList.Add(num);
         }
-        var listedItems = string.Join(", ", numList);
-        Plugin.Logger.LogInfo($"{name}: {listedItems}");
         return numList;
     }
 
