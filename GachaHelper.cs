@@ -32,10 +32,8 @@ namespace FlipwitchAP
         private static bool UpdateTokenDisplay_DisplayAPCoinCountInstead(GachaSceneManager __instance)
         {
             var currentCollection = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
-            Plugin.Logger.LogInfo(currentCollection);
             var coinName = ObtainCoinName(currentCollection);
             int gachaTokenCount = SwitchDatabase.instance.getInt("AP" + coinName);
-            Plugin.Logger.LogInfo($"{coinName}: {gachaTokenCount}");
             if (gachaTokenCount == 0)
             {
                 __instance.tokenCounter.color = Color.red;
@@ -82,21 +80,15 @@ namespace FlipwitchAP
         private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance, ref GachaCollections ___currentCollection, 
         ref int ___ballsRemaining)
         {
-            Plugin.Logger.LogInfo($"Balls Remaining: {___ballsRemaining}");
             ___ballsRemaining--;
             if (___ballsRemaining < 0)
             {
-                Plugin.Logger.LogInfo("It was negative, setting to zero.");
                 ___ballsRemaining = 0;
             }
             var ballCountAnimParam = (string)__instance.GetType().GetField("ballCountAnimParam", GenericMethods.Flags).GetValue(__instance);
-            Plugin.Logger.LogInfo($"BallCountAnimParam: {ballCountAnimParam}");
-            Plugin.Logger.LogInfo($"Setting gacha machine anim {ballCountAnimParam} to {___ballsRemaining}");
             __instance.gachaMachineAnim.SetInteger(ballCountAnimParam, ___ballsRemaining);
-            Plugin.Logger.LogInfo($"Current Collection: {___currentCollection.ToString()}");
             var chosenGachaName = ___currentCollection.ToString();
             var currentGachaState = SwitchDatabase.instance.getInt("AP" + chosenGachaName);
-            Plugin.Logger.LogInfo($"Current Gacha State: {currentGachaState}");
             int randomIndex = currentGachaState;
             var closeGachaMethod = __instance.GetType().GetMethod("closeGachaScreen", GenericMethods.Flags);
             foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
@@ -105,12 +97,9 @@ namespace FlipwitchAP
                 {
                     var PickedGachaList = ObtainRandomOrderList(___currentCollection);
                     var elementsInList = string.Join(", ", PickedGachaList);
-                    Plugin.Logger.LogInfo($"Chose {elementsInList} with size {PickedGachaList.Count}");
                     int index = PickedGachaList.ElementAt(randomIndex);
                     index -= 1;
-                    Plugin.Logger.LogInfo($"From {randomIndex}, we pull {index}");
                     var chosenGacha = gachaCollection.gachas[index];
-                    Plugin.Logger.LogInfo($"This gets us {chosenGacha.animationName}");
                     SwitchDatabase.instance.setBool($"{gachaCollection.collection}_{chosenGacha.number}", value: true);
                     __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
                     var animation = gachaCollection.gachas[index].animationName;
