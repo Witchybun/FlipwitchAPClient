@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -30,7 +30,6 @@ public class ArchipelagoClient
     public static Queue<ReceivedItem> ItemsToProcess = new();
     public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
     public static bool IsInGame = false;
-    public int MaxReceivedCount = 0;
 
     /// <summary>
     /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
@@ -227,12 +226,8 @@ public class ArchipelagoClient
         // Since we connect before picking a save, Index is always 0.  So this will always pull every item.
         // Once we get to a state where picking the save moves to connecting, we can move to less calls.
         var item = helper.DequeueItem();
-        Plugin.Logger.LogInfo($"Received {item.ItemName} in situation where helper index is {helper.Index} and saved index is {ServerData.Index}");
-
         var receivedItem = new ReceivedItem(item, helper.Index);
         ItemsToProcess.Enqueue(receivedItem);
-        Plugin.Logger.LogInfo($"Queued {item.ItemName}.");
-        MaxReceivedCount++;
     }
 
     /// <summary>
@@ -270,16 +265,7 @@ public class ArchipelagoClient
 
     public bool DetermineOwnerAndDirectlyGiveIfSelf(LocationData location, ArchipelagoItem item)
     {
-        if (item.IsOwnItem) // Handle without an internet connection.
-        {
-            ItemHelper.GiveFlipwitchItem(item.Game, location.APLocationName, item.Name, item.SlotName, item.Classification);
-            ServerData.Index++;
-            if (Authenticated)
-            {
-                session.Locations.CompleteLocationChecks(location.APLocationID);
-            }
-        }
-        else if (Authenticated) // If someone else's item an online, do the usual
+        if (Authenticated) // If someone else's item an online, do the usual
         {
             session.Locations.CompleteLocationChecks(location.APLocationID);
         }
