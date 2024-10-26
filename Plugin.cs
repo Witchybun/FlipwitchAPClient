@@ -1,4 +1,4 @@
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Logging;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
@@ -14,8 +14,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.1.12";
-    public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
+    public const string PluginVersion = "0.1.13";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
