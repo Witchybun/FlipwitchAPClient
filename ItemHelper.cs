@@ -1,13 +1,8 @@
 using FlipwitchAP.Data;
 using FlipwitchAP.Archipelago;
 using HarmonyLib;
-using System.Linq;
 using System.Collections.Generic;
-using System.Reflection;
-using Archipelago.MultiClient.Net.Enums;
 using System;
-using System.Diagnostics;
-using UnityEngine;
 
 namespace FlipwitchAP
 {
@@ -276,14 +271,7 @@ namespace FlipwitchAP
 
         public static void GiveFlipwitchItem(ReceivedItem item)
         {
-            GiveFlipwitchItem(item.Game, item.LocationName, item.ItemName, item.PlayerName, item.Classification);
-        }
-
-        public static void GiveFlipwitchItem(string game, string locationName, string itemName, string slotName, ItemFlags classification)
-        {
-            var isNotReal = FlipwitchItems.SkipPopupItems.Contains(itemName);
-            var skipPopup = isNotReal || slotName == ArchipelagoClient.ServerData.SlotName;
-            GiveFlipwitchItem(itemName, skipPopup);
+            GiveFlipwitchItem(item.ItemName);
         }
 
         private static void CustomGiveItemIfMethodIsOnUpdate(Item item, string itemName)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,17 +7,12 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
-using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using FlipwitchAP.Utils;
 using FlipwitchAP.Data;
-using UnityEngine;
 using static FlipwitchAP.Data.FlipwitchLocations;
 using System.Collections.ObjectModel;
-using BepInEx;
-using Mono.Cecil.Cil;
-using UnityEngine.Analytics;
 
 namespace FlipwitchAP.Archipelago;
 

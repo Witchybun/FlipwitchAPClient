@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using BepInEx;
 using BepInEx.Logging;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using FlipwitchAP.Utils;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace FlipwitchAP
 {
@@ -66,10 +64,8 @@ namespace FlipwitchAP
 
                     var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags).GetValue(__instance);
                     var loadedSave = SaveHelper.GrabSaveDataForSlot(select);
-                    Plugin.Logger.LogInfo($"On {select}, Comparing {loadedSave.Seed} with {ArchipelagoClient.ServerData.Seed}");
                     if (loadedSave.Seed != ArchipelagoClient.ServerData.Seed)
                     {
-                        Plugin.Logger.LogInfo("Test Success");
                         return false;
                     }
                     return true;
@@ -125,7 +121,7 @@ namespace FlipwitchAP
             int @int = SwitchDatabase.instance.getInt("PendingPeachCharges");
             SwitchDatabase.instance.setInt("AppliedAndPendingPeaches", playerPeachChargesCap + num);
             SwitchDatabase.instance.setInt("PendingPeachCharges", num - playerPeachChargesCap);
-            Debug.Log("SexualExperienceCount: " + SwitchDatabase.instance.getInt("SexualExperienceCount"));
+            UnityEngine.Debug.Log("SexualExperienceCount: " + SwitchDatabase.instance.getInt("SexualExperienceCount"));
             if (num >= 2)
             {
                 SwitchDatabase.instance.setInt("PendingWandLevel", 1);
@@ -151,7 +147,6 @@ namespace FlipwitchAP
                 Plugin.ArchipelagoClient.KillEveryone();
             }
             hasDied = true;
-
         }
 
         public static void SyncItemsOnLoad()
@@ -178,8 +173,6 @@ namespace FlipwitchAP
                 // Reflects the old method in OnItemReceived
                 // If we can get a better UI made, this can be toned down some.
                 var item = ArchipelagoClient.ItemsToProcess.Dequeue();
-                Plugin.Logger.LogInfo($"Determining whether or not to give the player {item.ItemName}.");
-                Plugin.Logger.LogInfo($"{item.Index} vs {ArchipelagoClient.ServerData.Index}.");
                 if (item.Index < ArchipelagoClient.ServerData.Index)
                 {
                     continue;

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Archipelago.MultiClient.Net.Enums;
 using FlipwitchAP.Data;
 using Newtonsoft.Json;
 

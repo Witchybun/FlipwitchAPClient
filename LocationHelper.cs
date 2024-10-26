@@ -6,11 +6,7 @@ using HarmonyLib;
 using static FlipwitchAP.Data.FlipwitchLocations;
 using System;
 using UnityEngine;
-using System.Linq;
-using System.Diagnostics;
 using Archipelago.MultiClient.Net.Enums;
-using Archipelago.MultiClient.Net.Exceptions;
-using UnityEngine.Rendering;
 
 namespace FlipwitchAP
 {
@@ -67,17 +63,8 @@ namespace FlipwitchAP
         private static bool SpawnItem_GiveAnItemInsteadOfCoins(ChestLootDrop __instance)
         {
             var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
-            Plugin.Logger.LogInfo($"Opened coin chest with switch {switchName}");
             SwitchDatabase.instance.setInt(switchName, 1);
             var chestName = switchName;
-            if (switchName == "gc_slime_secret_coins")
-            {
-                var objectName = __instance.name;
-                if (objectName == "Drop Coins Chest")
-                {
-                    chestName = switchName + "_1";
-                }
-            }
             if (!FlipwitchLocations.CoinChestLocations.TryGetValue(chestName, out var location))
             {
                 Plugin.Logger.LogWarning($"Could not find location for {chestName}");

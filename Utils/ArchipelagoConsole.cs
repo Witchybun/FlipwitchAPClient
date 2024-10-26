@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Models;
@@ -6,7 +6,6 @@ using Archipelago.MultiClient.Net.Enums;
 using BepInEx;
 using FlipwitchAP.Archipelago;
 using UnityEngine;
-using Archipelago.MultiClient.Net.MessageLog.Parts;
 
 namespace FlipwitchAP.Utils;
 
