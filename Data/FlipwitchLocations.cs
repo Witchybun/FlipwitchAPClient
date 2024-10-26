@@ -163,7 +163,7 @@ namespace FlipwitchAP.Data
             CreateLocation(115, "SS: Dr. Witch Doctor Tutorial Chest", "sc_coins_mermaid_tutorial", COINCHEST),
 
             CreateLocation(151, "GC: Below Entrance Chest", "gc_crypt_coins", COINCHEST),
-            CreateLocation(152, "GC: Slime Form Room Chest 1", "gc_slime_secret_coins_1", COINCHEST), // All three chests have the same switchName?
+            CreateLocation(152, "GC: Slime Form Room Chest 1", "gc_slime_secret_coins_upper", COINCHEST), // All three chests have the same switchName?
             CreateLocation(153, "GC: Slime Form Room Chest 2", "gc_slime_secret_coins", COINCHEST), // All three chests have the same switchName?
             CreateLocation(154, "GC: Slime Form Room Chest 3", "gc_slime_secret_coins2", COINCHEST), // All three chests have the same switchName?
             CreateLocation(155, "GC: Giant Room, Flip Magic Platform", "RoseGardenKey", CHEST),
