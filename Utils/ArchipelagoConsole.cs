@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Models;
@@ -215,10 +215,10 @@ public static class ArchipelagoConsole
             scrollDepth = height * 10;
         }
         textStyle.richText = true;
-        window = new Rect(Screen.width / 2 - width / 2, 0, width, height);
-        scroll = new Rect(0, 0, width * 0.9f, scrollDepth);
+        window = new Rect(Screen.width / 2 - width / 2, Screen.height - height, width, height);
+        scroll = new Rect(0, Screen.height - scrollDepth, width * 0.9f, scrollDepth);
         scrollView = new Vector2(0, scrollDepth);
-        text = new Rect(0, 0, width, scrollDepth);
+        text = new Rect(0, Screen.height - scrollDepth, width, scrollDepth);
 
         textStyle.alignment = TextAnchor.LowerLeft;
         textStyle.fontSize = Hidden ? (int)(Screen.height * 0.0165f) : (int)(Screen.height * 0.0185f);
@@ -235,14 +235,14 @@ public static class ArchipelagoConsole
         var buttonWidth = (int)(Screen.width * 0.12f);
         var buttonHeight = (int)(Screen.height * 0.03f);
 
-        hideShowButton = new Rect(Screen.width / 2 + width / 2 + buttonWidth / 3, Screen.height * 0.004f, buttonWidth,
+        hideShowButton = new Rect(Screen.width / 2 + width / 2 + buttonWidth / 3, Screen.height - Screen.height * 0.004f - buttonHeight, buttonWidth,
             buttonHeight);
 
         // draw server command text field and button
         width = (int)(Screen.width * 0.4f);
         var xPos = (int)(Screen.width / 2.0f - width / 2.0f);
-        var yPos = (int)(Screen.height * 0.307f);
         height = (int)(Screen.height * 0.022f);
+        var yPos = (int)(Screen.height - Screen.height * 0.307f - height);
 
         CommandTextRect = new Rect(xPos, yPos, width, height);
 
