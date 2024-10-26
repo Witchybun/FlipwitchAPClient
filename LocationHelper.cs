@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Reflection;
 using FlipwitchAP.Data;
 using FlipwitchAP.Archipelago;
 using HarmonyLib;
@@ -347,7 +346,6 @@ namespace FlipwitchAP
             {
                 var location = CutsceneLocations[intName];
                 SendLocationGivenLocationDataSendingGift(location);
-                CreateItemNotification(location, null);
             }
         }
 
