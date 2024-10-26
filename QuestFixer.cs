@@ -17,12 +17,10 @@ namespace FlipwitchAP
         [HarmonyPostfix]
         private static void Start_FixQuests(NPCDialogueAdvanced __instance)
         {
-            Plugin.Logger.LogInfo(__instance.gameObject.name);
             switch (__instance.gameObject.name)
             {
                 case "Goblin Model - Quest 1":
                     {
-                        Plugin.Logger.LogInfo("Handling Gobliana.");
                         var wasGivenHeadshot = new NPCDialogueAdvanced.SwitchRequirement()
                         {
                             switchName = "APGoblianaGaveHeadshot",
