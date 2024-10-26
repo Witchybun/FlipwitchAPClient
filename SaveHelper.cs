@@ -82,7 +82,7 @@ namespace FlipwitchAP
                 ArchipelagoClient.ServerData.InitialIndex = loadedSave.Index;
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
-                
+
                 GenericMethods.HandleLocationDifference();
                 if (GenericMethods.hasDied)
                 {
@@ -113,6 +113,49 @@ namespace FlipwitchAP
             var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
             Plugin.Logger.LogInfo($"Save Data: Index {loadedSave.Index} | Seed: {loadedSave.Seed}");
             return loadedSave;
+        }
+
+        public static void SaveCurrentConnectionData(string uri, string slotName, string password)
+        {
+            var dir = Application.absoluteURL + "ArchSaves/";
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            var savePath = Path.Combine(dir, "LastConnectionInfo.json");
+            var currentConnectionData = new ConnectionData(uri, slotName, password);
+            string json = JsonConvert.SerializeObject(currentConnectionData);
+            File.WriteAllText(savePath, json);
+        }
+
+        public static void GrabLastConnectionInfo()
+        {
+            var dir = Application.absoluteURL + "ArchSaves/";
+            var savePath = Path.Combine(dir, "LastConnectionInfo.json");
+            if (!File.Exists(savePath))
+            {
+                return;
+            }
+            using StreamReader reader = new StreamReader(savePath);
+            string text = reader.ReadToEnd();
+            var loadedConnectionData = JsonConvert.DeserializeObject<ConnectionData>(text);
+            ArchipelagoClient.ServerData.Uri = loadedConnectionData.Uri;
+            ArchipelagoClient.ServerData.SlotName = loadedConnectionData.SlotName;
+            ArchipelagoClient.ServerData.Password = loadedConnectionData.Password;
+        }
+    }
+
+    public class ConnectionData
+    {
+        public string Uri;
+        public string SlotName;
+        public string Password;
+
+        public ConnectionData(string uri, string slotName, string password)
+        {
+            Uri = uri;
+            SlotName = slotName;
+            Password = password;
         }
     }
 

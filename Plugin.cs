@@ -37,6 +37,8 @@ public class Plugin : BaseUnityPlugin
     {
         // Plugin startup logic
         Logger = base.Logger;
+        
+        SaveHelper.GrabLastConnectionInfo();
         ArchipelagoWindowToggle.Enable();
         ArchipelagoWindowToggle.performed += OnWindowTogglePressed;
         ArchipelagoClient = new ArchipelagoClient();
@@ -160,7 +162,6 @@ public class Plugin : BaseUnityPlugin
             GUI.Label(new Rect(5, 40, 150, 20), "Host: ");
             GUI.Label(new Rect(5, 60, 150, 20), "Player Name: ");
             GUI.Label(new Rect(5, 80, 150, 20), "Password: ");
-
             ArchipelagoClient.ServerData.Uri = GUI.TextField(new Rect(150, 40, 140, 20),
                 ArchipelagoClient.ServerData.Uri);
             ArchipelagoClient.ServerData.SlotName = GUI.TextField(new Rect(150, 60, 140, 20),
