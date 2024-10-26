@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using BepInEx;
@@ -33,6 +33,7 @@ public class Plugin : BaseUnityPlugin
     public GenericMethods GenericMethods;
     public QuestFixer QuestFixer;
     public GachaHelper GachaHelper;
+    public CollectMethods CollectMethods;
 
 
     private void Awake()
@@ -49,7 +50,7 @@ public class Plugin : BaseUnityPlugin
         GenericMethods = new GenericMethods();
         QuestFixer = new QuestFixer();
         GachaHelper = new GachaHelper();
-
+        CollectMethods = new CollectMethods();
     }
 
     private void Update()
