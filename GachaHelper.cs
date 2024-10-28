@@ -11,10 +11,6 @@ namespace FlipwitchAP
     public class GachaHelper
     {
         private static GachaPhase apPhase;
-        public GachaHelper()
-        {
-            Harmony.CreateAndPatchAll(typeof(GachaHelper));
-        }
 
         // Patch the enum call.  Fuck this.
         [HarmonyPatch(typeof(GachaSceneManager), "gachaWaiting")]
@@ -104,10 +100,7 @@ namespace FlipwitchAP
                     __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
                     var animation = gachaCollection.gachas[index].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
-                    if (ArchipelagoClient.ServerData.GachaOn)
-                    {
-                        LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
-                    }
+                    LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
                     SwitchDatabase.instance.setInt("AP" + chosenGachaName, currentGachaState + 1);
                     __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
                     return false;

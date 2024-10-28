@@ -6,11 +6,6 @@ namespace FlipwitchAP
 {
     public class QuestFixer
     {
-        public QuestFixer()
-        {
-            Harmony.CreateAndPatchAll(typeof(QuestFixer));
-        }
-
         // Patches certain events that rely too much on holding the item to continue progress.
         // Instead of checking for items, it checks for custom flags set upon getting the quest item.
         [HarmonyPatch(typeof(NPCDialogueAdvanced), "Start")]

@@ -8,13 +8,6 @@ namespace FlipwitchAP
 {
     public class ItemHelper
     {
-
-        public ItemHelper()
-        {
-            Harmony.CreateAndPatchAll(typeof(ItemHelper));
-        }
-
-
         public static void GiveFlipwitchItem(string name, bool skipPopup = false)
         {
             var switchName = $"AP" + name.Replace(" ", "") + "ItemCount";
@@ -24,6 +17,13 @@ namespace FlipwitchAP
             {
                 case "Nothing":
                     {
+                        return;
+                    }
+                case "Sexual Experience":
+                    {
+                        var sexualExperience = SwitchDatabase.instance.getInt("SexualExperienceCount");
+                        var additional = Math.Min(40, 1 + sexualExperience);
+                        SwitchDatabase.instance.setInt("SexualExperienceCount", additional);
                         return;
                     }
                 case "Protective Barrier Upgrade":
@@ -36,6 +36,7 @@ namespace FlipwitchAP
                 case "Animal Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAnimalCoin");
+                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APAnimalCoin", currentCount + 1);
                         SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
@@ -43,6 +44,7 @@ namespace FlipwitchAP
                 case "Bunny Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APBunnyCoin");
+                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APBunnyCoin", currentCount + 1);
                         SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
@@ -50,6 +52,7 @@ namespace FlipwitchAP
                 case "Monster Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APMonsterCoin");
+                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APMonsterCoin", currentCount + 1);
                         SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
@@ -57,6 +60,7 @@ namespace FlipwitchAP
                 case "Angel & Demon Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAngelDemonCoin");
+                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APAngelDemonCoin", currentCount + 1);
                         SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
@@ -64,6 +68,7 @@ namespace FlipwitchAP
                 case "Promotional Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APPromotionalCoin");
+                        if (currentCount > 0) return;
                         SwitchDatabase.instance.setInt("APPromotionalCoin", currentCount + 1);
                         SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
@@ -152,7 +157,8 @@ namespace FlipwitchAP
                     }
                 case "Sexual Thoughts":
                     {
-                        // Figure out how to play moan sound effects.
+                        CutsceneHelper.cutsceneTrapQueue.Enqueue("Get Fucked");
+                        //Plugin.StartCutsceneTrapRoutine();  There's code there but...eh.
                         return;
                     }
 

@@ -13,13 +13,7 @@ namespace FlipwitchAP
     public class GenericMethods
     {
         public static bool allowingOutsideItems = true;
-        public static bool hasDied = false;
         public const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
-
-        public GenericMethods()
-        {
-            Harmony.CreateAndPatchAll(typeof(GenericMethods));
-        }
 
         [HarmonyPatch(typeof(MainMenuScreen), "StartNewGame")]
         [HarmonyPrefix]
@@ -112,48 +106,13 @@ namespace FlipwitchAP
             damage -= amount * damage / 4;
         }
 
-        [HarmonyPatch(typeof(Cutscene), "calculateUnlockedRewards")]
-        [HarmonyPrefix]
-        private static bool CalculateUnlockedRewards_CalculateUsingOwnUnlockCount(Cutscene __instance)
-        {
-            int playerPeachChargesCap = SwitchDatabase.instance.getInt("APTotalPeachCharges");
-            int num = SwitchDatabase.instance.getInt("SexualExperienceCount") / 4;
-            int @int = SwitchDatabase.instance.getInt("PendingPeachCharges");
-            SwitchDatabase.instance.setInt("AppliedAndPendingPeaches", playerPeachChargesCap + num);
-            SwitchDatabase.instance.setInt("PendingPeachCharges", num - playerPeachChargesCap);
-            UnityEngine.Debug.Log("SexualExperienceCount: " + SwitchDatabase.instance.getInt("SexualExperienceCount"));
-            if (num >= 2)
-            {
-                SwitchDatabase.instance.setInt("PendingWandLevel", 1);
-            }
-            if (num >= 6)
-            {
-                SwitchDatabase.instance.setInt("PendingWandLevel", 2);
-            }
-            if (@int < SwitchDatabase.instance.getInt("PendingPeachCharges"))
-            {
-                SwitchDatabase.instance.triggerUpgradePendingPopup();
-            }
-            SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
-            return false;
-        }
-
-        [HarmonyPatch(typeof(GameOverManager), "updateAnim")]
-        [HarmonyPostfix]
-        private static void EndCutscene_AddExtraEffects()
-        {
-            if (ArchipelagoClient.ServerData.DeathLink)
-            {
-                Plugin.ArchipelagoClient.KillEveryone();
-            }
-            hasDied = true;
-        }
+        
 
         public static void SyncItemsOnLoad()
         {
             var items = Plugin.ArchipelagoClient.GetAllSentItems();
             HandleMissingItems(items);
-            hasDied = false;
+            CutsceneHelper.hasDied = false;
         }
 
         public static void HandleReceivedItems()
@@ -180,6 +139,7 @@ namespace FlipwitchAP
                 ItemHelper.GiveFlipwitchItem(item);
                 ArchipelagoClient.ServerData.Index++;
             }
+            SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
         }
 
         public static void HandleMissingItems(List<ItemInfo> items)

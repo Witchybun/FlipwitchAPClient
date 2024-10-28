@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Data;
 using Newtonsoft.Json;
 
@@ -20,21 +21,25 @@ public class ArchipelagoData
     private string DEATH_KEY = "death_link";
     private string GENDER_KEY = "starting_gender";
     private string PRICE_KEY = "shop_prices";
-    private string GACHA_KEY = "gachapon";
+    private string CRYSTAL_KEY = "crystal_teleports";
     private string ANIMAL_KEY = "animal_order";
     private string BUNNY_KEY = "bunny_order";
     private string MONSTER_KEY = "monster_order";
     private string ANGEL_KEY = "angel_order";
+    private string HINT_KEY = "hints";
+    private string QUEST_KEY = "quest_for_sex";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
-    public Gender StartingGender { get; set; }
-    public int ShopPrices {get; set;}
-    public bool GachaOn {get; set;}
+    public Gender StartingGender { get; private set; }
+    public int ShopPrices { get; private set;}
+    public bool CrystalTeleport { get; private set; }
+    public Quest QuestForSex { get; private set; }
     public bool DeathLink { get; private set; }
     public List<int> AnimalGachaOrder {get; private set; }
     public List<int> BunnyGachaOrder {get; private set; }
     public List<int> MonsterGachaOrder {get; private set; }
     public List<int> AngelGachaOrder {get; private set; }
+    public Dictionary<string, string> HintLookup { get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
 
     private Dictionary<string, object> slotData;
@@ -63,7 +68,8 @@ public class ArchipelagoData
         DeathLink = GetSlotSetting(DEATH_KEY, false);
         StartingGender = GetSlotSetting(GENDER_KEY, Gender.Woman);
         ShopPrices = GetSlotSetting(PRICE_KEY, 100);
-        GachaOn = GetSlotSetting(GACHA_KEY, false);
+        CrystalTeleport = GetSlotSetting(CRYSTAL_KEY, false);
+        QuestForSex = GetSlotSetting(QUEST_KEY, Quest.Quest);
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
@@ -72,6 +78,8 @@ public class ArchipelagoData
         MonsterGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(monsterOrderData));
         var angelOrderData = GetSlotSetting(ANGEL_KEY, "");
         AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
+        var hintData = GetSlotSetting(HINT_KEY, "");
+        HintLookup = JsonConvert.DeserializeObject<Dictionary<string, string>>(hintData);
     }
 
     // Why...?
@@ -96,6 +104,17 @@ public class ArchipelagoData
     {
         return (Gender)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Gender), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
+
+    private Gacha GetSlotSetting(string key, Gacha defaultValue)
+    {
+        return (Gacha)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Gacha), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
+    }
+
+    private Quest GetSlotSetting(string key, Quest defaultValue)
+    {
+        return (Quest)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Quest), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
+    }
+
 
     private string GetSlotSetting(string key, string defaultValue)
     {
@@ -154,5 +173,20 @@ public class ArchipelagoData
     {
         Woman = 0,
         Man = 1,
+    }
+
+    public enum Gacha
+    {
+        Off = 0,
+        Coins = 1,
+        All = 2
+    }
+
+    public enum Quest
+    {
+        Off = 1,
+        Sensei = 2,
+        Quest = 3,
+        All = 4
     }
 }

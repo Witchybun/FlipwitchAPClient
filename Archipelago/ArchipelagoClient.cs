@@ -29,6 +29,7 @@ public class ArchipelagoClient
     private ArchipelagoSession session;
     public static Queue<ReceivedItem> ItemsToProcess = new();
     public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
+    public readonly List<string> CutsceneIDsForTraps = new();
     public static bool IsInGame = false;
 
     /// <summary>
@@ -119,6 +120,8 @@ public class ArchipelagoClient
             session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
             SaveHelper.SaveCurrentConnectionData(ServerData.Uri, ServerData.SlotName, ServerData.Password);
+            DialogueHelper.UpdateDialogueToHaveHints(SwitchDatabase.instance.dialogueManager);
+            //GrabAllTrapOrientedCutscenes();
             Authenticated = true;
         }
         else
@@ -275,6 +278,18 @@ public class ArchipelagoClient
             ServerData.CheckedLocations.Add(location.APLocationID);
         }
         return false;
+    }
+
+    public void GrabAllTrapOrientedCutscenes()
+    {
+        CutsceneIDsForTraps.Clear();
+        foreach (var cutscene in SwitchDatabase.instance.cutsceneManager.cutscenes)
+        {
+            if (cutscene.cutsceneUnlockedID.Contains("Reward") && cutscene.animName.Contains("_0"))
+            {
+                CutsceneIDsForTraps.Add(cutscene.animName);
+            }
+        }
     }
 
     public List<ItemInfo> GetAllSentItems()

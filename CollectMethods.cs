@@ -6,11 +6,6 @@ namespace FlipwitchAP
 {
     public class CollectMethods
     {
-        public CollectMethods()
-        {
-            Harmony.CreateAndPatchAll(typeof(CollectMethods));
-        }
-
         [HarmonyPatch(typeof(ChestLootDrop), "OnEnable")]
         [HarmonyPrefix]
         private static bool OnEnable_FixSwitchOrCollectOnChestLoot(ChestLootDrop __instance, ref string ___switchName,

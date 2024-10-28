@@ -36,8 +36,20 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="Ak.Wwise.Api.WAAPI">
+      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Ak.Wwise.Api.WAAPI.dll</HintPath>
+    </Reference>
     <Reference Include="AK.Wwise.Unity.API">
       <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.API.WwiseTypes">
+      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.WwiseTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.MonoBehaviour">
+      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.MonoBehaviour.dll</HintPath>
+    </Reference>
+    <Reference Include="AK.Wwise.Unity.Timeline">
+      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.InputSystem.dll</HintPath>

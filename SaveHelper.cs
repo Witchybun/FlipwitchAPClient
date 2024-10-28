@@ -15,10 +15,6 @@ namespace FlipwitchAP
 {
     public class SaveHelper
     {
-        public SaveHelper()
-        {
-            Harmony.CreateAndPatchAll(typeof(SaveHelper));
-        }
         [HarmonyPatch(typeof(SwitchDatabase), "saveGame")]
         [HarmonyPostfix]
         private static void SaveGame_AlsoSaveArchipelagoState(int saveSlotIdx)
@@ -84,7 +80,7 @@ namespace FlipwitchAP
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
 
                 GenericMethods.HandleLocationDifference();
-                if (GenericMethods.hasDied)
+                if (CutsceneHelper.hasDied)
                 {
                     GenericMethods.SyncItemsOnLoad();
                 }

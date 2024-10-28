@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using FlipwitchAP.Utils;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -14,7 +15,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.1.13";
+    public const string PluginVersion = "0.1.14";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
@@ -23,14 +24,6 @@ public class Plugin : BaseUnityPlugin
     private static InputAction ArchipelagoWindowToggle = new InputAction(binding: "<Keyboard>/f8");
 
     internal static new ManualLogSource Logger;
-    public ItemHelper ItemHelper;
-    public LocationHelper LocationHelper;
-    public SaveHelper SaveHelper;
-    public ShopHelper ShopHelper;
-    public GenericMethods GenericMethods;
-    public QuestFixer QuestFixer;
-    public GachaHelper GachaHelper;
-    public CollectMethods CollectMethods;
 
 
     private void Awake()
@@ -44,15 +37,22 @@ public class Plugin : BaseUnityPlugin
         ArchipelagoClient = new ArchipelagoClient();
         ArchipelagoConsole.Awake();
 
-        ItemHelper = new ItemHelper();
-        LocationHelper = new LocationHelper();
-        SaveHelper = new SaveHelper();
-        ShopHelper = new ShopHelper();
-        GenericMethods = new GenericMethods();
-        QuestFixer = new QuestFixer();
-        GachaHelper = new GachaHelper();
-        CollectMethods = new CollectMethods();
+        PatchAll();
 
+    }
+
+    private void PatchAll()
+    {
+        Harmony.CreateAndPatchAll(typeof(ItemHelper));
+        Harmony.CreateAndPatchAll(typeof(LocationHelper));
+        Harmony.CreateAndPatchAll(typeof(SaveHelper));
+        Harmony.CreateAndPatchAll(typeof(ShopHelper));
+        Harmony.CreateAndPatchAll(typeof(GenericMethods));
+        Harmony.CreateAndPatchAll(typeof(QuestFixer));
+        Harmony.CreateAndPatchAll(typeof(GachaHelper));
+        Harmony.CreateAndPatchAll(typeof(CollectMethods));
+        Harmony.CreateAndPatchAll(typeof(DialogueHelper));
+        Harmony.CreateAndPatchAll(typeof(CutsceneHelper));
     }
 
     private void OnWindowTogglePressed(InputAction.CallbackContext context)
@@ -139,7 +139,7 @@ public class Plugin : BaseUnityPlugin
         // this is a good place to create and add a bunch of debug buttons
     }
 
-    public void WindowContents(int id)
+    private void WindowContents(int id)
     {
         GUI.backgroundColor = Color.black;
         string statusMessage;
@@ -177,5 +177,14 @@ public class Plugin : BaseUnityPlugin
             }
 
         }
+    }
+
+    public void StartCutsceneTrapRoutine()
+    {
+        if (CutsceneHelper.trapRoutineRunning)
+        {
+            return;
+        }
+        StartCoroutine(CutsceneHelper.HandleAllPendingCutsceneTraps());
     }
 }

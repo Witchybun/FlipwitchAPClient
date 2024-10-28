@@ -11,11 +11,6 @@ namespace FlipwitchAP
 {
     public class LocationHelper
     {
-        public LocationHelper()
-        {
-            Harmony.CreateAndPatchAll(typeof(LocationHelper));
-        }
-
         // Code for patching gacha token pickups
         [HarmonyPatch(typeof(GachaCoinCollect), "OnTriggerEnter2D")]
         [HarmonyPrefix]

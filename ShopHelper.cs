@@ -12,18 +12,12 @@ namespace FlipwitchAP
 {
     public class ShopHelper
     {
-        const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        public ShopHelper()
-        {
-            Harmony.CreateAndPatchAll(typeof(ShopHelper));
-        }
-
         [HarmonyPatch(typeof(StoreUI), "OnEnable")]
         [HarmonyPostfix]
         private static void OnEnable_WriteArchipelagoInfoInstead(StoreUI __instance)
         {
-            var itemListings = (List<StoreItemListing>)__instance.GetType().GetField("itemListings", Flags).GetValue(__instance);
-            var itemsOnOffer = (List<ItemShopListingMetaData>)__instance.GetType().GetField("itemsOnOffer", Flags).GetValue(__instance);
+            var itemListings = (List<StoreItemListing>)__instance.GetType().GetField("itemListings", GenericMethods.Flags).GetValue(__instance);
+            var itemsOnOffer = (List<ItemShopListingMetaData>)__instance.GetType().GetField("itemsOnOffer", GenericMethods.Flags).GetValue(__instance);
             for (var i = 0; i < itemsOnOffer.Count; i++)
             {
                 if (itemListings[i].itemNameID == "")
@@ -38,7 +32,6 @@ namespace FlipwitchAP
                 var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
                 itemListings[i].listingName.textObject.text = locationScout.Name;
                 itemListings[i].listingName.translationKey = locationScout.Name;
-                
                 if (int.TryParse(itemListings[i].listingCost.text, out var _))
                 {
                     var priceSetup = int.Parse(itemListings[i].listingCost.text)*ArchipelagoClient.ServerData.ShopPrices;
@@ -54,20 +47,20 @@ namespace FlipwitchAP
         private static bool UpdateInput_SendLocationOnPurchase(StoreUI __instance)
         {
             SwitchDatabase instance = SwitchDatabase.instance;
-            var popUpActivated = (bool)__instance.GetType().GetField("popUpActivated", Flags).GetValue(__instance);
+            var popUpActivated = (bool)__instance.GetType().GetField("popUpActivated", GenericMethods.Flags).GetValue(__instance);
             if (popUpActivated && !SwitchDatabase.instance.isItemPopupActive())
             {
                 SwitchDatabase.instance.playerMov.disableMovement();
                 instance.dialogueManager.setUiCanvasVisibility(isVisible: true);
             }
             Vector2 vector = NewInputManager.instance.pollUiMovement();
-            var itemSelected = (bool)__instance.GetType().GetField("itemSelected", Flags).GetValue(__instance);
+            var itemSelected = (bool)__instance.GetType().GetField("itemSelected", GenericMethods.Flags).GetValue(__instance);
             if (itemSelected)
             {
                 if (vector.y != 0f)
                 {
-                    var yesSelected = (bool)__instance.GetType().GetField("yesSelected", Flags).GetValue(__instance);
-                    __instance.GetType().GetField("yesSelected", Flags).SetValue(__instance, !yesSelected);
+                    var yesSelected = (bool)__instance.GetType().GetField("yesSelected", GenericMethods.Flags).GetValue(__instance);
+                    __instance.GetType().GetField("yesSelected", GenericMethods.Flags).SetValue(__instance, !yesSelected);
                     if (!yesSelected)
                     {
                         __instance.yesBox.color = __instance.selectedColour;
@@ -82,13 +75,13 @@ namespace FlipwitchAP
                 }
                 if (NewInputManager.instance.Interact.pressedThisFrame || NewInputManager.instance.Submit.pressedThisFrame)
                 {
-                    var yesSelected = (bool)__instance.GetType().GetField("yesSelected", Flags).GetValue(__instance);
+                    var yesSelected = (bool)__instance.GetType().GetField("yesSelected", GenericMethods.Flags).GetValue(__instance);
                     __instance.yesNoBox.SetActive(value: false);
-                    __instance.GetType().GetField("itemSelected", Flags).SetValue(__instance, false);
+                    __instance.GetType().GetField("itemSelected", GenericMethods.Flags).SetValue(__instance, false);
                     if (yesSelected)
                     {
-                        var itemListings = (List<StoreItemListing>)__instance.GetType().GetField("itemListings", Flags).GetValue(__instance);
-                        var currentItemIndex = (int)__instance.GetType().GetField("currentItemIndex", Flags).GetValue(__instance);
+                        var itemListings = (List<StoreItemListing>)__instance.GetType().GetField("itemListings", GenericMethods.Flags).GetValue(__instance);
+                        var currentItemIndex = (int)__instance.GetType().GetField("currentItemIndex", GenericMethods.Flags).GetValue(__instance);
                         instance.setInt("ShopPurchase_" + itemListings[currentItemIndex].itemNameID, 1);
                         itemListings[currentItemIndex].listingName.textObject.color = new Color32(90, 90, 90, byte.MaxValue);
                         itemListings[currentItemIndex].listingCost.color = new Color32(90, 90, 90, byte.MaxValue);
@@ -97,14 +90,14 @@ namespace FlipwitchAP
                         LocationHelper.SendLocationGivenLocationDataSendingGift(location);
                         itemListings[currentItemIndex].listingCost.text = instance.dialogueManager.getTranslationString("ShopUI.SoldText");
                         instance.dialogueManager.setUiCanvasVisibility(isVisible: false);
-                        __instance.GetType().GetField("popUpActivated", Flags).SetValue(__instance, true);
+                        __instance.GetType().GetField("popUpActivated", GenericMethods.Flags).SetValue(__instance, true);
                         AkSoundEngine.PostEvent("purchase", __instance.gameObject);
                     }
                 }
                 else if ((!SwitchDatabase.instance.isItemPopupActive() && NewInputManager.instance.Cancel.pressedThisFrame) || NewInputManager.instance.EscapeMenu.pressedThisFrame)
                 {
                     __instance.yesNoBox.SetActive(value: false);
-                    __instance.GetType().GetField("itemSelected", Flags).SetValue(__instance, false);
+                    __instance.GetType().GetField("itemSelected", GenericMethods.Flags).SetValue(__instance, false);
                 }
                 return false;
             }

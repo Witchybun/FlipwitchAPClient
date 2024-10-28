@@ -26,6 +26,7 @@ namespace FlipwitchAP.Data
             {"Sexual Thoughts", "GlassWand"},
             {"Peachy Peach Upgrade", "PeachyPeach"},
             {"Peachy Peach Charge", "PeachyPeach"},
+            {"Sexual Experience", "GlassWand"},
         };
 
         private static readonly List<string> Rings = new()
@@ -168,7 +169,7 @@ namespace FlipwitchAP.Data
             }
             else if (itemName.Contains("Crystal"))
             {
-                return "Goblin Crystal";
+                return "GoblinCrystal";
             }
             else if (itemName.Contains("Fruit") || itemName.Contains("Sapling"))
             {

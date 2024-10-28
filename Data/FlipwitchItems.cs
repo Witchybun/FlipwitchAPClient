@@ -10,7 +10,7 @@ namespace FlipwitchAP
             "Lucky Coin", "Woods Crystal Blockade Removal", "City Crystal Blockade Removal", "Loose Change",
             "Healing Surge", "Mana Surge", "Peachy Peach Recharge", "Sexual Thoughts", "Mana Upgrade", "Health Upgrade", 
             "Wand Upgrade", "Protective Barrier Upgrade", "Peachy Peach Charge", "Peachy Peach Upgrade",
-            "Animal Coin", "Bunny Coin", "Monster Coin", "Angel & Demon Coin", "Promotional Coin"
+            "Animal Coin", "Bunny Coin", "Monster Coin", "Angel & Demon Coin", "Promotional Coin", "Sexual Experience"
         };
 
         public static readonly Dictionary<string, string> APItemToGameName = new()
@@ -129,6 +129,7 @@ namespace FlipwitchAP
             {"Peachy Peach Upgrade", "My Peachy Peach is even more powerful!"},
             {"Sexual Thoughts", "I really can't stop thinking about that one time..."},
             {"Protective Barrier Upgrade", "I can feel a lustful aura surround me!"},
+            {"Sexual Experience", "Wow, they really showed me a good time~"}
         };
 
 
