@@ -11,6 +11,10 @@ namespace FlipwitchAP
 {
     public class LocationHelper
     {
+        private const string CHEST = "Chest";
+        private const string CUTSCENE = "Cutscene";
+        private const string QUEST = "Quest";
+        
         // Code for patching gacha token pickups
         [HarmonyPatch(typeof(GachaCoinCollect), "OnTriggerEnter2D")]
         [HarmonyPrefix]
@@ -196,14 +200,6 @@ namespace FlipwitchAP
                 SwitchDatabase.instance.setInt("WW_CrystalBreakTriggered", 1);
                 // Normally this is set from the ruins crystal being destroyed.  We do this to avoid doing it so this stops spamming.
             }
-            if (location.APLocationName == "WW: Great Fairy's Reward")
-            {
-                if (!Plugin.ArchipelagoClient.IsLocationChecked("WW: Rescue Great Fairy"))
-                {
-                    var rescueLocation = FlipwitchLocations.CutsceneLocations["WW_CrystalBreakTriggered"];
-                    SendLocationGivenLocationDataSendingGift(rescueLocation);
-                }
-            }
             __instance.nextPhase.gameObject.SetActive(value: true);
             __instance.gameObject.SetActive(value: false);
             return false;
@@ -333,17 +329,6 @@ namespace FlipwitchAP
             
         }
 
-        [HarmonyPatch(typeof(SwitchDatabase), "setInt")]
-        [HarmonyPostfix]
-        private static void SetInt_AlsoSendLocationForGoblinQueen(string intName, int value)
-        {
-            if (intName == "GoblinBossDefeated" && value != 0)
-            {
-                var location = CutsceneLocations[intName];
-                SendLocationGivenLocationDataSendingGift(location);
-            }
-        }
-
         public static void SendLocationGivenLocationDataSendingGift(LocationData locationData)
         {
 
@@ -363,41 +348,20 @@ namespace FlipwitchAP
             {
                 case "ChaosKey1":
                     {
-                        var chaosCount = SwitchDatabase.instance.getInt("APChaosKeyCount");
-                        if (chaosCount == 0)
-                        {
-                            Plugin.Logger.LogError("Total count claims you have 0 keys, but you're being sent one?");
-                        }
-                        else
-                        {
-                            itemName = "ChaosKey" + chaosCount.ToString();
-                        }
+                        var chaosCount = Math.Min(6, SwitchDatabase.instance.getInt("APChaosKeyCount") + 1);
+                        itemName = "ChaosKey" + chaosCount.ToString();
                         break;
                     }
                 case "SummonStone1":
                     {
-                        var stoneCount = SwitchDatabase.instance.getInt("APSummonStoneCount");
-                        if (stoneCount == 0)
-                        {
-                            Plugin.Logger.LogError("Total count claims you have 0 stones, but you're being sent one?");
-                        }
-                        else
-                        {
-                            itemName = "SummonStone" + stoneCount.ToString();
-                        }
+                        var stoneCount = Math.Min(3, SwitchDatabase.instance.getInt("APSummonStoneCount") + 1);
+                        itemName = "SummonStone" + stoneCount.ToString();
                         break;
                     }
                 case "SoulFragment1":
                     {
-                        var soulCount = SwitchDatabase.instance.getInt("APSoulFragmentCount");
-                        if (soulCount == 0)
-                        {
-                            Plugin.Logger.LogError("Total count claims you have 0 souls, but you're being sent one?");
-                        }
-                        else
-                        {
-                            itemName = "SoulFragment" + soulCount.ToString();
-                        }
+                        var soulCount = Math.Min(3, SwitchDatabase.instance.getInt("APSoulFragmentCount") + 1);
+                        itemName = "SoulFragment" + soulCount.ToString();
                         break;
                     }
             }
@@ -465,13 +429,21 @@ namespace FlipwitchAP
 
         public static void CreateItemNotification(LocationData location, Action onItemPopupClosedCallback)
         {
-            var scoutedInformation = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
+            if (!ArchipelagoClient.ServerData.ScoutedLocations.TryGetValue(location.APLocationID, out var scoutedInformation))
+            {
+                Plugin.Logger.LogError($"Location {location.APLocationName} does not exist in the scouted information table!");
+                return;
+            }
             if (scoutedInformation.IsOwnItem || scoutedInformation.Game == ArchipelagoClient.Game)
             {
                 var isShrimple = !FlipwitchItems.SkipPopupItems.Contains(scoutedInformation.Name);
                 if (isShrimple && !scoutedInformation.Name.Contains(" Figure #"))
                 {
-                    var inGameName = FlipwitchItems.APItemToGameName[scoutedInformation.Name];
+                    if (!FlipwitchItems.APItemToGameName.TryGetValue(scoutedInformation.Name, out var inGameName))
+                    {
+                        Plugin.Logger.LogError($"Tried to grab {scoutedInformation.Name} from the in-game dictionary, but could not find it!");
+                        return;
+                    }
                     CustomInternalPopUpItem(inGameName, onItemPopupClosedCallback);
                 }
                 else
