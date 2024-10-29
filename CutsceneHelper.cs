@@ -18,17 +18,29 @@ namespace FlipwitchAP
 
         [HarmonyPatch(typeof(Cutscene), "unlockCutscene")]
         [HarmonyPrefix]
-        private static bool UnlockCutscene_DontGiveSexualExperienceIfOnAll(string cutsceneUnlockedID, ref bool countTowardsSexualExperiences)
+        private static bool UnlockCutscene_DontGiveSexualExperienceIfOnAll(Cutscene __instance, string cutsceneUnlockedID, bool countTowardsSexualExperiences)
         {
-            if (ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.All)
+            var isSexShuffled = ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.All;
+            SwitchDatabase instance = SwitchDatabase.instance;
+            instance.setBool(cutsceneUnlockedID, value: true);
+            bool flag = false;
+            for (int i = 0; i < __instance.cutscenes.Count; i++)
             {
-                countTowardsSexualExperiences = false;
+                if (cutsceneUnlockedID == __instance.cutscenes[i].cutsceneUnlockedID && !__instance.cutscenes[i].unlocked)
+                {
+                    __instance.cutscenes[i].unlockCutscene(unlock: true);
+                    if (countTowardsSexualExperiences)
+                    {
+                        flag = true;
+                    }
+                }
             }
-            if (currentlyCutsceneTrapped)
+            if (flag && !isSexShuffled)
             {
-                return false;
+                instance.setInt("SexualExperienceCount", instance.getInt("SexualExperienceCount") + 1);
             }
-            return true;
+            CheckUnlockRewardsForArchipelago();
+            return false;
         }
 
         [HarmonyPatch(typeof(Cutscene), "endCutscene")]
@@ -94,6 +106,11 @@ namespace FlipwitchAP
             }
             yield return null;
             trapRoutineRunning = false;
+        }
+
+        public static void CheckUnlockRewardsForArchipelago()
+        {
+            CalculateUnlockedRewards_CalculateUsingOwnUnlockCount(SwitchDatabase.instance.cutsceneManager);
         }
     }
 }

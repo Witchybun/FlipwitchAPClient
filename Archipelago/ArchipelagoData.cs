@@ -184,9 +184,9 @@ public class ArchipelagoData
 
     public enum Quest
     {
-        Off = 1,
-        Sensei = 2,
-        Quest = 3,
-        All = 4
+        Off = 0,
+        Sensei = 1,
+        Quest = 2,
+        All = 3
     }
 }
