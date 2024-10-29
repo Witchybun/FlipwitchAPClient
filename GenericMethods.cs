@@ -139,7 +139,6 @@ namespace FlipwitchAP
                 ItemHelper.GiveFlipwitchItem(item);
                 ArchipelagoClient.ServerData.Index++;
             }
-            SwitchDatabase.instance.upgradePendingPopup.updatePendingPopupSymbol();
         }
 
         public static void HandleMissingItems(List<ItemInfo> items)

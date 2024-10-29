@@ -24,6 +24,7 @@ namespace FlipwitchAP
                         var sexualExperience = SwitchDatabase.instance.getInt("SexualExperienceCount");
                         var additional = Math.Min(40, 1 + sexualExperience);
                         SwitchDatabase.instance.setInt("SexualExperienceCount", additional);
+                        CutsceneHelper.CheckUnlockRewardsForArchipelago();
                         return;
                     }
                 case "Protective Barrier Upgrade":
