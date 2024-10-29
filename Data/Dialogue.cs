@@ -49,6 +49,8 @@ namespace FlipwitchAP.Data
             {"SubShroom.2.1", "You have bested me.  I put that deed somewhere at [COLOR:YELLOW]{0}[COLOR:WHITE].[GIVEITEM:FungalForestDeed]"},
             {"SubGhost.1.4", "You can find my stash at [COLOR:YELLOW]{0}[COLOR:WHITE]. Go ahead, take it all. They weren't even smelly."},
             {"SubPlague.1.4", "Ith not like you can find the real prithe at [COLOR:YELLOW]{0}[COLOR:WHITE] anyway!"},
+            {"KyoniDango.1.1", "I heard a rumour that a [COLOR:BLUE]Hellish Dango[COLOR:WHITE] is at [COLOR:YELLOW]{0}[COLOR:WHITE]. If you find it, please bring it to me![ACTIVATEQUEST:KyoniQuest1.QuestTitle]"},
+            {"KyoniDaikon2.1", "Legends say that angels hid away a [COLOR:BLUE]Heavenly Daikon[COLOR:WHITE], somewhere at {0}."},
         };
 
         public static readonly Dictionary<string, List<string>> RelevantItemToRelevantKeys = new()
@@ -89,6 +91,24 @@ namespace FlipwitchAP.Data
             {"Deed to Fungal Forest", new(){"SubShroom.2.1"}},
             {"Bundle of Clothes", new(){"SubGhost.1.4"}},
             {"Mermaid Scale", new(){"SubPlague.1.4"}},
+            {"Heavenly Daikon", new(){"KyoniDaikon2.1"}},
+            {"Hellish Dango", new(){"KyoniDango.1.1"}},
+        };
+
+        public static readonly Dictionary<string, string> HintNameToItemName = new()
+        {
+            {"Chaos Key Piece 1", "ChaosKey1"},
+            {"Chaos Key Piece 2", "ChaosKey2"},
+            {"Chaos Key Piece 5", "ChaosKey3"},
+            {"Chaos Key Piece 3", "ChaosKey4"},
+            {"Chaos Key Piece 4", "ChaosKey5"},
+            {"Chaos Key Piece 6", "ChaosKey6"},
+            {"Summon Stone 1", "SummonStone"},
+            {"Summon Stone 2", "SummonStone"},
+            {"Summon Stone 3", "SummonStone"},
+            {"Soul Fragment 1", "SoulFragment"},
+            {"Soul Fragment 2", "SoulFragment"},
+            {"Soul Fragment 3", "SoulFragment"},
         };
     }
 }
