@@ -6,6 +6,7 @@ using Archipelago.MultiClient.Net.Enums;
 using BepInEx;
 using FlipwitchAP.Archipelago;
 using UnityEngine;
+using FlipwitchAP.Data;
 
 namespace FlipwitchAP.Utils;
 
@@ -40,7 +41,10 @@ public static class ArchipelagoConsole
     public const string PLAYER_COLOR_DEFAULT = "#00FF00";
     public const string OTHER_PLAYER_COLOR_DEFAULT = "#86DA86";
 
-    private static GameObject ArchipelagoMenu = new();
+    private static readonly List<string> ExceptionItems = new()
+    {
+        "Chaos Key Piece", "Summon Stone", "Soul Fragment"
+    };
 
     public static void Awake()
     {
@@ -100,7 +104,7 @@ public static class ArchipelagoConsole
                 }
         }
         LogMessage(message);
-        
+
     }
 
     public static void LogMessage(string message)
@@ -115,7 +119,7 @@ public static class ArchipelagoConsole
         lastUpdateTime = Time.time;
         UpdateWindow();
     }
-    
+
     public static string ColorTextBasedOnProgression(ItemInfo item)
     {
         if (item.Flags.HasFlag(ItemFlags.Trap))
@@ -165,13 +169,27 @@ public static class ArchipelagoConsole
             Hidden = !Hidden;
             UpdateWindow();
         }
-        
+
         // draw client/server commands entry
         if (Hidden || !ArchipelagoClient.Authenticated) return;
 
         CommandText = GUI.TextField(CommandTextRect, CommandText);
         if (!CommandText.IsNullOrWhiteSpace() && GUI.Button(SendCommandButton, "Send"))
         {
+            if (CommandText.Contains(" "))
+            {
+                var stringArray = CommandText.Split(' ');
+                if (stringArray[0] == "!!hint")
+                {
+                    var withoutHint = stringArray.Skip(1).ToArray();
+                    var hintedItem = string.Join(" ", withoutHint);
+                    var hintMessage = GrabHintBasedOnString(hintedItem);
+                    LogMessage(hintMessage);
+                    CommandText = "";
+                    return;
+                }
+                
+            }
             Plugin.ArchipelagoClient.SendMessage(CommandText);
             CommandText = "";
         }
@@ -249,5 +267,85 @@ public static class ArchipelagoConsole
         width = (int)(Screen.width * 0.035f);
         yPos += (int)(Screen.height * 0.03f);
         SendCommandButton = new Rect(xPos, yPos, width, height);
+    }
+
+    private static string GrabHintBasedOnString(string itemName)
+    {
+        if (!Dialogue.RelevantItemToRelevantKeys.Keys.Contains(itemName))
+        {
+            if (!ExceptionItems.Contains(itemName)) return $"Could not find {itemName}.  Are you sure its typed correctly?";
+        }
+        if (ExceptionItems.Contains(itemName))
+        {
+            return HandleCaseOfMultipleItems(itemName);
+        }
+        else
+        {
+            var inGameItem = FlipwitchItems.APItemToGameName[itemName];
+            var wasTextShown = SwitchDatabase.instance.getInt("AP" + inGameItem + "HintFound") > 0;
+            if (!wasTextShown)
+            {
+                return $"Cannot give hint for {itemName}.  Hint source not found.";
+            }
+            return PrepareHint(itemName);
+        }
+
+
+    }
+
+    private static string HandleCaseOfMultipleItems(string itemName)
+    {
+        var finalString = "";
+        switch (itemName)
+        {
+            case "Chaos Key Piece":
+                {
+                    for (var i = 1; i < 7; i++)
+                    {
+                        var piece = "ChaosKey" + i.ToString();
+                        var wasTextShown = SwitchDatabase.instance.getInt("AP" + piece + "HintFound") > 0;
+                        if (!wasTextShown) continue;
+                        var hint = ArchipelagoClient.ServerData.HintLookup["Chaos Key Piece " + i.ToString()];
+                        finalString += $"{itemName} can be found at {hint}\n";
+                    }
+                    if (finalString == "") return $"Cannot give hint for {itemName}.  Hint source not found.";
+                    finalString.Substring(0, finalString.Length - 2);
+                    return finalString;
+                }
+            case "Summon Stone":
+                {
+                    var wasTextShown = SwitchDatabase.instance.getInt("APSummonStoneHintFound") > 0;
+                    if (!wasTextShown) return $"Cannot give hint for {itemName}.  Hint source not found.";
+                    for (var i = 1; i < 4; i++)
+                    {
+                        var hint = ArchipelagoClient.ServerData.HintLookup["Summon Stone " + i.ToString()];
+                        finalString += $"{itemName} can be found at {hint}\n";
+                    }
+                    finalString.Substring(0, finalString.Length - 2);
+                    return finalString;
+                }
+            case "Soul Fragment":
+                {
+                    var wasTextShown = SwitchDatabase.instance.getInt("APSoulFragmentHintFound") > 0;
+                    if (!wasTextShown) return $"Cannot give hint for {itemName}.  Hint source not found.";
+                    for (var i = 1; i < 4; i++)
+                    {
+                        var hint = ArchipelagoClient.ServerData.HintLookup["Soul Fragment " + i.ToString()];
+                        finalString += $"{itemName} can be found at {hint}\n";
+                    }
+                    finalString.Substring(0, finalString.Length - 2);
+                    return finalString;
+                }
+        }
+        return "MROW";
+    }
+
+    private static string PrepareHint(string itemName)
+    {
+        if (!ArchipelagoClient.ServerData.HintLookup.TryGetValue(itemName, out var hint))
+        {
+            return $"Item {itemName} was not given a prepared hint.  Possibly an error.";
+        }
+        return $"{itemName} can be found at {hint}";
     }
 }

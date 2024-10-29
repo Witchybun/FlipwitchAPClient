@@ -25,6 +25,38 @@ namespace FlipwitchAP
             UpdateDialogueToHaveHints(SwitchDatabase.instance.dialogueManager);
         }
 
+
+        [HarmonyPatch(typeof(DialogueManager), "TypeText")]
+        [HarmonyPostfix]
+        public static void TypeText_SendSignalForHintAlso(TMPResizeText currentTextResizer, ref List<string> ___currentKeys,  ref int ___keyIndex)
+        {
+            var key = ___currentKeys[___keyIndex];
+            var item = "";
+            if (!Dialogue.TranslationKeytoHintMessage.Keys.Contains(key))
+            {
+                return;
+            }
+            foreach (var itemPair in Dialogue.RelevantItemToRelevantKeys)
+            {
+                if (itemPair.Value.Contains(key))
+                {
+                    item = itemPair.Key;
+                    break;
+                }
+            }
+            if (item == "") return;
+            if  (Dialogue.HintNameToItemName.TryGetValue(item, out var hintGameItem))
+            {
+                SwitchDatabase.instance.setInt("AP" + hintGameItem + "HintFound", 1);
+                return;
+            }
+            else if (FlipwitchItems.APItemToGameName.TryGetValue(item, out var gameItem))
+            {
+                SwitchDatabase.instance.setInt("AP" + gameItem + "HintFound", 1);
+                return;
+            }
+        }
+
         
 
         [HarmonyPatch(typeof(DialogueManager), "getTranslationString")]
@@ -114,6 +146,5 @@ namespace FlipwitchAP
             translationDictionary[summonStone] = summonMessage;
             return translationDictionary;
         }
-
     }
 }
