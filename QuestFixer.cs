@@ -1,4 +1,5 @@
 using System.Linq;
+using FlipwitchAP.Data;
 using HarmonyLib;
 using UnityEngine;
 
@@ -420,7 +421,7 @@ namespace FlipwitchAP
                             switchValue = 2,
                             comparisonOperator = ComparisonOperators.IS_LESS_THAN
                         };
-                        
+
                         if (!senseiGroups[4].switches.Any(x => x.switchName == "APPlayerWand"))
                         {
                             senseiGroups[4].switches[1] = receivedNoWandUpgrade;
@@ -437,7 +438,7 @@ namespace FlipwitchAP
                         {
                             senseiGroups[7].switches[1] = receivedFirstWandNotSecond;
                         }
-                        
+
                         // 4 is first wand upgrade but wrong
                         // 5 is first wand upgrade
                         // 6 is second but you're a woman
@@ -472,6 +473,33 @@ namespace FlipwitchAP
                         {
                             stoneGroups[1].switches.Add(receivedStones);
                         }
+                        return;
+                    }
+                case "FortuneTeller":
+                    {
+                        var madeUpShit = new NPCDialogueAdvanced.SwitchRequirement()
+                        {
+                            switchName = "APMYFUGGENDICC",
+                            switchValue = 999,
+                            comparisonOperator = ComparisonOperators.IS_EQUAL_TO
+                        };
+                        var fortuneGroups = __instance.dialogueGroups;
+                        if (!fortuneGroups[0].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
+                        {
+                            fortuneGroups[0].switches.Add(madeUpShit);
+                        }
+                        if (!fortuneGroups[2].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
+                        {
+                            fortuneGroups[2].itemRequirements.Clear();
+                        }
+                        for (var i = 3; i < 9; i++)
+                        {
+                            if (!fortuneGroups[i].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
+                            {
+                                fortuneGroups[i].switches.Add(madeUpShit);
+                            }
+                        }
+                        DialogueHelper.GenerateCurrentHintForFortuneTeller(__instance.gameObject.scene.name);
                         return;
                     }
             }

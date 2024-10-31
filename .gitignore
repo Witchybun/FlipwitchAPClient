@@ -118,3 +118,5 @@ obj/Release/netstandard2.1/FlipwitchAP.pdb
 obj/Release/netstandard2.1/MyPluginInfo.cs
 bin/Debug/netstandard2.1/Ak.Wwise.Api.WAAPI.dll
 bin/Debug/netstandard2.1/AK.Wwise.Unity.Timeline.dll
+bin/Release/netstandard2.1/Ak.Wwise.Api.WAAPI.dll
+bin/Release/netstandard2.1/AK.Wwise.Unity.Timeline.dll

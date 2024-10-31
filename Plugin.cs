@@ -15,7 +15,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.2.0pre3";
+    public const string PluginVersion = "0.2.0pre4";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
@@ -118,6 +118,7 @@ public class Plugin : BaseUnityPlugin
                 ArchipelagoClient.SendCurrentScene(trueName);
             }
         }
+        DialogueHelper.GenerateCurrentHintForFortuneTeller(scene.name);
     }
 
     // Display was shamelessly used from Hunie Pop 2's implementation, by dotsofdarkness, since I just want the window on the right.

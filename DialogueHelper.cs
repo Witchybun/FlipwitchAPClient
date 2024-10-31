@@ -146,5 +146,35 @@ namespace FlipwitchAP
             translationDictionary[summonStone] = summonMessage;
             return translationDictionary;
         }
+
+        public static void GenerateCurrentHintForFortuneTeller(string sceneName)
+        {
+            if (!ArchipelagoClient.ServerData.IsTherePlaythroughGenerated)
+            {
+                return;
+            }
+            if (sceneName != "Spirit_City_Final")
+            {
+                return;
+            }
+            var translationDictionaryField = SwitchDatabase.instance.dialogueManager.GetType().GetField("translationStrings", GenericMethods.Flags);
+            var translationDictionary = (Dictionary<string, string>) translationDictionaryField.GetValue(SwitchDatabase.instance.dialogueManager);
+            foreach (var fortunePair in ArchipelagoClient.ServerData.FortuneTellerLookup)
+            {
+                if (fortunePair.Key == -100) // Last one; victory
+                {
+                    translationDictionary["Psychic.1.1"] = fortunePair.Value;
+                    break;
+                }
+                var wasLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(fortunePair.Key);
+                if (wasLocationChecked)
+                {
+                    continue;
+                }
+                translationDictionary["Psychic.1.1"] = fortunePair.Value;
+                break;
+            }
+            translationDictionaryField.SetValue(SwitchDatabase.instance.dialogueManager, translationDictionary);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Data;
 using Newtonsoft.Json;
@@ -28,6 +29,7 @@ public class ArchipelagoData
     private string ANGEL_KEY = "angel_order";
     private string HINT_KEY = "hints";
     private string QUEST_KEY = "quest_for_sex";
+    private string FORTUNE_KEY = "path";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
     public Gender StartingGender { get; private set; }
@@ -35,11 +37,13 @@ public class ArchipelagoData
     public bool CrystalTeleport { get; private set; }
     public Quest QuestForSex { get; private set; }
     public bool DeathLink { get; private set; }
-    public List<int> AnimalGachaOrder {get; private set; }
-    public List<int> BunnyGachaOrder {get; private set; }
-    public List<int> MonsterGachaOrder {get; private set; }
-    public List<int> AngelGachaOrder {get; private set; }
+    public List<int> AnimalGachaOrder { get; private set; }
+    public List<int> BunnyGachaOrder { get; private set; }
+    public List<int> MonsterGachaOrder { get; private set; }
+    public List<int> AngelGachaOrder { get; private set; }
     public Dictionary<string, string> HintLookup { get; private set; }
+    public Dictionary<int, string> FortuneTellerLookup { get; private set; }
+    public bool IsTherePlaythroughGenerated { get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
 
     private Dictionary<string, object> slotData;
@@ -80,6 +84,9 @@ public class ArchipelagoData
         AngelGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(angelOrderData));
         var hintData = GetSlotSetting(HINT_KEY, "");
         HintLookup = JsonConvert.DeserializeObject<Dictionary<string, string>>(hintData);
+        var pathData = GetSlotSetting(FORTUNE_KEY, "");
+        FortuneTellerLookup = JsonConvert.DeserializeObject<Dictionary<int, string>>(pathData);
+        IsTherePlaythroughGenerated = FortuneTellerLookup.Any();
     }
 
     // Why...?
