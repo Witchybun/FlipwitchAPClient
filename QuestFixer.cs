@@ -374,7 +374,6 @@ namespace FlipwitchAP
                         var goblianaGroups = __instance.dialogueGroups;
                         if (goblianaGroups[1].itemRequirements.Any())
                         {
-                            goblianaGroups[1].itemRequirements.Clear();
                             goblianaGroups[1].switches.Add(wasGivenLuggage);
                         }
                         if (goblianaGroups[2].itemRequirements.Any())
@@ -389,12 +388,16 @@ namespace FlipwitchAP
                         }
                         if (goblianaGroups[5].itemRequirements.Any())
                         {
+                            goblianaGroups[5].itemRequirements.Clear();
                             goblianaGroups[5].switches.Add(wasGivenKey);
                         }
                         if (!goblianaGroups[6].switches.Any(x => x.switchName == "APExGaveLuggage"))
                         {
                             goblianaGroups[6].switches.Add(wasGivenLuggage);
                         }
+                        var swapPosition = goblianaGroups[4];
+                        goblianaGroups[4] = goblianaGroups[6];
+                        goblianaGroups[6] = swapPosition;
                         return;
                     }
                 case "Flipwitch_Sensei":

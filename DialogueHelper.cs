@@ -165,8 +165,7 @@ namespace FlipwitchAP
                 {
                     translationDictionary["Psychic.1.1"] = fortunePair.Value;
                     break;
-                }
-                var wasLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(fortunePair.Key);
+                }var wasLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(fortunePair.Key);
                 if (wasLocationChecked)
                 {
                     continue;

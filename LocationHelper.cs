@@ -136,6 +136,11 @@ namespace FlipwitchAP
                         SwitchDatabase.instance.setInt("APMomoGavePassword", 1);
                         return;
                     }
+                case "ST: Leg's Office Goblin Apartment Key":
+                    {
+                        SwitchDatabase.instance.setInt("APGoblianaGaveKey", 1);
+                        return;
+                    }
             }
         }
 
