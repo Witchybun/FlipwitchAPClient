@@ -13,7 +13,6 @@ public class DeathLinkHandler
     private string slotName;
     private readonly DeathLinkService service;
     private readonly Queue<DeathLink> deathLinks = new();
-    public bool killThatBitch = true;
 
     /// <summary>
     /// instantiates our death link handler, sets up the hook for receiving death links, and enables death link if needed
@@ -69,10 +68,9 @@ public class DeathLinkHandler
         try
         {
             if (deathLinks.Count < 1) return;
-
             var deathLink = deathLinks.Dequeue();
             var cause = deathLink.Cause.IsNullOrWhiteSpace() ? GetDeathLinkCause(deathLink) : deathLink.Cause;
-
+            ArchipelagoClient.PlayerWasDeathlinked = true;
             SwitchDatabase.instance.setPlayerHealth(0);
             Plugin.Logger.LogMessage(cause);
         }

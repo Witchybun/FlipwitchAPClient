@@ -80,11 +80,12 @@ namespace FlipwitchAP
         [HarmonyPostfix]
         private static void EndCutscene_AddExtraEffects()
         {
-            if (ArchipelagoClient.ServerData.DeathLink)
+            if (ArchipelagoClient.ServerData.DeathLink && !ArchipelagoClient.PlayerWasDeathlinked)
             {
                 Plugin.ArchipelagoClient.KillEveryone();
             }
             hasDied = true;
+            ArchipelagoClient.PlayerWasDeathlinked = false;
         }
 
         public static IEnumerator HandleAllPendingCutsceneTraps()

@@ -31,6 +31,7 @@ public class ArchipelagoClient
     public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
     public readonly List<string> CutsceneIDsForTraps = new();
     public static bool IsInGame = false;
+    public static bool PlayerWasDeathlinked = false;
 
     /// <summary>
     /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
