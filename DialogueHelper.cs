@@ -65,7 +65,6 @@ namespace FlipwitchAP
         {
             if (!string.IsNullOrEmpty(id) && CurrentGameHintDialogue.ContainsKey(id))
             {
-                Plugin.Logger.LogInfo("Hi");
                 __result = CurrentGameHintDialogue[id];
                 return false;
             }
