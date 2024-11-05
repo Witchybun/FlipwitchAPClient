@@ -150,7 +150,7 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool GivePlayerItem_GiveAPLocationInCaseofUpdateMethodNonsense(SwitchDatabase __instance, string itemName, bool skipPopup = false, Action onPopupCloseCallback = null)
         {
-            if (FlipwitchLocations.UpdateWhitelist.Contains(itemName))
+            if (UpdateWhitelist.Contains(itemName))
             {
                 var location = SecondaryCallLocations[itemName];
                 SendLocationGivenLocationDataSendingGift(location);
@@ -159,15 +159,15 @@ namespace FlipwitchAP
                 {
                     SwitchDatabase.instance.setInt("APExGaveLuggage", 1);
                 }
-                if (FlipwitchLocations.CatStatueLocations.Contains(location.APLocationName))
+                if (CatStatueLocations.Contains(location.APLocationName))
                 {
                     var kittyCount = SwitchDatabase.instance.getInt("APCatStatueCount");
                     SwitchDatabase.instance.setInt("APCatStatueCount", kittyCount + 1);
                 }
-                if (FlipwitchLocations.SummongStoneLocations.Contains(location.APLocationName))
+                if (SummongStoneLocations.Contains(location.APLocationName))
                 {
-                    var summonStoneCount = SwitchDatabase.instance.getInt("APSummonStoneCount");
-                    SwitchDatabase.instance.setInt("APSummonStoneCount", summonStoneCount + 1);
+                    var summonStoneCount = SwitchDatabase.instance.getInt("APNatashaCount");
+                    SwitchDatabase.instance.setInt("APNatashaCount", summonStoneCount + 1);
                 }
                 return false;
             }
@@ -183,7 +183,7 @@ namespace FlipwitchAP
             ints["PeachGiven"] -= 1;
             SwitchDatabase.instance.setInt("APPeachItemGiven", 1);
             SwitchDatabase.instance.GetType().GetField("ints", GenericMethods.Flags).SetValue(SwitchDatabase.instance, ints);
-            var peachyLocation = FlipwitchLocations.CutsceneLocations["PeachGiven"];
+            var peachyLocation = CutsceneLocations["PeachGiven"];
             SendLocationGivenLocationDataSendingGift(peachyLocation);
             return true;
         }
@@ -194,7 +194,7 @@ namespace FlipwitchAP
         private static bool OnEnable_GiveLocationInsteadOfSwitch(SetSwitchValueIngameCutscene __instance)
         {
             Plugin.Logger.LogInfo(__instance.switchName);
-            if (!FlipwitchLocations.CutsceneLocations.TryGetValue(__instance.switchName, out var location))
+            if (!CutsceneLocations.TryGetValue(__instance.switchName, out var location))
             {
                 return true;
             }
@@ -218,7 +218,7 @@ namespace FlipwitchAP
         private static void CompleteQuest_GiveQuestLocation(QuestUpdatedPopup __instance)
         {
             var questName = __instance.questName.textObject.text;
-            if (!FlipwitchLocations.QuestLocations.TryGetValue(questName, out var location))
+            if (!QuestLocations.TryGetValue(questName, out var location))
             {
                 Plugin.Logger.LogWarning($"Quest {questName} does not have an associated location, returning");
                 return;
