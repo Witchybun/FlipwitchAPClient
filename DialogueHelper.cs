@@ -73,11 +73,6 @@ namespace FlipwitchAP
 
         public static void UpdateDialogueToHaveHints(DialogueManager dialogueManager)
         {
-            /*if (!ArchipelagoClient.Authenticated)
-            {
-                return;
-            }*/
-            UpdateDialogueToHaveHints();
             var translationDictionaryField = dialogueManager.GetType().GetField("translationStrings", GenericMethods.Flags);
             var translationDictionary = (Dictionary<string, string>) translationDictionaryField.GetValue(dialogueManager);
             foreach (var hintPair in ArchipelagoClient.ServerData.HintLookup)
@@ -104,37 +99,16 @@ namespace FlipwitchAP
             translationDictionaryField.SetValue(dialogueManager, translationDictionary);
         }
 
-        public static void UpdateDialogueToHaveHints()
-        {
-            foreach (var hintPair in ArchipelagoClient.ServerData.HintLookup)
-            {
-                if (Dialogue.RelevantItemToRelevantKeys.TryGetValue(hintPair.Key, out var relevantTranslations))
-                {
-                    var hint = hintPair.Value;
-                    foreach (var translationKey in relevantTranslations)
-                    {
-                        if (!Dialogue.TranslationKeytoHintMessage.TryGetValue(translationKey, out var message))
-                        {
-                            continue;
-                        }
-                        if (translationKey == "SubPlague.1.4")
-                        {
-                            hint.Replace("ss", "th").Replace("s", "th").Replace("S", "Th").Replace("Z", "th").Replace("z", "th");
-                        }
-                        var newMessage = string.Format(message, hint);
-                        CurrentGameHintDialogue[translationKey] = newMessage;
-                    }
-                }
-            }
-            CurrentGameHintDialogue = HandleGroupedMessages(CurrentGameHintDialogue);
-        }
-
         private static Dictionary<string, string> HandleGroupedMessages(Dictionary<string, string> translationDictionary)
         {
+            // This is just a cheeky check for whether or not quests are shuffled.  If this isn't in the hint list, its not, so don't do the lookup.
+            if (!ArchipelagoClient.ServerData.HintLookup.TryGetValue("Soul Fragment 2", out var soul2Hint))
+            {
+                return translationDictionary;
+            }
             var unluckyCat = "UnluckyCat.1.2";
             var summonStone = "PhilosopherStone.1.3";
             var catDialogueFormat = Dialogue.TranslationKeytoHintMessage[unluckyCat];
-            var soul2Hint = ArchipelagoClient.ServerData.HintLookup["Soul Fragment 2"];
             var soul3Hint = ArchipelagoClient.ServerData.HintLookup["Soul Fragment 3"];
             var summonMessageFormat = Dialogue.TranslationKeytoHintMessage[summonStone];
             var summon2Hint = ArchipelagoClient.ServerData.HintLookup["Summon Stone 2"];
