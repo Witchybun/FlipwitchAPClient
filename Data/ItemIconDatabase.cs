@@ -91,7 +91,7 @@ namespace FlipwitchAP.Data
             {
                 return "DemonBossKey";
             }
-            else if (itemName.Contains("Key"))
+            else if (itemName.Contains("Key", StringComparison.OrdinalIgnoreCase))
             {
                 return "RundownHouseKey";
             }
@@ -131,17 +131,13 @@ namespace FlipwitchAP.Data
             {
                 return "MagicalMushroom";
             }
-            else if (itemName.Contains("Briefcase") || itemName.Contains("Luggage"))
+            else if (itemName.Contains("Briefcase") || itemName.Contains("Luggage") || itemName.Contains("Bag"))
             {
                 return "GoblinModelLuggage";
             }
             else if (itemName.Contains("Feather"))
             {
                 return "HarpyFeather";
-            }
-            else if (itemName.Contains("Bag"))
-            {
-                return "UnstableBomb";
             }
             else if (itemName.Contains("Bomb"))
             {
