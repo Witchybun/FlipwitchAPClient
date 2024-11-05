@@ -114,9 +114,7 @@ public class ArchipelagoClient
             }
             var seedBeforeSetup = ServerData.Seed;
             ServerData.SetupSession(success.SlotData);
-
             BuildLocations(seedBeforeSetup);
-
             DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
             session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
@@ -301,6 +299,7 @@ public class ArchipelagoClient
 
     public string GetPlayerNameFromSlot(int slot)
     {
+        if (slot < 0) return "CheaterBozo";
         return session.Players.GetPlayerName(slot);
     }
 
