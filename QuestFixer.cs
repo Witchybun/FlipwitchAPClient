@@ -467,12 +467,12 @@ namespace FlipwitchAP
                     {
                         var receivedStones = new NPCDialogueAdvanced.SwitchRequirement()
                         {
-                            switchName = "APSummonStoneCount",
+                            switchName = "APNatashaCount",
                             switchValue = 2,
                             comparisonOperator = ComparisonOperators.IS_MORE_THAN
                         };
                         var stoneGroups = __instance.dialogueGroups;
-                        if (!stoneGroups[1].switches.Any(x => x.switchName == "APSummonStoneCount"))
+                        if (!stoneGroups[1].switches.Any(x => x.switchName == "APNatashaCount"))
                         {
                             stoneGroups[1].switches.Add(receivedStones);
                         }
