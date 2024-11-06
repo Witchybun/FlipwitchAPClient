@@ -274,6 +274,11 @@ namespace FlipwitchAP
                         var rewardDropBounce = world.Find("38_RewardDrop").Find("LevelData").Find("Bouncy_Honey (10)");
                         rewardDropBounce.GetComponent<BouncyHoney>().force = 60;
                         world.Find("30_DangerDrop").Find("LevelData").Find("Bouncy_Honey (14)").GetComponent<BouncyHoney>().force = 70;
+                        var deepDropBounce = GameObject.Instantiate(rewardDropBounce);
+                        var deepDropSpot = world.Find("11_DeepDrop").Find("LevelData");
+                        deepDropBounce.parent = deepDropSpot;
+                        deepDropBounce.position = new Vector3(-152.485f, -48.395f, 0f);
+                        deepDropBounce.GetComponent<BouncyHoney>().force = 35;
                         return;
                     }
             }
