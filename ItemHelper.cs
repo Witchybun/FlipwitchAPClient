@@ -37,41 +37,31 @@ namespace FlipwitchAP
                 case "Animal Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAnimalCoin");
-                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APAnimalCoin", currentCount + 1);
-                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Bunny Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APBunnyCoin");
-                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APBunnyCoin", currentCount + 1);
-                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Monster Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APMonsterCoin");
-                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APMonsterCoin", currentCount + 1);
-                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Angel & Demon Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APAngelDemonCoin");
-                        if (currentCount > 9) return;
                         SwitchDatabase.instance.setInt("APAngelDemonCoin", currentCount + 1);
-                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Promotional Coin":
                     {
                         var currentCount = SwitchDatabase.instance.getInt("APPromotionalCoin");
-                        if (currentCount > 0) return;
                         SwitchDatabase.instance.setInt("APPromotionalCoin", currentCount + 1);
-                        SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
                         return;
                     }
                 case "Woods Crystal Blockade Removal":
@@ -109,11 +99,14 @@ namespace FlipwitchAP
                     }
                 case "Health Upgrade":
                     {
+                        SwitchDatabase.instance.getInt("hpUpgradeLevel");  // Done to initialize if needed
                         SwitchDatabase.instance.upgradeHPLevel();
                         return;
                     }
                 case "Mana Upgrade":
                     {
+                        
+                        SwitchDatabase.instance.getInt("mpUpgradeLevel");  // Done to initialize if needed
                         SwitchDatabase.instance.upgradeMPLevel();
                         return;
                     }
