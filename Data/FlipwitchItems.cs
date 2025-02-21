@@ -13,6 +13,15 @@ namespace FlipwitchAP
             "Animal Coin", "Bunny Coin", "Monster Coin", "Angel & Demon Coin", "Promotional Coin", "Sexual Experience"
         };
 
+        public static readonly List<string> QuestItems = new()
+        {
+            "FairyBubble", "BewitchedBubble", "GoblinHeadshot", "GoblinBusinessCard", "GoblinModelLuggage", "MimicKey", "DeliciousMilk", 
+            "GlassWand", "BelleMilkshake", "CatGirlsClothes", "MomoBotAdminPassword", "Cowbell", "LegendaryHalo", "Wine", 
+            "CherryKey", "VIPKey", "AngelLetter", "DemonLetter", "FungalKey", "FungalForestDeed", "AbandonedApartmentKey", 
+            "HellishDango", "HeavenlyDaikon", "SummonStone1", "SummonStone2", "SummonStone3", "SoulFragment1", "SoulFragment2", "SoulFragment3", 
+            "BunnyCostume", "MaidContract", "SilkySlime"
+        };
+
         public static readonly Dictionary<string, string> APItemToGameName = new()
         {
             {"Nothing", "Blank"},

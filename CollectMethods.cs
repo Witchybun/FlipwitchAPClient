@@ -48,12 +48,11 @@ ref bool ___dropped, ref bool ___playerWithinZone, ref float ___spawnCountdown)
             ___spawnCountdown = 0f;
             if (!FlipwitchLocations.ChestLocations.TryGetValue(__instance.itemName, out var location))
             {
-                Plugin.Logger.LogInfo($"The switch {__instance.itemName} isn't in the dictionary.");
+                Plugin.Logger.LogWarning($"The switch {__instance.itemName} isn't in the dictionary.");
                 return true;
             }
             var isSwitchToggled = SwitchDatabase.instance.getInt(___switchName) > 0;
             var isLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(location.APLocationID);
-            Plugin.Logger.LogInfo($"Switch Toggled: {isSwitchToggled}, location checked: {isLocationChecked}");
             if (isSwitchToggled || isLocationChecked)
             {
                 ___dropped = true;

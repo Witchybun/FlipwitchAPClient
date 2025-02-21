@@ -16,6 +16,10 @@ namespace FlipwitchAP
         [HarmonyPostfix]
         private static void OnEnable_WriteArchipelagoInfoInstead(StoreUI __instance)
         {
+            if (!ArchipelagoClient.ServerData.Shopsanity)
+            {
+                return;
+            }
             var itemListings = (List<StoreItemListing>)__instance.GetType().GetField("itemListings", GenericMethods.Flags).GetValue(__instance);
             var itemsOnOffer = (List<ItemShopListingMetaData>)__instance.GetType().GetField("itemsOnOffer", GenericMethods.Flags).GetValue(__instance);
             for (var i = 0; i < itemsOnOffer.Count; i++)
@@ -26,7 +30,7 @@ namespace FlipwitchAP
                 }
                 if (!FlipwitchLocations.ShopLocations.TryGetValue(itemListings[i].itemNameID, out var location))
                 {
-                    Plugin.Logger.LogInfo($"Could not find location for {itemListings[i].itemNameID}");
+                    Plugin.Logger.LogWarning($"Could not find location for {itemListings[i].itemNameID}");
                     continue;
                 }
                 var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
@@ -46,6 +50,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool UpdateInput_SendLocationOnPurchase(StoreUI __instance)
         {
+            if (!ArchipelagoClient.ServerData.Shopsanity)
+            {
+                return true;
+            }
             SwitchDatabase instance = SwitchDatabase.instance;
             var popUpActivated = (bool)__instance.GetType().GetField("popUpActivated", GenericMethods.Flags).GetValue(__instance);
             if (popUpActivated && !SwitchDatabase.instance.isItemPopupActive())
@@ -108,9 +116,13 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool UpdateSelectedItemInfo_UpdateArchipelagoItemInfo(StoreUI __instance, string itemName)
         {
+            if (!ArchipelagoClient.ServerData.Shopsanity)
+            {
+                return true;
+            }
             if (!FlipwitchLocations.ShopLocations.TryGetValue(itemName, out var location))
             {
-                Plugin.Logger.LogInfo($"Could not find location for {itemName}");
+                Plugin.Logger.LogWarning($"Could not find location for {itemName}");
                 return true;
             }
             var locationScout = ArchipelagoClient.ServerData.ScoutedLocations[FlipwitchLocations.ShopLocations[itemName].APLocationID];

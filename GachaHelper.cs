@@ -17,6 +17,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool GachaWaiting_ChangeEnum(GachaSceneManager __instance)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return true;
+            }
             __instance.prizeArrow.SetActive(value: true);
             apPhase = GachaPhase.INPUT_OPEN_PRIZE;
             return false;
@@ -27,6 +31,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool UpdateTokenDisplay_DisplayAPCoinCountInstead(GachaSceneManager __instance)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return true;
+            }
             var currentCollection = (GachaCollections)__instance.GetType().GetField("currentCollection", GenericMethods.Flags).GetValue(__instance);
             var coinName = ObtainCoinName(currentCollection);
             int gachaTokenCount = SwitchDatabase.instance.getInt("AP" + coinName);
@@ -48,6 +56,10 @@ namespace FlipwitchAP
         private static void LoadMachine_ReloadMachineBasedOnLocationsNotItems(GachaSceneManager __instance, GachaCollections collection, 
         ref int ___ballsRemaining, ref List<int> ___remainingGachasIndexes)
         {
+            if (ArchipelagoClient.ServerData.Gachapon != ArchipelagoData.Gacha.All)
+            {
+                return;
+            }
             apPhase = GachaPhase.INPUT_PAY;
             foreach (GachaCollection gachaCollection in SwitchDatabase.instance.gachaCollections)
             {
@@ -76,6 +88,10 @@ namespace FlipwitchAP
         private static bool EjectGacha_SwapBoolToggleWithLocation(GachaSceneManager __instance, ref GachaCollections ___currentCollection, 
         ref int ___ballsRemaining)
         {
+            if (ArchipelagoClient.ServerData.Gachapon != ArchipelagoData.Gacha.All)
+            {
+                return true;
+            }
             ___ballsRemaining--;
             if (___ballsRemaining < 0)
             {
@@ -117,6 +133,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool Update_AlterGachaBasedOnNewCoinSystem(GachaSceneManager __instance, ref float ___closePrizeCooldown)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return true;
+            }
             switch (apPhase)
             {
                 case GachaPhase.INPUT_PAY:
@@ -139,7 +159,7 @@ namespace FlipwitchAP
                             if (!SwitchDatabase.instance.DEBUG_infiniteGachaCoins)
                             {
                                 RemoveTokenGivenCollection(currentCollection);
-                                SwitchDatabase.instance.GetType().GetMethod("refreshGachaTokenCount", GenericMethods.Flags).Invoke(SwitchDatabase.instance, null);
+                                RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
                             }
                             var updateTokenDisplay = __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags);
                             updateTokenDisplay.Invoke(__instance, null);
@@ -203,6 +223,10 @@ namespace FlipwitchAP
         [HarmonyPostfix]
         private static void InitializeDisplay_WriteSpecialGachaInstead(KeyItemScreen __instance)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return;
+            }
             var animalCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAnimalCoin"));
             var bunnyCount = GetStringFromInt(SwitchDatabase.instance.getInt("APBunnyCoin"));
             var monsterCount = GetStringFromInt(SwitchDatabase.instance.getInt("APMonsterCoin"));
@@ -214,8 +238,12 @@ namespace FlipwitchAP
 
         [HarmonyPatch(typeof(SwitchDatabase), "refreshGachaTokenCount")]
         [HarmonyPostfix]
-        private static void RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase __instance)
+        public static void RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase __instance)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return;
+            }
             var animalCount = GetStringFromInt(SwitchDatabase.instance.getInt("APAnimalCoin"));
             var bunnyCount = GetStringFromInt(SwitchDatabase.instance.getInt("APBunnyCoin"));
             var monsterCount = GetStringFromInt(SwitchDatabase.instance.getInt("APMonsterCoin"));

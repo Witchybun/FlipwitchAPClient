@@ -13,6 +13,7 @@ using FlipwitchAP.Utils;
 using FlipwitchAP.Data;
 using static FlipwitchAP.Data.FlipwitchLocations;
 using System.Collections.ObjectModel;
+using BepInEx.Logging;
 
 namespace FlipwitchAP.Archipelago;
 
@@ -40,6 +41,7 @@ public class ArchipelagoClient
     public void Connect()
     {
         if (Authenticated || attemptingConnection) return;
+        attemptingConnection = true;
 
         try
         {
@@ -50,7 +52,6 @@ public class ArchipelagoClient
         {
             Plugin.Logger.LogError(e);
         }
-
         TryConnect();
     }
 
@@ -159,6 +160,15 @@ public class ArchipelagoClient
             BuildLocationTable();
             // Scout unchecked locations
             var uncheckedLocationIDs = from locationID in LocationTable.Keys select locationID;
+            var locations = session.Locations.AllLocations;
+            foreach (var location in uncheckedLocationIDs)
+            {
+                if (locations.Contains(location))
+                {
+                    continue;
+                }
+                Plugin.Logger.LogWarning($"There's a location you're trying to scout that isn't there!  Location: {location}");
+            }
             Task<Dictionary<long, ScoutedItemInfo>> scoutedInfoTask = Task.Run(async () => await session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
             //Task<LocationInfoPacket> locationInfoTask = Task.Run(async () => await Session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
             if (scoutedInfoTask.IsFaulted)
@@ -183,6 +193,43 @@ public class ArchipelagoClient
         foreach (var location in FlipwitchLocations.APLocationData)
         {
             if (location.IgnoreLocationHandler == true)
+            {
+                continue;
+            }
+            // There's like one coin chest in cabaret lol
+            if (location.APLocationID == 494 && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+            {
+                continue;
+            }
+            else if (location.PrimaryCallName.Contains("ChaosKey") && !ServerData.ShuffleChaosPieces)
+            {
+                continue;
+            }
+            else if (FlipwitchItems.QuestItems.Contains(location.PrimaryCallName) && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+            {
+                continue;
+            }
+            else if (location.Type == QUEST && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+            {
+                continue;
+            }
+            else if (location.Type == SEX && ServerData.QuestForSex == ArchipelagoData.Quest.Off)
+            {
+                continue;
+            }
+            else if (location.Type == GACHA && ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                continue;
+            }
+            else if (location.Type == GACHAMACHINE && ServerData.Gachapon != ArchipelagoData.Gacha.All)
+            {
+                continue;
+            }
+            else if (location.Type == SHOP && !ServerData.Shopsanity)
+            {
+                continue;
+            }
+            else if (location.Type == STAT && !ServerData.Statshuffle)
             {
                 continue;
             }

@@ -6,6 +6,7 @@ using static FlipwitchAP.Data.FlipwitchLocations;
 using System;
 using UnityEngine;
 using Archipelago.MultiClient.Net.Enums;
+using UnityEngine.Analytics;
 
 namespace FlipwitchAP
 {
@@ -14,12 +15,16 @@ namespace FlipwitchAP
         private const string CHEST = "Chest";
         private const string CUTSCENE = "Cutscene";
         private const string QUEST = "Quest";
-        
+
         // Code for patching gacha token pickups
         [HarmonyPatch(typeof(GachaCoinCollect), "OnTriggerEnter2D")]
         [HarmonyPrefix]
         private static bool OnTriggerEnter2D_GiveLocationInsteadofToken(GachaCoinCollect __instance, Collider2D collision)
         {
+            if (ArchipelagoClient.ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+            {
+                return true;
+            }
             var collected = (bool)__instance.GetType().GetField("collected", GenericMethods.Flags).GetValue(__instance);
             bool flag = PlayerController.GetPlayerControllerFromCollider(collision) != null;
             if (!collected && flag)
@@ -42,6 +47,15 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool giveItem_GiveLocationInstead(ChestItemDrop __instance)
         {
+            var questStatus = ArchipelagoClient.ServerData.QuestForSex;
+            if ((questStatus == ArchipelagoData.Quest.Off || questStatus == ArchipelagoData.Quest.Sensei) && FlipwitchItems.QuestItems.Contains(__instance.itemName))
+            {
+                return true;
+            }
+            if (!ArchipelagoClient.ServerData.ShuffleChaosPieces && __instance.itemName.Contains("ChaosKey"))
+            {
+                return true;
+            }
             var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
             SwitchDatabase.instance.setInt(switchName, 1);
             if (!FlipwitchLocations.ChestLocations.TryGetValue(__instance.itemName, out var location))
@@ -81,6 +95,11 @@ namespace FlipwitchAP
         private static bool AnyKeyPressed_SendLocationNotGetItem(DialogueManager __instance)
         {
             var queuedItemName = (string)__instance.GetType().GetField("queuedItemName", GenericMethods.Flags).GetValue(__instance);
+            if (queuedItemName != "PeachyPeach" && (ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Off ||
+            ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+            {
+                return true;
+            }
             var giveItemActive = (bool)__instance.GetType().GetField("giveItemActive", GenericMethods.Flags).GetValue(__instance);
             if (queuedItemName != "" && !giveItemActive)
             {
@@ -150,8 +169,14 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool GivePlayerItem_GiveAPLocationInCaseofUpdateMethodNonsense(SwitchDatabase __instance, string itemName, bool skipPopup = false, Action onPopupCloseCallback = null)
         {
+
             if (UpdateWhitelist.Contains(itemName))
             {
+                var questStatus = ArchipelagoClient.ServerData.QuestForSex;
+                if (questStatus == ArchipelagoData.Quest.Off || questStatus == ArchipelagoData.Quest.Sensei)
+                {
+                    return true;
+                }
                 var location = SecondaryCallLocations[itemName];
                 SendLocationGivenLocationDataSendingGift(location);
                 CreateItemNotification(location, onPopupCloseCallback);
@@ -193,7 +218,6 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool OnEnable_GiveLocationInsteadOfSwitch(SetSwitchValueIngameCutscene __instance)
         {
-            Plugin.Logger.LogInfo(__instance.switchName);
             if (!CutsceneLocations.TryGetValue(__instance.switchName, out var location))
             {
                 return true;
@@ -210,13 +234,18 @@ namespace FlipwitchAP
             return false;
         }
 
-        
+
 
         // Handles the case where you complete a quest.
         [HarmonyPatch(typeof(QuestUpdatedPopup), "completeQuest")]
         [HarmonyPostfix]
         private static void CompleteQuest_GiveQuestLocation(QuestUpdatedPopup __instance)
         {
+            var questStatus = ArchipelagoClient.ServerData.QuestForSex;
+            if (questStatus == ArchipelagoData.Quest.Off || questStatus == ArchipelagoData.Quest.Sensei)
+            {
+                return;
+            }
             var questName = __instance.questName.textObject.text;
             if (!QuestLocations.TryGetValue(questName, out var location))
             {
@@ -232,6 +261,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool OnTriggerEnter2D_GiveItemInsteadHP(HealthContainerUpgrade __instance, Collider2D collision)
         {
+            if (!ArchipelagoClient.ServerData.Statshuffle)
+            {
+                return true;
+            }
             bool flag = PlayerController.GetPlayerControllerFromCollider(collision) != null;
             var collected = (bool)__instance.GetType().GetField("collected", GenericMethods.Flags).GetValue(__instance);
             if (!collected && flag)
@@ -257,6 +290,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool OnTriggerEnter2D_GiveItemInsteadMP(HealthContainerUpgrade __instance, Collider2D collision)
         {
+            if (!ArchipelagoClient.ServerData.Statshuffle)
+            {
+                return true;
+            }
             bool flag = PlayerController.GetPlayerControllerFromCollider(collision) != null;
             var collected = (bool)__instance.GetType().GetField("collected", GenericMethods.Flags).GetValue(__instance);
             if (!collected && flag)
@@ -282,6 +319,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool HandleAllPendingUpgrades_SendOutChecksInstead(SwitchDatabase __instance)
         {
+            if (ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Off)
+            {
+                return true;
+            }
             var playerWandLocationCount = __instance.getInt("APPlayerWand");
             if (__instance.getInt("APPlayerWand") < __instance.getInt("PendingWandLevel"))
             {
@@ -331,7 +372,7 @@ namespace FlipwitchAP
                 var pickedLocation = SexExperienceLocations[pickedLocationName];
                 SendLocationGivenLocationDataSendingGift(pickedLocation);
             }
-            
+
         }
 
         public static void SendLocationGivenLocationDataSendingGift(LocationData locationData)

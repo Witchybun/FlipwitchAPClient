@@ -18,15 +18,15 @@ namespace FlipwitchAP.Data
         public static Dictionary<string, LocationData> SexExperienceLocations = new();
         public static Dictionary<long, LocationData> IDToLocation = new();
 
-        private const string CHEST = "Chest";
-        private const string COINCHEST = "Coin Chest";
-        private const string CUTSCENE = "Cutscene";
-        private const string QUEST = "Quest";
-        private const string STAT = "Stat";
-        private const string SEX = "Sex Experience";
-        private const string GACHA = "Gacha";
-        private const string GACHAMACHINE = "Gacha Machine";
-        private const string SHOP = "Shop";
+        public const string CHEST = "Chest";
+        public const string COINCHEST = "Coin Chest";
+        public const string CUTSCENE = "Cutscene";
+        public const string QUEST = "Quest";
+        public const string STAT = "Stat";
+        public const string SEX = "Sex Experience";
+        public const string GACHA = "Gacha";
+        public const string GACHAMACHINE = "Gacha Machine";
+        public const string SHOP = "Shop";
 
         public class LocationData
         {
