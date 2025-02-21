@@ -34,6 +34,8 @@ namespace FlipwitchAP
                         {
                             SwitchDatabase.instance.playerMov.GetType().GetMethod("flipGender", Flags).Invoke(SwitchDatabase.instance.playerMov, null);
                         }
+                        SwitchDatabase.instance.givePlayerItem("GoblinCrystal", true);
+                        SwitchDatabase.instance.givePlayerItem("PortablePortal", true);
                         return;
                     }
                 case "Chaos Witch Defeated For Real":
@@ -139,6 +141,7 @@ namespace FlipwitchAP
                 ItemHelper.GiveFlipwitchItem(item);
                 ArchipelagoClient.ServerData.Index++;
             }
+            GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
         }
 
         public static void HandleMissingItems(List<ItemInfo> items)
@@ -165,6 +168,7 @@ namespace FlipwitchAP
                 Plugin.Logger.LogInfo($"Gave back {item.ItemName}");
                 continue;
             }
+            GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
         }
 
         public static void HandleLocationDifference()
@@ -181,7 +185,6 @@ namespace FlipwitchAP
                 if (switchToFlip != "")
                 {
                     SwitchDatabase.instance.setInt(switchToFlip, 1);
-                    Plugin.Logger.LogInfo($"{switchToFlip} set to {SwitchDatabase.instance.getInt(switchToFlip)}");
                 }
             }
         }
@@ -214,71 +217,6 @@ namespace FlipwitchAP
                         }
                         var bestGirlSwitch = GameObject.Find("World").transform.Find("CabaretCafe").Find("LevelData").Find("Cabaret Owner Complete Manager");
                         bestGirlSwitch.GetComponent<SetGameObjectEnabledOnSwitch>().switchName = "APCabaretComplete";
-                        return;
-                    }
-            }
-        }
-
-        public static void SoftlockSparer(string sceneName)
-        {
-            switch (sceneName)
-            {
-                case "Jigoku_Main":
-                    {
-                        var world = GameObject.Find("Grid").transform.Find("World");
-                        var antHell = world.Find("16_AntHill").Find("LevelData");
-                        var bouncy = antHell.Find("Bouncy_Honey (2)").gameObject;
-                        var antBounce = GameObject.Instantiate(bouncy);
-                        antBounce.transform.parent = antHell;
-                        antBounce.transform.position = new Vector3(142.8934f, -95.395f, 0f);
-
-                        var firstDrop = world.Find("4_FirstDrop").Find("LevelData");
-                        var firstBounce = GameObject.Instantiate(bouncy);
-                        firstBounce.transform.parent = firstDrop;
-                        firstBounce.transform.position = new Vector3(-87.1152f, -38.395f, 0f);
-                        firstBounce.GetComponent<BouncyHoney>().force = 40;
-
-                        var orangeRoom = world.Find("ClubDemon").Find("53_OrangeStairs").Find("LevelData");
-                        orangeRoom.Find("Bouncy_Honey (33)").gameObject.GetComponent<BouncyHoney>().force = 50;
-
-                        var purpleOrangeBouncy = GameObject.Instantiate(bouncy);
-                        var purpleOrangeRoom = world.Find("ClubDemon").Find("40_PurpleOrange").Find("LevelData");
-                        purpleOrangeBouncy.transform.parent = purpleOrangeRoom;
-                        purpleOrangeBouncy.transform.position = new Vector3(-9.99f, -225.4299f, 0.1f);
-                        purpleOrangeBouncy.gameObject.GetComponent<BouncyHoney>().force = 55;
-                        return;
-                    }
-                case "Tengoku_Final":
-                    {
-                        var world = GameObject.Find("World").transform.Find("Tengoku");
-                        var freeBouncy = world.Find("4_CloudUp").Find("LevelData").Find("Bouncy_Honey (2)");
-                        var extraCloudBouncy = GameObject.Instantiate(freeBouncy);
-                        extraCloudBouncy.transform.parent = world.Find("4_CloudUp").Find("LevelData");
-                        extraCloudBouncy.transform.position = new Vector3(23.0589f, 203.6128f, 0f);
-                        return;
-                    }
-                case "FungalForest_Main":
-                    {
-                        var world = GameObject.Find("World").transform;
-                        var freeBouncy = world.Find("19_MushroomClimb").Find("LevelData").Find("Bouncy_Honey (8)");
-                        var plummetBouncy = GameObject.Instantiate(freeBouncy);
-                        var plummet = world.Find("18_Plummet").Find("LevelData");
-                        plummetBouncy.transform.parent = plummet;
-                        plummetBouncy.transform.position = new Vector3(339.0535f, -49.2658f, 0f);
-                        plummetBouncy.GetComponent<BouncyHoney>().force = 80;
-                        return;
-                    }
-                case "UmiUmi_Main":
-                    {
-                        var world = GameObject.Find("World").transform;
-                        var rewardDropBounce = world.Find("38_RewardDrop").Find("LevelData").Find("Bouncy_Honey (10)");
-                        rewardDropBounce.GetComponent<BouncyHoney>().force = 60;
-                        world.Find("30_DangerDrop").Find("LevelData").Find("Bouncy_Honey (14)").GetComponent<BouncyHoney>().force = 70;
-                        var deepDropBounce = GameObject.Instantiate(rewardDropBounce);
-                        var deepDropSpot = world.Find("11_DeepDrop").Find("LevelData");
-                        deepDropBounce.parent = deepDropSpot;
-                        deepDropBounce.position = new Vector3(-152.485f, -48.395f, 0f);
-                        deepDropBounce.GetComponent<BouncyHoney>().force = 35;
                         return;
                     }
             }
