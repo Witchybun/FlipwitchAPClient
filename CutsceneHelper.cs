@@ -54,6 +54,10 @@ namespace FlipwitchAP
         [HarmonyPrefix]
         private static bool CalculateUnlockedRewards_CalculateUsingOwnUnlockCount(Cutscene __instance)
         {
+            if (ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Off)
+            {
+                return true;
+            }
             int playerPeachChargesCap = SwitchDatabase.instance.getInt("APTotalPeachCharges");
             int num = SwitchDatabase.instance.getInt("SexualExperienceCount") / 4;
             int @int = SwitchDatabase.instance.getInt("PendingPeachCharges");
