@@ -134,11 +134,18 @@ namespace FlipwitchAP
             var translationDictionary = (Dictionary<string, string>) translationDictionaryField.GetValue(SwitchDatabase.instance.dialogueManager);
             foreach (var fortunePair in ArchipelagoClient.ServerData.FortuneTellerLookup)
             {
-                if (fortunePair.Key == -100) // Last one; victory
+                if (!int.TryParse(fortunePair.Key, out var code))
+                {
+                    Plugin.Logger.LogWarning($"Tried to parse {fortunePair.Key} and failed.");
+                    Plugin.Logger.LogWarning($"Was for \"{fortunePair.Value}\"");
+                    continue;
+                }
+                if ( code == -100) // Last one; victory
                 {
                     translationDictionary["Psychic.1.1"] = fortunePair.Value;
                     break;
-                }var wasLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(fortunePair.Key);
+                }
+                var wasLocationChecked = Plugin.ArchipelagoClient.IsLocationChecked(code);
                 if (wasLocationChecked)
                 {
                     continue;
