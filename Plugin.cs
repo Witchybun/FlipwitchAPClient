@@ -15,7 +15,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.2.0";
+    public const string PluginVersion = "0.2.6";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
@@ -103,7 +103,6 @@ public class Plugin : BaseUnityPlugin
     {
         IsInGame = scene.name != "MainMenu";
         GenericMethods.PatchSceneSwitchTriggers(scene.name);
-        GenericMethods.SoftlockSparer(scene.name);
         if (!IsInGame)
         {
             //ArchipelagoConsole.CreateArchipelagoMenu();
