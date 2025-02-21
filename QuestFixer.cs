@@ -395,6 +395,10 @@ namespace FlipwitchAP
                         {
                             goblianaGroups[6].switches.Add(wasGivenLuggage);
                         }
+                        if (!goblianaGroups[6].switches.Any(x => x.switchName == "APGoblianaGaveKey"))
+                        {
+                            goblianaGroups[6].switches.Add(wasGivenKey);
+                        }
                         var swapPosition = goblianaGroups[4];
                         goblianaGroups[4] = goblianaGroups[6];
                         goblianaGroups[6] = swapPosition;
