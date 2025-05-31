@@ -93,7 +93,13 @@ ref bool ___dropped, ref bool ___playerWithinZone, ref float ___spawnCountdown)
         {
             if (!FlipwitchLocations.StatLocations.TryGetValue(___switchName, out var location))
             {
-                return true;
+                var nonEuropeanSwitchName = ___switchName.Replace(",", ".");
+                if (!FlipwitchLocations.StatLocations.TryGetValue(nonEuropeanSwitchName, out var euroLocation))
+                {
+                    return true;
+                }
+                location = euroLocation;
+                
             }
             if (SwitchDatabase.instance.getInt(___switchName) > 0 || Plugin.ArchipelagoClient.IsLocationChecked(location.APLocationID))
             {
@@ -109,7 +115,13 @@ ref bool ___dropped, ref bool ___playerWithinZone, ref float ___spawnCountdown)
         {
             if (!FlipwitchLocations.StatLocations.TryGetValue(___switchName, out var location))
             {
-                return true;
+                var nonEuropeanSwitchName = ___switchName.Replace(",", ".");
+                if (!FlipwitchLocations.StatLocations.TryGetValue(nonEuropeanSwitchName, out var euroLocation))
+                {
+                    return true;
+                }
+                location = euroLocation;
+                
             }
             if (SwitchDatabase.instance.getInt(___switchName) > 0 || Plugin.ArchipelagoClient.IsLocationChecked(location.APLocationID))
             {
