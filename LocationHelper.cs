@@ -273,7 +273,11 @@ namespace FlipwitchAP
                 var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
                 var anim = (Animator)__instance.GetType().GetField("anim", GenericMethods.Flags).GetValue(__instance);
                 anim.Play("HeartContainer_collect");
-                var location = FlipwitchLocations.StatLocations[switchName];
+                if (!FlipwitchLocations.StatLocations.TryGetValue(switchName, out var location))
+                {
+                    switchName = switchName.Replace(",", ".");  // European players may run into a situation where this is commas
+                    location = FlipwitchLocations.StatLocations[switchName];
+                }
                 SendLocationGivenLocationDataSendingGift(location);
                 CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_hpup", __instance.gameObject);
@@ -302,7 +306,11 @@ namespace FlipwitchAP
                 var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
                 var anim = (Animator)__instance.GetType().GetField("anim", GenericMethods.Flags).GetValue(__instance);
                 anim.Play("ManaContainer_collect");
-                var location = FlipwitchLocations.StatLocations[switchName];
+                if (!FlipwitchLocations.StatLocations.TryGetValue(switchName, out var location))
+                {
+                    switchName = switchName.Replace(",", ".");  // European players may run into a situation where this is commas
+                    location = FlipwitchLocations.StatLocations[switchName];
+                }
                 SendLocationGivenLocationDataSendingGift(location);
                 CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_mpup", __instance.gameObject);
@@ -425,7 +433,7 @@ namespace FlipwitchAP
             SwitchDatabase.instance.ItemCollectPopUp.popUpItem("Item." + item2.ItemID + ".Name", "Item." + item2.ItemID + ".Description", howToUseId, item2.animatorController, onItemPopupClosedCallback);
         }
 
-        private static void FakeInternalPopUpItem(ArchipelagoItem scoutedInformation)
+        private static void FakeInternalPopUpItem(long locationID, ArchipelagoItem scoutedInformation)
         {
             var swappedItem = "Blank";
             var name = scoutedInformation.Name;
@@ -447,8 +455,7 @@ namespace FlipwitchAP
             }
             else
             {
-                name = scoutedInformation.SlotName + "'s " + scoutedInformation.Name;
-                swappedItem = ItemIconDatabase.GiveSpecialIconGivenItemname(scoutedInformation.Name);
+                name = $"{scoutedInformation.Game}_{scoutedInformation.Name}_{locationID}_{scoutedInformation.SlotName}";
                 swappedDesc = $"An item from the world of {scoutedInformation.Game}.  It vanishes upon you touching it.";
                 var singleClassification = ItemFlags.None;
 
@@ -466,8 +473,11 @@ namespace FlipwitchAP
                 }
                 swappedFlav = FlipwitchItems.ClassificationToUseBlurb[singleClassification];
             }
-            var fakeAnim = SwitchDatabase.instance.itemDictionary[swappedItem].animatorController;
-
+            var fakeAnim = SwitchDatabase.instance.itemDictionary["Blank"].animatorController;
+            if (isOwnItem)
+            {
+                fakeAnim = SwitchDatabase.instance.itemDictionary[swappedItem].animatorController;
+            }
 
             SwitchDatabase.instance.ItemCollectPopUp.popUpItem(name, swappedDesc, swappedFlav, fakeAnim);
 
@@ -494,12 +504,12 @@ namespace FlipwitchAP
                 }
                 else
                 {
-                    FakeInternalPopUpItem(scoutedInformation);
+                    FakeInternalPopUpItem(location.APLocationID, scoutedInformation);
                 }
             }
             else
             {
-                FakeInternalPopUpItem(scoutedInformation);
+                FakeInternalPopUpItem(location.APLocationID, scoutedInformation);
             }
         }
     }
