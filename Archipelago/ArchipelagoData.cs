@@ -11,6 +11,7 @@ public class ArchipelagoData
 {
     public string Uri;
     public int SlotId;
+    public int TeamId;
     public string SlotName;
     public string Password;
     public int Index;
@@ -62,7 +63,8 @@ public class ArchipelagoData
     {
         Uri = "localhost";
         SlotName = "Player1";
-        SlotId = 0;
+        SlotId = -1;
+        TeamId = -1;
         CheckedLocations = new();
     }
 
