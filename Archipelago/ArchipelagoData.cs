@@ -10,7 +10,7 @@ namespace FlipwitchAP.Archipelago;
 public class ArchipelagoData
 {
     public string Uri;
-    public int SlotId;
+    public static int SlotId;
     public string SlotName;
     public string Password;
     public int Index;

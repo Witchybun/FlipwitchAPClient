@@ -382,7 +382,7 @@ public class ArchipelagoClient
 
     public void SendCurrentScene(string sceneName)
     {
-        session.DataStorage["FlipwitchZone"] = sceneName;
+        session.DataStorage["FlipwitchZone_" + ArchipelagoData.SlotId] = sceneName;
     }
 
     public void ReceiveViolation()

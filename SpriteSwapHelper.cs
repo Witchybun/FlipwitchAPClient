@@ -45,6 +45,12 @@ namespace FlipwitchAP
             }
         }
 
+        public class itemDescription
+        {
+            public string Name;
+            public string Description;
+        }
+
         public static Dictionary<string, Dictionary<string, SpriteData>> GameToSpriteData = new() { };
 
         [HarmonyPatch(typeof(ItemCollectPopup), "popUpItem")]
@@ -118,11 +124,12 @@ namespace FlipwitchAP
             {
                 var gameName = Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar));
                 var aliasPath = Path.Combine(folder, "aliases.json");
-                var descriptionPath = Path.Combine(folder, "description.json");
+                var descriptionPath = Path.Combine(folder, "descriptions.json");
                 var aliasText = "";
                 var descriptionText = "";
                 var aliasGroup = new ItemSpriteAliases();
                 var aliases = new Dictionary<string, List<string>>();
+                var descriptionList = new List<itemDescription>();
                 var descriptions = new Dictionary<string, string>();
                 if (File.Exists(aliasPath))
                 {
@@ -136,7 +143,8 @@ namespace FlipwitchAP
                 if (File.Exists(descriptionPath))
                 {
                     descriptionText = File.ReadAllText(descriptionPath);
-                    descriptions = JsonConvert.DeserializeObject<Dictionary<string, string>>(descriptionText);
+                    descriptionList = JsonConvert.DeserializeObject<List<itemDescription>>(descriptionText);
+                    descriptions = CreateLookupForDescription(descriptionList);
                 }
                 var pictures = Directory.GetFiles(folder).Select(Path.GetFileName);
                 GameToSpriteData[gameName] = new();
@@ -190,9 +198,18 @@ namespace FlipwitchAP
                     }
                     newSpriteData = new SpriteData(itemDescription, sprite);
                     GameToSpriteData[gameName][lookup] = newSpriteData;
-                    Plugin.Logger.LogInfo($"Added {itemName} to {gameName} list");
                 }
             }
+        }
+
+        private static Dictionary<string, string> CreateLookupForDescription(List<itemDescription> itemDescriptions)
+        {
+            var result = new Dictionary<string, string>();
+            foreach (var item in itemDescriptions)
+            {
+                result[item.Name] = item.Description;
+            }
+            return result;
         }
 
         private static void MakeGenericArchipelagoItemsFirst(string path)
@@ -213,7 +230,7 @@ namespace FlipwitchAP
                 var bytes = File.ReadAllBytes(picturePath);
                 var texture = new Texture2D(2, 2);
                 texture.LoadImage(bytes);
-                var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width/2, texture.height/2));
+                var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
                 var itemDescription = $"An item from an Archipelago.";
                 var newSpriteData = new SpriteData(itemDescription, sprite);
                 newSpriteData = new SpriteData(itemDescription, sprite);
