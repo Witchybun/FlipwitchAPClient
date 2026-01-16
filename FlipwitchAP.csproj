@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>FlipwitchAP</AssemblyName>
     <Product>FlipwitchAP</Product>
-    <Version>0.2.6</Version>
+    <Version>0.2.12</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.5.0" />
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.6.0" />
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.AssemblyPublicizer" Version="0.4.2" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
@@ -29,30 +29,30 @@
   </ItemGroup>
 
       <ItemGroup>
-    <Reference Include="Assembly-CSharp" HintPath="/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Assembly-CSharp.dll" Publicize="true" />
+    <Reference Include="Assembly-CSharp" HintPath="/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Assembly-CSharp.dll" Publicize="true" />
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/UnityEngine.UI.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Ak.Wwise.Api.WAAPI">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Ak.Wwise.Api.WAAPI.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Ak.Wwise.Api.WAAPI.dll</HintPath>
     </Reference>
     <Reference Include="AK.Wwise.Unity.API">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.dll</HintPath>
     </Reference>
     <Reference Include="AK.Wwise.Unity.API.WwiseTypes">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.WwiseTypes.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.API.WwiseTypes.dll</HintPath>
     </Reference>
     <Reference Include="AK.Wwise.Unity.MonoBehaviour">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.MonoBehaviour.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.MonoBehaviour.dll</HintPath>
     </Reference>
     <Reference Include="AK.Wwise.Unity.Timeline">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.Timeline.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/AK.Wwise.Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InputSystem">
-      <HintPath>/mnt/GameCollectionDos/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.InputSystem.dll</HintPath>
+      <HintPath>/mnt/115b93af-9f3b-43c4-a778-48dcab29caf0/SteamLibrary/steamapps/common/FlipWitch Forbidden Sex Hex/SteamBuild1.5/FlipWitch_Data/Managed/Unity.InputSystem.dll</HintPath>
     </Reference>
   </ItemGroup>  
 </Project>

@@ -15,7 +15,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.2.6";
+    public const string PluginVersion = "0.2.12";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static bool IsInGame = false;
@@ -30,15 +30,14 @@ public class Plugin : BaseUnityPlugin
     {
         // Plugin startup logic
         Logger = base.Logger;
-        
+
         SaveHelper.GrabLastConnectionInfo();
         ArchipelagoWindowToggle.Enable();
         ArchipelagoWindowToggle.performed += OnWindowTogglePressed;
         ArchipelagoClient = new ArchipelagoClient();
         ArchipelagoConsole.Awake();
-
+        SpriteSwapHelper.GenerateData();
         PatchAll();
-
     }
 
     private void PatchAll()
@@ -53,6 +52,7 @@ public class Plugin : BaseUnityPlugin
         Harmony.CreateAndPatchAll(typeof(CollectMethods));
         Harmony.CreateAndPatchAll(typeof(DialogueHelper));
         Harmony.CreateAndPatchAll(typeof(CutsceneHelper));
+        Harmony.CreateAndPatchAll(typeof(SpriteSwapHelper));
     }
 
     private void OnWindowTogglePressed(InputAction.CallbackContext context)
