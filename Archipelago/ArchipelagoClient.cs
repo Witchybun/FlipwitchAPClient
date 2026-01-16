@@ -115,6 +115,8 @@ public class ArchipelagoClient
             }
             var seedBeforeSetup = ServerData.Seed;
             ServerData.SetupSession(success.SlotData);
+            ServerData.SlotId = session.ConnectionInfo.Slot;
+            ServerData.TeamId = session.ConnectionInfo.Team;
             BuildLocations(seedBeforeSetup);
             DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
             session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
@@ -382,7 +384,7 @@ public class ArchipelagoClient
 
     public void SendCurrentScene(string sceneName)
     {
-        session.DataStorage["FlipwitchZone_" + ArchipelagoData.SlotId] = sceneName;
+        session.DataStorage["FlipwitchZone_" + ServerData.TeamId.ToString() + "_" + ServerData.SlotId.ToString()] = sceneName;
     }
 
     public void ReceiveViolation()
