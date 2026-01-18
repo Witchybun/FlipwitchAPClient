@@ -12,7 +12,6 @@ namespace FlipwitchAP
 {
     public class GenericMethods
     {
-        public static bool allowingOutsideItems = true;
         public const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic;
 
         [HarmonyPatch(typeof(MainMenuScreen), "StartNewGame")]
@@ -32,7 +31,7 @@ namespace FlipwitchAP
                     {
                         if (ArchipelagoClient.ServerData.StartingGender == ArchipelagoData.Gender.Man)
                         {
-                            SwitchDatabase.instance.playerMov.GetType().GetMethod("flipGender", Flags).Invoke(SwitchDatabase.instance.playerMov, null);
+                            SwitchDatabase.instance.playerMov.GetType().GetMethod("flipGender", Flags)?.Invoke(SwitchDatabase.instance.playerMov, null);
                         }
                         SwitchDatabase.instance.givePlayerItem("GoblinCrystal", true);
                         SwitchDatabase.instance.givePlayerItem("PortablePortal", true);
@@ -46,6 +45,7 @@ namespace FlipwitchAP
 
             }
         }
+        
 
         [HarmonyPatch(typeof(SaveSlotSelection), "Update")]
         [HarmonyPrefix]
@@ -54,11 +54,11 @@ namespace FlipwitchAP
             NewInputManager instance = NewInputManager.instance;
             if (instance.Interact.pressedThisFrame || instance.Submit.pressedThisFrame)
             {
-                var mode = (SaveSlotSelection.Mode)__instance.GetType().GetField("_mode", Flags).GetValue(__instance);
+                var mode = (SaveSlotSelection.Mode)__instance.GetType().GetField("_mode", Flags)?.GetValue(__instance);
                 if (mode == SaveSlotSelection.Mode.Continue)
                 {
 
-                    var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags).GetValue(__instance);
+                    var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags)?.GetValue(__instance);
                     var loadedSave = SaveHelper.GrabSaveDataForSlot(select);
                     if (loadedSave.Seed != ArchipelagoClient.ServerData.Seed)
                     {
@@ -81,7 +81,7 @@ namespace FlipwitchAP
             NewInputManager instance = NewInputManager.instance;
             if (instance.Interact.pressedThisFrame || instance.Submit.pressedThisFrame)
             {
-                var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags).GetValue(__instance);
+                var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags)?.GetValue(__instance);
 
                 switch (select)
                 {
@@ -100,77 +100,18 @@ namespace FlipwitchAP
             return true;
         }
 
-        [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: new System.Type[] { typeof(int), typeof(Transform) })]
+        [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: [typeof(int), typeof(Transform)])]
         [HarmonyPrefix]
         private static void InflictDamage_ReduceDamageBasedOnBarrier(ref int damage, Transform enemy)
         {
+            if (enemy is not null)
+            {
+                Plugin.Logger.LogInfo($"This enemy hit me!  {enemy.name}");
+            }
             var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
             damage -= amount * damage / 4;
         }
-
         
-
-        public static void SyncItemsOnLoad()
-        {
-            var items = Plugin.ArchipelagoClient.GetAllSentItems();
-            HandleMissingItems(items);
-            CutsceneHelper.hasDied = false;
-        }
-
-        public static void HandleReceivedItems()
-        {
-            if (!allowingOutsideItems)
-            {
-                return;
-            }
-            bool itemsNeedProcessing = true;
-            while (itemsNeedProcessing)
-            {
-                if (ArchipelagoClient.ItemsToProcess.Count() == 0)
-                {
-                    itemsNeedProcessing = false;
-                    break;
-                }
-                // Reflects the old method in OnItemReceived
-                // If we can get a better UI made, this can be toned down some.
-                var item = ArchipelagoClient.ItemsToProcess.Dequeue();
-                if (item.Index < ArchipelagoClient.ServerData.Index)
-                {
-                    continue;
-                }
-                ItemHelper.GiveFlipwitchItem(item);
-                ArchipelagoClient.ServerData.Index++;
-            }
-            GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
-        }
-
-        public static void HandleMissingItems(List<ItemInfo> items)
-        {
-            var switchDictionary = new Dictionary<string, int>();
-            foreach (var item in items)
-            {
-                var switchName = "AP" + item.ItemName.Replace(" ", "") + "ItemCount";
-                var currentAmount = SwitchDatabase.instance.getInt(switchName);
-                if (!switchDictionary.ContainsKey(switchName))
-                {
-                    switchDictionary[switchName] = 0;
-                }
-                Plugin.Logger.LogInfo($"{switchDictionary[switchName]} vs {currentAmount}");
-                if (switchDictionary[switchName] < currentAmount)
-                {
-                    switchDictionary[switchName] += 1;
-                    continue;
-                }
-                switchDictionary[switchName] += 1;
-                SwitchDatabase.instance.setInt(switchName, currentAmount + 1);
-                ItemHelper.GiveFlipwitchItem(item.ItemName, false);
-                ArchipelagoClient.ServerData.Index++;
-                Plugin.Logger.LogInfo($"Gave back {item.ItemName}");
-                continue;
-            }
-            GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
-        }
-
         public static void HandleLocationDifference()
         {
             var locationsToVerify = Plugin.ArchipelagoClient.AllLocationsCompletedNotedByServer();

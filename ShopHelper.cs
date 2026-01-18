@@ -95,7 +95,7 @@ namespace FlipwitchAP
                         itemListings[currentItemIndex].listingCost.color = new Color32(90, 90, 90, byte.MaxValue);
                         SwitchDatabase.instance.chargeCoins(int.Parse(itemListings[currentItemIndex].listingCost.text));
                         var location = FlipwitchLocations.ShopLocations[itemListings[currentItemIndex].itemNameID];
-                        LocationHelper.SendLocationGivenLocationDataSendingGift(location);
+                        LocationHelper.SendLocation(location);
                         itemListings[currentItemIndex].listingCost.text = instance.dialogueManager.getTranslationString("ShopUI.SoldText");
                         instance.dialogueManager.setUiCanvasVisibility(isVisible: false);
                         __instance.GetType().GetField("popUpActivated", GenericMethods.Flags).SetValue(__instance, true);

@@ -19,7 +19,7 @@ namespace FlipwitchAP.Data
             {"Protective Barrier Upgrade", "PiercingEarrings"},
             {"Health Upgrade", "HeartGem"},
             {"Mana Upgrade", "StarGem"},
-            {"Wand Upgrade", "ArcaneCannon"},
+            {"Wand Upgrade", "GlassWand"},
             {"Healing Surge", "HeartGem"},
             {"Mana Surge", "StarGem"},
             {"Peachy Peach Recharge", "PeachyPeach"},
@@ -27,6 +27,8 @@ namespace FlipwitchAP.Data
             {"Peachy Peach Upgrade", "PeachyPeach"},
             {"Peachy Peach Charge", "PeachyPeach"},
             {"Sexual Experience", "GlassWand"},
+            {"Rose Ribbon", "RoseCutters"},
+            {"Orb of Avoidance", "ArcaneCannon"}
         };
 
         private static readonly List<string> Rings = new()

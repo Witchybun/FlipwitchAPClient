@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,38 +15,56 @@ using FlipwitchAP.Data;
 using static FlipwitchAP.Data.FlipwitchLocations;
 using System.Collections.ObjectModel;
 using BepInEx.Logging;
+using UnityEngine;
 
 namespace FlipwitchAP.Archipelago;
 
-public class ArchipelagoClient
+public class ArchipelagoClient: MonoBehaviour
 {
-    public const string APVersion = "0.5.0";
+    public const string APVersion = "0.6.5";
     public const string Game = "Flipwitch Forbidden Sex Hex";
 
     public static bool Authenticated;
-    private bool attemptingConnection;
+    private bool _attemptingConnection;
+    public bool allowOutsideItems;
+    public bool allowCoroutines;
 
-    public static ArchipelagoData ServerData = new();
-    private DeathLinkHandler DeathLinkHandler;
-    private ArchipelagoSession session;
-    public static Queue<ReceivedItem> ItemsToProcess = new();
+    public static ArchipelagoClient AP;
+    private static GameObject Obj;
+    public static readonly ArchipelagoData ServerData = new();
+    private DeathLinkHandler _deathLinkHandler;
+    private ArchipelagoSession _session;
+    public static readonly Queue<ReceivedItem> ItemsToProcess = new();
+    public static List<ReceivedItem> AllReceivedItems = new();
     public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
     public readonly List<string> CutsceneIDsForTraps = new();
     public static bool IsInGame = false;
     public static bool PlayerWasDeathlinked = false;
+    public bool FirstTimeWarp = false;
 
+    public static void Setup()
+    {
+        Obj = new()
+        {
+            name = "ArchipelagoClient"
+        };
+        DontDestroyOnLoad(Obj);
+        AP = Obj.AddComponent<ArchipelagoClient>();
+    }
+    
+    
     /// <summary>
     /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
     /// </summary>
     /// <returns></returns>
     public void Connect()
     {
-        if (Authenticated || attemptingConnection) return;
-        attemptingConnection = true;
+        if (Authenticated || _attemptingConnection) return;
+        _attemptingConnection = true;
 
         try
         {
-            session = ArchipelagoSessionFactory.CreateSession(ServerData.Uri);
+            _session = ArchipelagoSessionFactory.CreateSession(ServerData.Uri);
             SetupSession();
         }
         catch (Exception e)
@@ -60,11 +79,11 @@ public class ArchipelagoClient
     /// </summary>
     private void SetupSession()
     {
-        session.MessageLog.OnMessageReceived += message => ArchipelagoConsole.LogMessage(message);
-        session.Items.ItemReceived += OnItemReceived;
-        session.Socket.ErrorReceived += OnSessionErrorReceived;
-        session.Socket.SocketClosed += OnSessionSocketClosed;
-        session.Locations.CheckedLocationsUpdated += OnCheckedLocationsUpdated;
+        _session.MessageLog.OnMessageReceived += message => ArchipelagoConsole.LogMessage(message);
+        _session.Items.ItemReceived += OnItemReceived;
+        _session.Socket.ErrorReceived += OnSessionErrorReceived;
+        _session.Socket.SocketClosed += OnSessionSocketClosed;
+        _session.Locations.CheckedLocationsUpdated += OnCheckedLocationsUpdated;
     }
 
 
@@ -78,7 +97,7 @@ public class ArchipelagoClient
             // it's safe to thread this function call but unity notoriously hates threading so do not use excessively
             ThreadPool.QueueUserWorkItem(
                 _ => HandleConnectResult(
-                    session.TryConnectAndLogin(
+                    _session.TryConnectAndLogin(
                         Game,
                         ServerData.SlotName,
                         ItemsHandlingFlags.AllItems, // TODO make sure to change this line
@@ -91,7 +110,7 @@ public class ArchipelagoClient
         {
             Plugin.Logger.LogError(e);
             HandleConnectResult(new LoginFailure(e.ToString()));
-            attemptingConnection = false;
+            _attemptingConnection = false;
         }
     }
 
@@ -111,19 +130,22 @@ public class ArchipelagoClient
                 ArchipelagoConsole.LogMessage(outMes);
                 Authenticated = false;
                 Disconnect();
-                attemptingConnection = false;
+                _attemptingConnection = false;
             }
             var seedBeforeSetup = ServerData.Seed;
             ServerData.SetupSession(success.SlotData);
-            ServerData.SlotId = session.ConnectionInfo.Slot;
-            ServerData.TeamId = session.ConnectionInfo.Team;
+            ServerData.SlotId = _session.ConnectionInfo.Slot;
+            ServerData.TeamId = _session.ConnectionInfo.Team;
             BuildLocations(seedBeforeSetup);
-            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
-            session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
+            _deathLinkHandler = new(_session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
+            _session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
             SaveHelper.SaveCurrentConnectionData(ServerData.Uri, ServerData.SlotName, ServerData.Password);
             DialogueHelper.UpdateDialogueToHaveHints(SwitchDatabase.instance.dialogueManager);
             //GrabAllTrapOrientedCutscenes();
+            allowCoroutines = true;
+            StartCoroutine(HandleQueuedItems());
+            StartCoroutine(ReceiveViolation());
             Authenticated = true;
         }
         else
@@ -138,7 +160,7 @@ public class ArchipelagoClient
             Disconnect();
         }
         ArchipelagoConsole.LogMessage(outText);
-        attemptingConnection = false;
+        _attemptingConnection = false;
     }
 
     private bool APVersionIsAcceptable(Dictionary<string, object> slotData, out string version)
@@ -162,7 +184,7 @@ public class ArchipelagoClient
             BuildLocationTable();
             // Scout unchecked locations
             var uncheckedLocationIDs = from locationID in LocationTable.Keys select locationID;
-            var locations = session.Locations.AllLocations;
+            var locations = _session.Locations.AllLocations;
             foreach (var location in uncheckedLocationIDs)
             {
                 if (locations.Contains(location))
@@ -171,7 +193,7 @@ public class ArchipelagoClient
                 }
                 Plugin.Logger.LogWarning($"There's a location you're trying to scout that isn't there!  Location: {location}");
             }
-            Task<Dictionary<long, ScoutedItemInfo>> scoutedInfoTask = Task.Run(async () => await session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
+            Task<Dictionary<long, ScoutedItemInfo>> scoutedInfoTask = Task.Run(async () => await _session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
             //Task<LocationInfoPacket> locationInfoTask = Task.Run(async () => await Session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
             if (scoutedInfoTask.IsFaulted)
             {
@@ -192,9 +214,9 @@ public class ArchipelagoClient
     private void BuildLocationTable()
     {
         List<int> locations = new();
-        foreach (var location in FlipwitchLocations.APLocationData)
+        foreach (var location in APLocationData)
         {
-            if (location.IgnoreLocationHandler == true)
+            if (location.IgnoreLocationHandler)
             {
                 continue;
             }
@@ -203,35 +225,42 @@ public class ArchipelagoClient
             {
                 continue;
             }
-            else if (location.PrimaryCallName.Contains("ChaosKey") && !ServerData.ShuffleChaosPieces)
+            if (location.PrimaryCallName.Contains("ChaosKey") && !ServerData.ShuffleChaosPieces)
             {
                 continue;
             }
-            else if (FlipwitchItems.QuestItems.Contains(location.PrimaryCallName) && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+
+            if (FlipwitchItems.QuestItems.Contains(location.PrimaryCallName) && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
             {
                 continue;
             }
-            else if (location.Type == QUEST && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
+
+            if (location.Type == QUEST && (ServerData.QuestForSex == ArchipelagoData.Quest.Off || ServerData.QuestForSex == ArchipelagoData.Quest.Sensei))
             {
                 continue;
             }
-            else if (location.Type == SEX && ServerData.QuestForSex == ArchipelagoData.Quest.Off)
+
+            if (location.Type == SEX && ServerData.QuestForSex == ArchipelagoData.Quest.Off)
             {
                 continue;
             }
-            else if (location.Type == GACHA && ServerData.Gachapon == ArchipelagoData.Gacha.Off)
+
+            if (location.Type == GACHA && ServerData.Gachapon == ArchipelagoData.Gacha.Off)
             {
                 continue;
             }
-            else if (location.Type == GACHAMACHINE && ServerData.Gachapon != ArchipelagoData.Gacha.All)
+
+            if (location.Type == GACHAMACHINE && ServerData.Gachapon != ArchipelagoData.Gacha.All)
             {
                 continue;
             }
-            else if (location.Type == SHOP && !ServerData.Shopsanity)
+
+            if (location.Type == SHOP && !ServerData.Shopsanity)
             {
                 continue;
             }
-            else if (location.Type == STAT && !ServerData.Statshuffle)
+
+            if (location.Type == STAT && !ServerData.Statshuffle)
             {
                 continue;
             }
@@ -250,9 +279,11 @@ public class ArchipelagoClient
     private void Disconnect()
     {
         Plugin.Logger.LogDebug("disconnecting from server...");
-        session?.Socket.DisconnectAsync();
-        session = null;
+        _session?.Socket.DisconnectAsync();
+        _session = null;
+        allowCoroutines = false;
         Authenticated = false;
+        AllReceivedItems.Clear();
     }
 
     public void Cleanup()
@@ -266,7 +297,7 @@ public class ArchipelagoClient
 
     public void SendMessage(string message)
     {
-        session.Socket.SendPacketAsync(new SayPacket { Text = message });
+        _session.Socket.SendPacketAsync(new SayPacket { Text = message });
     }
 
     /// <summary>
@@ -280,7 +311,54 @@ public class ArchipelagoClient
         var item = helper.DequeueItem();
         var receivedItem = new ReceivedItem(item, helper.Index);
         ItemsToProcess.Enqueue(receivedItem);
+        AllReceivedItems.Add(receivedItem);
     }
+
+    private IEnumerator HandleQueuedItems()
+    {
+        while (allowCoroutines)
+        {
+            while (!ItemsToProcess.Any())
+            {
+                if (!allowCoroutines)
+                {
+                    ItemsToProcess.Clear();
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            while (SwitchDatabase.instance.gamePaused ||
+                   SwitchDatabase.instance.dialogueManager.dialogueOrCutsceneOrIngameCutsceneInProgress() ||
+                   SwitchDatabase.instance.isItemPopupActive() || !IsInGame)
+            {
+                yield return null;
+            }
+
+            var item = ItemsToProcess.Dequeue();
+            var currentIndex = SwitchDatabase.instance.getInt("RandoIndex");
+            if (item.Index < currentIndex)
+            {
+                continue;
+            }
+            SwitchDatabase.instance.setInt("RandoIndex", currentIndex + 1);
+            ItemHelper.GiveFlipwitchItem(item.ItemName);
+            GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+
+    public void ReAddAllPreviousChecksToEnqueueDueToDying()
+    {
+        var index = SwitchDatabase.instance.getInt("RandoIndex");
+        foreach (var item in AllReceivedItems.Where(item => item.Index >= index))
+        {
+            ItemsToProcess.Enqueue(item);
+        }
+    }
+    
 
     /// <summary>
     /// something went wrong with our socket connection
@@ -319,7 +397,7 @@ public class ArchipelagoClient
     {
         if (Authenticated) // If someone else's item an online, do the usual
         {
-            session.Locations.CompleteLocationChecks(location.APLocationID);
+            _session.Locations.CompleteLocationChecks(location.APLocationID);
         }
         else if (!ServerData.CheckedLocations.Contains(location.APLocationID)) // Otherwise just save it for syncing later.
         {
@@ -342,19 +420,19 @@ public class ArchipelagoClient
 
     public List<ItemInfo> GetAllSentItems()
     {
-        return session.Items.AllItemsReceived.ToList();
+        return _session.Items.AllItemsReceived.ToList();
     }
 
 
     public string GetPlayerNameFromSlot(int slot)
     {
         if (slot < 0) return "CheaterBozo";
-        return session.Players.GetPlayerName(slot);
+        return _session.Players.GetPlayerName(slot);
     }
 
     public void SendLocation(long locationID)
     {
-        session.Locations.CompleteLocationChecks(locationID);
+        _session.Locations.CompleteLocationChecks(locationID);
     }
 
     // Have a fallback.
@@ -364,7 +442,7 @@ public class ArchipelagoClient
         {
             return true;
         }
-        else if (session.Locations.AllLocationsChecked.Contains(locationID))
+        else if (_session.Locations.AllLocationsChecked.Contains(locationID))
         {
             return true;
         }
@@ -379,26 +457,31 @@ public class ArchipelagoClient
 
     public List<long> AllLocationsCompletedNotedByServer()
     {
-        return session.Locations.AllLocationsChecked.ToList();
+        return _session.Locations.AllLocationsChecked.ToList();
     }
 
     public void SendCurrentScene(string sceneName)
     {
-        session.DataStorage["FlipwitchZone_" + ServerData.TeamId.ToString() + "_" + ServerData.SlotId.ToString()] = sceneName;
+        _session.DataStorage["FlipwitchZone_" + ServerData.TeamId.ToString() + "_" + ServerData.SlotId.ToString()] = sceneName;
     }
 
-    public void ReceiveViolation()
+    public IEnumerator ReceiveViolation()
     {
-        DeathLinkHandler.KillPlayer();
+        while (allowCoroutines)
+        {
+            _deathLinkHandler.KillPlayer();
+            yield return new WaitForSeconds(1f);
+        }
+        
     }
 
     public void KillEveryone()
     {
-        DeathLinkHandler.SendDeathLink();
+        _deathLinkHandler.SendDeathLink();
     }
 
     public void SendVictory()
     {
-        session.SetGoalAchieved();
+        _session.SetGoalAchieved();
     }
 }

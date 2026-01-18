@@ -116,7 +116,7 @@ namespace FlipwitchAP
                     __instance.GetType().GetField("currentPrize", GenericMethods.Flags).SetValue(__instance, chosenGacha);
                     var animation = gachaCollection.gachas[index].animationName;
                     var gachaLocation = FlipwitchLocations.GachaLocations[animation];
-                    LocationHelper.SendLocationGivenLocationDataSendingGift(gachaLocation);
+                    LocationHelper.SendLocation(gachaLocation);
                     SwitchDatabase.instance.setInt("AP" + chosenGachaName, currentGachaState + 1);
                     __instance.GetType().GetMethod("updateTokenDisplay", GenericMethods.Flags).Invoke(__instance, null);
                     return false;

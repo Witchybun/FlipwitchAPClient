@@ -16,6 +16,8 @@ namespace FlipwitchAP.Data
         public static Dictionary<string, LocationData> StatLocations = new();
         public static Dictionary<string, LocationData> SecondaryCallLocations = new();
         public static Dictionary<string, LocationData> SexExperienceLocations = new();
+        public static Dictionary<string, Dictionary<string, LocationData>> PotLocations = new();
+        public static Dictionary<string, LocationData> WarpLocations = new();
         public static Dictionary<long, LocationData> IDToLocation = new();
 
         public const string CHEST = "Chest";
@@ -27,6 +29,13 @@ namespace FlipwitchAP.Data
         public const string GACHA = "Gacha";
         public const string GACHAMACHINE = "Gacha Machine";
         public const string SHOP = "Shop";
+        public const string POT = "Pot";
+        public const string WARP = "Warp";
+
+        public const string POT_THIN = "pot_breakable_thin";
+        public const string POT_MED = "pot_breakable_medium";
+        public const string POT_THINMED = "pot_breakable_thinmedium";
+        public const string POT_LARGE = "pot_breakable_large";
 
         public class LocationData
         {
@@ -417,7 +426,176 @@ namespace FlipwitchAP.Data
             CreateLocation(693, "CC: Ghost Castle Path Coin", "cc_fork_gacha", GACHA),
             CreateLocation(694, "CC: Fungal Area Coin", "cc_umimushroom_gacha", GACHA),
             
+            CreateLocation(701, "Sensei's Hut Crystal Teleporter", "TP_Beatrix", WARP),
+            CreateLocation(702, "Witchy Woods Crystal Teleporter", "TP_WitchyWoods", WARP),
+            CreateLocation(703, "Goblin Caves Crystal Teleporter", "TP_GoblinCaves", WARP),
+            CreateLocation(704, "Spirit City Crystal Teleporter", "TP_SpiritCity", WARP),
+            CreateLocation(705, "Shady Alley Crystal Teleporter", "TP_ShadyAlley", WARP),
+            CreateLocation(706, "Ghost Castle Entrance Crystal Teleporter", "TP_GhostCastleEntrance", WARP),
+            CreateLocation(707, "Ghost Castle Crystal Teleporter", "TP_GhostCastle", WARP),
+            CreateLocation(708, "Jigoku Teleport", "TP_Jigoku2_MiniBridge", WARP),
+            CreateLocation(709, "Club Demon Crystal Teleporter", "TP_ClubDemon", WARP),
+            CreateLocation(710, "Tengoku Crystal Teleporter", "TP_Tengoku", WARP),
+            CreateLocation(711, "Angelic Hallway Crystal Teleporter", "TP_Angelic_Hallway", WARP),
+            CreateLocation(712, "Fungal Forest Crystal Teleporter", "TP_FungalForest", WARP),
+            CreateLocation(713, "Slime Citadel Crystal Teleporter", "TP_SlimeCitadel", WARP),
+            CreateLocation(714, "Slimy Depths Crystal Teleporter", "TP_SlimyDepths", WARP),
+            CreateLocation(715, "Umi Umi Crystal Teleporter", "TP_UmiUmi", WARP),
+
+            CreateLocation(751, "WW: Goblin Camp Pot 1", "9_GoblinCamp", POT, secondaryCallName: POT_MED),
+            CreateLocation(752, "WW: Goblin Camp Pot 2", "9_GoblinCamp", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(753, "WW: Goblin Tower Pot 1", "11_GoblinTower", POT, secondaryCallName: POT_MED),
+            CreateLocation(754, "WW: Goblin Tower Pot 2", "11_GoblinTower", POT, secondaryCallName: POT_THIN),
+            CreateLocation(755, "WW: Goblin Tower Pot 3", "11_GoblinTower", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(756, "WW: Goblin Tower Pot 4", "11_GoblinTower", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(757, "WW: Goblin Stairwell Pot 1", "12_GoblinStairWell", POT, secondaryCallName: POT_MED),
+            CreateLocation(758, "WW: Goblin Stairwell Pot 2", "12_GoblinStairWell", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(759, "WW: Goblin Stairwell Pot 3", "12_GoblinStairWell", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(760, "WW: Man Cave Entrance Pot 1", "23_ManCaveEntrance", POT, secondaryCallName: POT_MED),
+            CreateLocation(761, "WW: Man Cave Entrance Pot 2", "23_ManCaveEntrance", POT, secondaryCallName: POT_THIN),
+            CreateLocation(762, "WW: Cavern Stairs Pot 1", "31_CavernStairs", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(763, "WW: Cavern Stairs Pot 2", "31_CavernStairs", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(764, "WW: Cavern Stairs Pot 3", "31_CavernStairs", POT, secondaryCallName: POT_THIN),
+            CreateLocation(765, "WW: Cavern Stairs Pot 4", "31_CavernStairs", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(766, "WW: Cavern Stairs Pot 5", "31_CavernStairs", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(767, "WW: Cavern Stairs Pot 6", "31_CavernStairs", POT, secondaryCallName: POT_MED),
+            CreateLocation(768, "WW: Ramp Pot 1", "41_Ramp", POT, secondaryCallName: POT_THINMED + " (2)"),
+            CreateLocation(769, "WW: Ramp Pot 2", "41_Ramp", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(770, "WW: Ramp Pot 3", "41_Ramp", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(771, "WW: Ramp Pot 4", "41_Ramp", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(772, "WW: Descent Pot 1", "43_Descent", POT, secondaryCallName: POT_THIN),
+            CreateLocation(773, "WW: Descent Pot 2", "43_Descent", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(774, "WW: Descent Pot 3", "43_Descent", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(775, "WW: Descent Pot 4", "43_Descent", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(776, "WW: Descent Pot 5", "43_Descent", POT, secondaryCallName: POT_THIN + " (2)"),
+            CreateLocation(777, "WW: Descent Pot 6", "43_Descent", POT, secondaryCallName: POT_THINMED + " (2)"),
+            CreateLocation(778, "WW: Goblin Queen Pot 1", "46_GoblinQueen", POT, secondaryCallName: POT_THIN),
+            CreateLocation(779, "WW: Goblin Queen Pot 2", "46_GoblinQueen", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(780, "WW: Goblin Queen Pot 3", "46_GoblinQueen", POT, secondaryCallName: POT_MED),
+            CreateLocation(781, "WW: Goblin Queen Pot 4", "46_GoblinQueen", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(782, "WW: Fairy Entrance Pot 1", "18_FairyEntrance", POT, secondaryCallName: POT_MED),
+            CreateLocation(783, "WW: Fairy Entrance Pot 2", "18_FairyEntrance", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(784, "WW: Fairy Entrance Pot 3", "18_FairyEntrance", POT, secondaryCallName: POT_THIN),
+            CreateLocation(785, "WW: Fairy Entrance Pot 4", "18_FairyEntrance", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(786, "WW: Spirit City Bridge Pot 1", "17_SpiritCityBridge", POT, secondaryCallName: POT_MED),
+            CreateLocation(787, "WW: Spirit City Bridge Pot 2", "17_SpiritCityBridge", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(788, "WW: Spirit City Bridge Pot 3", "17_SpiritCityBridge", POT, secondaryCallName: POT_THIN),
+            CreateLocation(789, "SpC: Waterfall Tomb Pot 1", "15_Tomb", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(790, "SpC: Waterfall Tomb Pot 2", "15_Tomb", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(791, "SpC: Waterfall Tomb Pot 3", "15_Tomb", POT, secondaryCallName: POT_THIN),
+            CreateLocation(792, "SpC: Waterfall Tomb Pot 4", "15_Tomb", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(793, "SpC: Cabaret Wizard Toilet Pot 1", "Cabaret_WizardToilet", POT, secondaryCallName: "crate_blue"),
+            CreateLocation(794, "SpC: Cabaret Wizard Toilet Pot 2", "Cabaret_WizardToilet", POT, secondaryCallName: "crate_blue (1)"),
+            CreateLocation(795, "SpC: Cabaret Wizard Toilet Pot 3", "Cabaret_WizardToilet", POT, secondaryCallName: "crate_blue (2)"),
+            CreateLocation(796, "SpC: Green House Pot 1", "InteriorHouse_1 (2)", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(797, "SpC: Green House Pot 2", "InteriorHouse_1 (2)", POT, secondaryCallName: POT_MED),
+            CreateLocation(798, "SpC: Green House Pot 3", "InteriorHouse_1 (2)", POT, secondaryCallName: POT_THIN),
+            CreateLocation(799, "SpC: Green House Pot 4", "InteriorHouse_1 (2)", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(800, "GC: Crypt Pot 1", "27_Crypt", POT, secondaryCallName: POT_THIN),
+            CreateLocation(801, "GC: Crypt Pot 2", "27_Crypt", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(802, "GC: Crypt Pot 3", "27_Crypt", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(803, "GC: Three Gardens Pot 1", "3_Gardens", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(804, "GC: Three Gardens Pot 2", "3_Gardens", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(805, "GC: Ghost Stairwell Lower Pot 1", "6_GhostStairWell", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(806, "GC: Ghost Stairwell Lower Pot 2", "6_GhostStairWell", POT, secondaryCallName: POT_THIN),
+            CreateLocation(807, "GC: Ghost Stairwell Mid Pot 1", "7_GhostStairWell", POT, secondaryCallName: POT_MED + " 1 (1)"),
+            CreateLocation(808, "GC: Ghost Stairwell Mid Pot 2", "7_GhostStairWell", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(809, "GC: Ghost Stairwell Mid Pot 3", "7_GhostStairWell", POT, secondaryCallName: POT_MED),
+            CreateLocation(810, "GC: Ghost Stairwell Mid Pot 4", "7_GhostStairWell", POT, secondaryCallName: POT_THIN),
+            CreateLocation(811, "GC: Ghost Stairwell Mid Pot 5", "7_GhostStairWell", POT, secondaryCallName: POT_MED + " 1 (2)"),
+            CreateLocation(812, "GC: Large Gardens Pot 1", "24_LargeGardens", POT, secondaryCallName: POT_THIN),
+            CreateLocation(813, "GC: Large Gardens Pot 2", "24_LargeGardens", POT, secondaryCallName: POT_MED),
+            CreateLocation(814, "GC: Large Gardens Pot 3", "24_LargeGardens", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(815, "GC: Large Gardens Pot 4", "24_LargeGardens", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(816, "GC: Large Gardens Pot 5", "24_LargeGardens", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(817, "GC: Large Gardens Pot 6", "24_LargeGardens", POT, secondaryCallName: POT_MED + "  (1)"),
+            CreateLocation(818, "GC: Ladder Room Pot 1", "10_LadderRoom", POT, secondaryCallName: POT_MED),
+            CreateLocation(819, "GC: Ladder Room Pot 2", "10_LadderRoom", POT, secondaryCallName: POT_THIN),
+            CreateLocation(820, "GC: Ladder Room Pot 3", "10_LadderRoom", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(821, "GC: Drop Down Lower Pot 1", "32_Dropdown", POT, secondaryCallName: "crate_blue (2)"),
+            CreateLocation(822, "GC: Drop Down Lower Pot 2", "32_Dropdown", POT, secondaryCallName: "crate_blue"),
+            CreateLocation(823, "GC: Drop Down Lower Pot 3", "32_Dropdown", POT, secondaryCallName: "crate_blue (1)"),
+            CreateLocation(824, "GC: Large Hallway Pot 1", "30_LargeHallway", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(825, "GC: Large Hallway Pot 2", "30_LargeHallway", POT, secondaryCallName: POT_THIN),
+            CreateLocation(826, "GC: Tall Tower Pot 1", "39_TallTower", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(827, "GC: Tall Tower Pot 2", "39_TallTower", POT, secondaryCallName: POT_MED),
+            CreateLocation(828, "GC: Tall Tower Pot 3", "39_TallTower", POT, secondaryCallName: POT_THIN),
+            CreateLocation(829, "GC: Tall Tower Pot 4", "39_TallTower", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(830, "GC: Crumbling Room Pot 1", "28_CrumblingRoom", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(831, "GC: Crumbling Room Pot 2", "28_CrumblingRoom", POT, secondaryCallName: POT_MED),
+            CreateLocation(832, "GC: Willow the Whiff Room Pot 1", "37_UpperGardens", POT, secondaryCallName: POT_THIN),
+            CreateLocation(833, "GC: Willow the Whiff Room Pot 2", "37_UpperGardens", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(834, "GC: Willow the Whiff Room Pot 3", "37_UpperGardens", POT, secondaryCallName: POT_MED),
+            CreateLocation(835, "GC: Willow the Whiff Room Pot 4", "37_UpperGardens", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(836, "GC: Willow the Whiff Room Pot 5", "37_UpperGardens", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(837, "GC: Willow the Whiff Room Pot 6", "37_UpperGardens", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(838, "JG: The Mound Room Pot 1", "15_TheMound", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(839, "JG: The Mound Room Pot 2", "15_TheMound", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(840, "JG: The Mound Room Pot 3", "15_TheMound", POT, secondaryCallName: POT_THIN),
+            CreateLocation(841, "JG: The Mound Room Pot 4", "15_TheMound", POT, secondaryCallName: POT_MED),
+            CreateLocation(842, "JG: The Mound Room Pot 5", "15_TheMound", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(843, "JG: Long Hallway Pot 1", "23_LongHallway", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(844, "JG: Long Hallway Pot 2", "23_LongHallway", POT, secondaryCallName: POT_THIN),
+            CreateLocation(845, "JG: Long Hallway Pot 3", "23_LongHallway", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(846, "JG: Long Hallway Pot 4", "23_LongHallway", POT, secondaryCallName: POT_MED + " 1 (1)"),
+            CreateLocation(847, "JG: Long Hallway Pot 5", "23_LongHallway", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(848, "JG: Long Hallway Pot 6", "23_LongHallway", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(849, "JG: Long Hallway Pot 7", "23_LongHallway", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(850, "JG: First Drop Pot 1", "4_FirstDrop", POT, secondaryCallName: POT_MED),
+            CreateLocation(851, "JG: First Drop Pot 2", "4_FirstDrop", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(852, "JG: First Drop Pot 3", "4_FirstDrop", POT, secondaryCallName: POT_THIN),
+            CreateLocation(853, "JG: First Drop Pot 4", "4_FirstDrop", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(854, "JG: First Drop Pot 5", "4_FirstDrop", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(855, "JG: First Drop Pot 6", "4_FirstDrop", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(856, "JG: Boxy Drop Pot 1", "6_BoxyDrop", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(857, "JG: Boxy Drop Pot 2", "6_BoxyDrop", POT, secondaryCallName: POT_MED),
+            CreateLocation(858, "JG: Green Stairwell Pot 1", "36_GreenStairwell", POT, secondaryCallName: "crate_blue (1)"),
+            CreateLocation(859, "JG: Green Stairwell Pot 2", "36_GreenStairwell", POT, secondaryCallName: "crate_blue (2)"),
+            CreateLocation(860, "SlC: Double Bananas Pot 1", "9_DoubleBananas", POT, secondaryCallName: POT_MED),
+            CreateLocation(861, "SlC: Double Bananas Pot 2", "9_DoubleBananas", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(862, "SlC: Pillars Pot 1", "10_Pillars", POT, secondaryCallName: POT_MED),
+            CreateLocation(863, "SlC: Pillars Pot 2", "10_Pillars", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(864, "SlC: Pillars Pot 3", "10_Pillars", POT, secondaryCallName: POT_THIN),
+            CreateLocation(865, "SlC: Reward Pot 1", "11_Reward", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(866, "SlC: Reward Pot 2", "11_Reward", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(867, "SlC: Reward Pot 3", "11_Reward", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(868, "SlC: Reward Pot 4", "11_Reward", POT, secondaryCallName: POT_MED),
+            CreateLocation(869, "SlC: Reward Pot 5", "11_Reward", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(870, "SlC: Reward Pot 6", "11_Reward", POT, secondaryCallName: POT_THIN),
+            CreateLocation(871, "SlC: Reward Pot 7", "11_Reward", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(872, "SlC: Reward Pot 8", "11_Reward", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(873, "TG: Cloudia Entrance Pot 1", "37_CloudEntrance", POT, secondaryCallName: "crate_blue"),
+            CreateLocation(874, "TG: Cloudia Entrance Pot 2", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (1)"),
+            CreateLocation(875, "TG: Cloudia Entrance Pot 3", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (2)"),
+            CreateLocation(876, "TG: Cloudia Entrance Pot 4", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (3)"),
+            CreateLocation(877, "TG: Cloudia Entrance Pot 5", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (4)"),
+            CreateLocation(878, "TG: Cloudia Entrance Pot 6", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (5)"),
+            CreateLocation(879, "TG: Cloudia Entrance Pot 7", "37_CloudEntrance", POT, secondaryCallName: "crate_blue (6)"),
+            CreateLocation(880, "TG: Cloud Ramp Pot 1", "36_CloudRamp", POT, secondaryCallName: POT_THINMED),
+            CreateLocation(881, "TG: Cloud Ramp Pot 2", "36_CloudRamp", POT, secondaryCallName: POT_THIN),
+            CreateLocation(882, "TG: Cloud Ramp Pot 3", "36_CloudRamp", POT, secondaryCallName: POT_MED),
+            CreateLocation(883, "TG: Cloud Ramp Pot 4", "36_CloudRamp", POT, secondaryCallName: POT_THINMED + " (1)"),
+            CreateLocation(884, "TG: Cloud Ramp Pot 5", "36_CloudRamp", POT, secondaryCallName: POT_THIN + " (1)"),
+            CreateLocation(885, "TG: Flower Garden Pot 1", "6_FlowerGarden", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(886, "TG: Flower Garden Pot 2", "6_FlowerGarden", POT, secondaryCallName: POT_THIN),
+            CreateLocation(887, "TG: Flower Garden Pot 3", "6_FlowerGarden", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(888, "TG: Flower Garden Pot 4", "6_FlowerGarden", POT, secondaryCallName: POT_MED),
+            CreateLocation(889, "TG: Flower Garden Pot 5", "6_FlowerGarden", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(890, "TG: Flower Garden Pot 6", "6_FlowerGarden", POT, secondaryCallName: POT_THIN),
+            CreateLocation(891, "TG: Flower Garden Pot 7", "6_FlowerGarden", POT, secondaryCallName: " 1 (1)"),
+            CreateLocation(892, "UU: Surfacing Pot 1", "24_Surfacing", POT, secondaryCallName: POT_LARGE),
+            CreateLocation(893, "UU: Surfacing Pot 2", "24_Surfacing", POT, secondaryCallName: "crate_blue (6)"),
+            CreateLocation(894, "UU: Diving Deeper Pot 1", "20_DivingDeeper", POT, secondaryCallName: "crate_blue"),
+            CreateLocation(895, "UU: Diving Deeper Pot 2", "20_DivingDeeper", POT, secondaryCallName: "crate_blue (1)"),
+            CreateLocation(896, "UU: Diving Deeper Pot 3", "20_DivingDeeper", POT, secondaryCallName: "crate_blue (2)"),
+            CreateLocation(897, "UU: Diving Deeper Pot 4", "20_DivingDeeper", POT, secondaryCallName: "ceate_blue (3)"),
+            CreateLocation(898, "UU: Diving Pot 1", "19_Diving", POT, secondaryCallName: "crate_blue (5)"),
+            CreateLocation(899, "UU: Diving Pot 2", "19_Diving", POT, secondaryCallName: "crate_blue (4)"),
             
+            CreateLocation(900, "WW: Goblin Camp Lower Pot 1", "9_GoblinCamp", POT, secondaryCallName: POT_MED + " 1"),
+            CreateLocation(901, "WW: Goblin Camp Lower Pot 2", "9_GoblinCamp", POT, secondaryCallName: POT_THIN),
+            CreateLocation(902, "WW: Goblin Camp Lower Pot 3", "9_GoblinCamp", POT, secondaryCallName: POT_MED + " (1)"),
+            CreateLocation(903, "JG: Green Stairwell Pot 3", "36_GreenStairwell", POT, "crate_blue")
         };
 
         private static LocationData CreateLocation(int id, string locationName, string primaryCallName, string type, string switchToFlip = "", string secondaryCallName = "")
@@ -425,7 +603,7 @@ namespace FlipwitchAP.Data
             var location = new LocationData(id, locationName, primaryCallName, type, secondaryCallName: secondaryCallName, switchToFlip: switchToFlip);
             NameToLocation[location.APLocationName] = location;
             IDToLocation[id] = location;
-            if (secondaryCallName != "")
+            if (secondaryCallName != "" && type != POT)
             {
                 SecondaryCallLocations[secondaryCallName] = location;
             }
@@ -480,6 +658,16 @@ namespace FlipwitchAP.Data
                         SexExperienceLocations[locationName] = location;
                         break;
                     }
+                case WARP:
+                {
+                    WarpLocations[primaryCallName] = location;
+                    break;
+                }
+                case POT:
+                {
+                    PotLocations[primaryCallName][secondaryCallName] = location;
+                    break;
+                }
             }
             return location;
         }

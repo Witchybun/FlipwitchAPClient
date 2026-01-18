@@ -32,7 +32,7 @@ namespace FlipwitchAP
                 __instance.GetType().GetField("collected", GenericMethods.Flags).SetValue(__instance, true);
                 var switchName = (string)__instance.GetType().GetField("switchName", GenericMethods.Flags).GetValue(__instance);
                 var gachaLocation = FlipwitchLocations.CoinLocations[switchName];
-                SendLocationGivenLocationDataSendingGift(gachaLocation);
+                SendLocation(gachaLocation);
                 AkSoundEngine.PostEvent("ui_gacha_coin_pickup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
                 CreateItemNotification(gachaLocation, null);
@@ -63,7 +63,7 @@ namespace FlipwitchAP
                 Plugin.Logger.LogWarning($"Could not find location for {__instance.itemName}");
                 return true;
             }
-            SendLocationGivenLocationDataSendingGift(location);
+            SendLocation(location);
             var onItemPopupClosedCallback = (Action)__instance.GetType().GetField("onItemPopupClosedCallback", GenericMethods.Flags).GetValue(__instance);
             CreateItemNotification(location, onItemPopupClosedCallback);
             return false;
@@ -82,7 +82,7 @@ namespace FlipwitchAP
                 Plugin.Logger.LogWarning($"Could not find location for {chestName}");
                 return true;
             }
-            SendLocationGivenLocationDataSendingGift(location);
+            SendLocation(location);
             var scoutedInformation = ArchipelagoClient.ServerData.ScoutedLocations[location.APLocationID];
             CreateItemNotification(location, SwitchDatabase.instance.startTrackingTimePlayed);
             return false;
@@ -108,7 +108,7 @@ namespace FlipwitchAP
                 uiCanvas.SetActive(false);
 
                 var location = FlipwitchLocations.SecondaryCallLocations[queuedItemName];
-                SendLocationGivenLocationDataSendingGift(location);
+                SendLocation(location);
                 CreateItemNotification(location, null);
                 SetSwitchesForCertainLocations(location);
                 return false;
@@ -178,7 +178,7 @@ namespace FlipwitchAP
                     return true;
                 }
                 var location = SecondaryCallLocations[itemName];
-                SendLocationGivenLocationDataSendingGift(location);
+                SendLocation(location);
                 CreateItemNotification(location, onPopupCloseCallback);
                 if (location.APLocationName == "WW: Gobliana's Belongings")
                 {
@@ -209,7 +209,7 @@ namespace FlipwitchAP
             SwitchDatabase.instance.setInt("APPeachItemGiven", 1);
             SwitchDatabase.instance.GetType().GetField("ints", GenericMethods.Flags).SetValue(SwitchDatabase.instance, ints);
             var peachyLocation = CutsceneLocations["PeachGiven"];
-            SendLocationGivenLocationDataSendingGift(peachyLocation);
+            SendLocation(peachyLocation);
             return true;
         }
 
@@ -222,7 +222,7 @@ namespace FlipwitchAP
             {
                 return true;
             }
-            SendLocationGivenLocationDataSendingGift(location);
+            SendLocation(location);
             CreateItemNotification(location, null);
             if (location.APLocationName == "WW: Rescue Great Fairy")
             {
@@ -252,7 +252,7 @@ namespace FlipwitchAP
                 Plugin.Logger.LogWarning($"Quest {questName} does not have an associated location, returning");
                 return;
             }
-            SendLocationGivenLocationDataSendingGift(location);
+            SendLocation(location);
             //Do Location bit
         }
 
@@ -278,7 +278,7 @@ namespace FlipwitchAP
                     switchName = switchName.Replace(",", ".");  // European players may run into a situation where this is commas
                     location = FlipwitchLocations.StatLocations[switchName];
                 }
-                SendLocationGivenLocationDataSendingGift(location);
+                SendLocation(location);
                 CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_hpup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
@@ -311,7 +311,7 @@ namespace FlipwitchAP
                     switchName = switchName.Replace(",", ".");  // European players may run into a situation where this is commas
                     location = FlipwitchLocations.StatLocations[switchName];
                 }
-                SendLocationGivenLocationDataSendingGift(location);
+                SendLocation(location);
                 CreateItemNotification(location, null);
                 AkSoundEngine.PostEvent("item_mpup", __instance.gameObject);
                 SwitchDatabase.instance.setInt(switchName, 1);
@@ -337,14 +337,14 @@ namespace FlipwitchAP
                 var secondWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 2"];
                 if (playerWandLocationCount == 1)
                 {
-                    SendLocationGivenLocationDataSendingGift(secondWandLocation);
+                    SendLocation(secondWandLocation);
                     __instance.setInt("APPlayerWand", 2);
                 }
                 playerWandLocationCount = __instance.getInt("APPlayerWand");
                 var firstWandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
                 if (playerWandLocationCount == 0 && !Plugin.ArchipelagoClient.IsLocationChecked(firstWandLocation.APLocationID))
                 {
-                    SendLocationGivenLocationDataSendingGift(firstWandLocation);
+                    SendLocation(firstWandLocation);
                     __instance.setInt("APPlayerWand", 1);
                 }
 
@@ -352,12 +352,12 @@ namespace FlipwitchAP
             if (__instance.getInt("SexualExperienceCount") >= 16)
             {
                 var firstPeachyPower = SexExperienceLocations["WW: Sexual Experience Reward - Peach Upgrade 1"];
-                SendLocationGivenLocationDataSendingGift(firstPeachyPower);
+                SendLocation(firstPeachyPower);
             }
             if (__instance.getInt("SexualExperienceCount") >= 32)
             {
                 var secondPeachyPower = SexExperienceLocations["WW: Sexual Experience Reward - Peach Upgrade 2"];
-                SendLocationGivenLocationDataSendingGift(secondPeachyPower);
+                SendLocation(secondPeachyPower);
             }
             var pendingPeachCharges = __instance.getInt("PendingPeachCharges");
             var totalChargesObtained = __instance.getInt("APTotalPeachCharges");
@@ -370,6 +370,59 @@ namespace FlipwitchAP
             __instance.upgradePendingPopup.updatePendingPopupSymbol();
             return false;
         }
+        
+        [HarmonyPatch(typeof(DestructableObject), "spawnItem")]
+        [HarmonyPrefix]
+        private static bool SpawnItem_SendLocationFirstTime(DestructableObject __instance)
+        {
+            if (!ArchipelagoClient.ServerData.Potsanity)
+            {
+                return true;
+            }
+
+            var level = SwitchDatabase.instance.currentLevel.name;
+            var potName = __instance.gameObject.name;
+            if (!FlipwitchLocations.PotLocations.TryGetValue(level, out var pots))
+            {
+                Plugin.Logger.LogWarning($"We couldn't find a level for this pot!  Info to give to dev: {level} : {potName}");
+                return true;
+            }
+            if (!pots.TryGetValue(potName, out var locationData))
+            {
+                Plugin.Logger.LogWarning($"We couldn't find a location for this pot!  Info to give to dev: {level} : {potName}");
+                return true;
+            }
+
+            if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
+            {
+                return true;
+            }
+            SendLocation(locationData);
+            return false;
+        }
+        
+        [HarmonyPatch(typeof(Teleporter), "OnEnable")]
+        [HarmonyPrefix]
+        private static bool OnEnable_SendCheckInsteadOnCrystalTeleport(Teleporter __instance, ref string ___switchName)
+        {
+            if (!ArchipelagoClient.ServerData.CrystalTeleport)
+            {
+                return true;
+            }
+            if (!WarpLocations.TryGetValue(___switchName, out var locationData))
+            {
+                Plugin.Logger.LogWarning($"The warp {___switchName} isn't sending a check.  Typo in code?");
+                return true;
+            }
+
+            if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
+            {
+                return true;
+            }
+            SendLocation(locationData);
+            // do some stuff here so if the check hasn't been sent yet, send a check, otherwise, allow use if enabled.
+            return false;
+        }
 
         private static void SendPeachyLocations(int sexExperience)
         {
@@ -378,12 +431,12 @@ namespace FlipwitchAP
             {
                 var pickedLocationName = $"WW: Sexual Experience Reward - Peach Charge {i + 1}";
                 var pickedLocation = SexExperienceLocations[pickedLocationName];
-                SendLocationGivenLocationDataSendingGift(pickedLocation);
+                SendLocation(pickedLocation);
             }
 
         }
 
-        public static void SendLocationGivenLocationDataSendingGift(LocationData locationData)
+        public static void SendLocation(LocationData locationData)
         {
 
             var item = ArchipelagoClient.ServerData.ScoutedLocations[locationData.APLocationID];
@@ -392,7 +445,6 @@ namespace FlipwitchAP
                 return;
             }
             Plugin.ArchipelagoClient.DetermineOwnerAndDirectlyGiveIfSelf(locationData, item);
-            return;
 
         }
 

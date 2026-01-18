@@ -1,20 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using FlipwitchAP.Data;
 using FlipwitchAP.Archipelago;
 using HarmonyLib;
 using Newtonsoft.Json;
 using UnityEngine;
-using System.Linq;
-using System.Data;
 using BepInEx;
 
 namespace FlipwitchAP
 {
     public class SaveHelper
     {
+        
         [HarmonyPatch(typeof(SwitchDatabase), "saveGame")]
         [HarmonyPostfix]
         private static void SaveGame_AlsoSaveArchipelagoState(int saveSlotIdx)
@@ -32,13 +29,12 @@ namespace FlipwitchAP
 
         public static void SaveData(int saveSlot)
         {
-            var dir = Application.absoluteURL + "ArchSaves/";
+            var dir = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), $"Save{saveSlot}");
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
-            var savePath = Path.Combine(dir, $"Save{saveSlot}.json");
-            Plugin.Logger.LogInfo($"Saving to {savePath}...");
+            var savePath = Path.Combine(dir, $"Data.json");
             var newGameVerification = -1;
             if (File.Exists(savePath))
             {
@@ -47,9 +43,8 @@ namespace FlipwitchAP
                 var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
                 newGameVerification = loadedSave.Seed;
             }
-            var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Index, ArchipelagoClient.ServerData.Seed,
+            var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Seed,
             ArchipelagoClient.ServerData.CheckedLocations);
-            ArchipelagoClient.ServerData.InitialIndex = ArchipelagoClient.ServerData.Index;
             string json = JsonConvert.SerializeObject(newAPSaveData);
             File.WriteAllText(savePath, json);
             Plugin.Logger.LogInfo("Save complete!");
@@ -57,9 +52,9 @@ namespace FlipwitchAP
             {
                 // We may be in a situation where this is a new save.  We should check.
                 GenericMethods.HandleLocationDifference();
-                GenericMethods.HandleReceivedItems();
+                ArchipelagoClient.AP.ReAddAllPreviousChecksToEnqueueDueToDying();
             }
-            GenericMethods.allowingOutsideItems = true;
+            ArchipelagoClient.AP.allowOutsideItems = true;
         }
 
         public static void ReadSave(int Save_Slot)
@@ -72,20 +67,17 @@ namespace FlipwitchAP
                 {
                     Directory.CreateDirectory(dir);
                 }
-                GenericMethods.allowingOutsideItems = false;
+                ArchipelagoClient.AP.allowOutsideItems = false;
                 var loadedSave = GrabSaveDataForSlot(Save_Slot);
-                ArchipelagoClient.ServerData.Index = loadedSave.Index;
-                ArchipelagoClient.ServerData.InitialIndex = loadedSave.Index;
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
 
                 GenericMethods.HandleLocationDifference();
                 if (CutsceneHelper.hasDied)
                 {
-                    GenericMethods.SyncItemsOnLoad();
+                    ArchipelagoClient.AP.ReAddAllPreviousChecksToEnqueueDueToDying();
                 }
-                GenericMethods.allowingOutsideItems = true;
-                return;
+                ArchipelagoClient.AP.allowOutsideItems = true;
 
             }
             catch (Exception ex)
@@ -102,23 +94,18 @@ namespace FlipwitchAP
             Plugin.Logger.LogInfo($"State of file existence: {File.Exists(savePath)}");
             if (!File.Exists(savePath))
             {
-                return new APSaveData(1, ArchipelagoClient.ServerData.Seed, new List<long>());
+                return new APSaveData(ArchipelagoClient.ServerData.Seed, new List<long>());
             }
             using StreamReader reader = new StreamReader(savePath);
             string text = reader.ReadToEnd();
             var loadedSave = JsonConvert.DeserializeObject<APSaveData>(text);
-            Plugin.Logger.LogInfo($"Save Data: Index {loadedSave.Index} | Seed: {loadedSave.Seed}");
+            Plugin.Logger.LogInfo($"Save Data: Seed: {loadedSave.Seed}");
             return loadedSave;
         }
 
         public static void SaveCurrentConnectionData(string uri, string slotName, string password)
         {
-            var dir = Application.absoluteURL + "ArchSaves/";
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-            var savePath = Path.Combine(dir, "LastConnectionInfo.json");
+            var savePath = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), "LastConnectionInfo.json");
             var currentConnectionData = new ConnectionData(uri, slotName, password);
             string json = JsonConvert.SerializeObject(currentConnectionData);
             File.WriteAllText(savePath, json);
@@ -126,8 +113,7 @@ namespace FlipwitchAP
 
         public static void GrabLastConnectionInfo()
         {
-            var dir = Application.absoluteURL + "ArchSaves/";
-            var savePath = Path.Combine(dir, "LastConnectionInfo.json");
+            var savePath = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), "LastConnectionInfo.json");
             if (!File.Exists(savePath))
             {
                 return;
@@ -143,9 +129,9 @@ namespace FlipwitchAP
 
     public class ConnectionData
     {
-        public string Uri;
-        public string SlotName;
-        public string Password;
+        public readonly string Uri;
+        public readonly string SlotName;
+        public readonly string Password;
 
         public ConnectionData(string uri, string slotName, string password)
         {
@@ -157,19 +143,16 @@ namespace FlipwitchAP
 
     public class APSaveData
     {
-        public int Index;
-        public int Seed;
-        public List<long> CheckedLocations;
+        public readonly int Seed;
+        public readonly List<long> CheckedLocations;
 
         public APSaveData()
         {
-            Index = 0;
             Seed = -1;
             CheckedLocations = new();
         }
-        public APSaveData(int index, int seed, List<long> checkedLocations)
+        public APSaveData(int seed, List<long> checkedLocations)
         {
-            Index = index;
             Seed = seed;
             CheckedLocations = checkedLocations;
         }

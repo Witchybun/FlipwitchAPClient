@@ -15,15 +15,14 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "0.2.12";
+    public const string PluginVersion = "1.0.0";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
-    public static bool IsInGame = false;
     public static int notifCounter = 0;
-    private static bool ToggleGameActions = false;
-    private static InputAction ArchipelagoWindowToggle = new InputAction(binding: "<Keyboard>/f8");
+    private static bool _toggleGameActions;
+    private static readonly InputAction ArchipelagoWindowToggle = new(binding: "<Keyboard>/f8");
 
-    internal static new ManualLogSource Logger;
+    internal new static ManualLogSource Logger;
 
 
     private void Awake()
@@ -35,9 +34,11 @@ public class Plugin : BaseUnityPlugin
         ArchipelagoWindowToggle.Enable();
         ArchipelagoWindowToggle.performed += OnWindowTogglePressed;
         ArchipelagoClient = new ArchipelagoClient();
+        ArchipelagoClient.Setup();
         ArchipelagoConsole.Awake();
         SpriteSwapHelper.GenerateData();
         PatchAll();
+        //Harmony.CreateAndPatchAll(typeof(InfoCatcher));
     }
 
     private void PatchAll()
@@ -53,44 +54,22 @@ public class Plugin : BaseUnityPlugin
         Harmony.CreateAndPatchAll(typeof(DialogueHelper));
         Harmony.CreateAndPatchAll(typeof(CutsceneHelper));
         Harmony.CreateAndPatchAll(typeof(SpriteSwapHelper));
+        
+        Harmony.CreateAndPatchAll(typeof(TeleportHelper));
+        Harmony.CreateAndPatchAll(typeof(BasicMovement));
+
     }
 
     private void OnWindowTogglePressed(InputAction.CallbackContext context)
     {
-        ToggleGameActions = !ToggleGameActions;
-        if (ToggleGameActions)
+        _toggleGameActions = !_toggleGameActions;
+        if (_toggleGameActions)
         {
             NewInputManager.instance?.disableActions();
         }
         else
         {
             NewInputManager.instance?.enableActions();
-        }
-    }
-
-    private void Update()
-    {
-        if (
-            !SwitchDatabase.instance.gamePaused &&
-            !SwitchDatabase.instance.dialogueManager.dialogueOrCutsceneOrIngameCutsceneInProgress() &&
-            !SwitchDatabase.instance.isItemPopupActive() &&
-            IsInGame
-            )
-        {
-            ArchipelagoClient.ReceiveViolation();
-            GenericMethods.HandleReceivedItems();
-        }
-        SendMessageOnTimer(30);
-
-    }
-
-    private void SendMessageOnTimer(int time)
-    {
-        notifCounter += 1;
-        if (notifCounter == time)
-        {
-            notifCounter = 0;
-            // Use to bugtest.
         }
     }
 
@@ -101,13 +80,12 @@ public class Plugin : BaseUnityPlugin
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        IsInGame = scene.name != "MainMenu";
+        ArchipelagoClient.IsInGame = scene.name != "MainMenu";
         GenericMethods.PatchSceneSwitchTriggers(scene.name);
-        if (!IsInGame)
+        if (!ArchipelagoClient.IsInGame)
         {
             //ArchipelagoConsole.CreateArchipelagoMenu();
             ArchipelagoClient.Cleanup();
-            ArchipelagoClient.ServerData.Index = 0;
             ArchipelagoClient.ServerData.CheckedLocations = new();
         }
         else
@@ -118,6 +96,10 @@ public class Plugin : BaseUnityPlugin
             }
         }
         DialogueHelper.GenerateCurrentHintForFortuneTeller(scene.name);
+        if (ArchipelagoClient.AP.FirstTimeWarp)
+        {
+            SwitchDatabase.instance.setBool("TP_Beatrix", false);
+        }
     }
 
     // Display was shamelessly used from Hunie Pop 2's implementation, by dotsofdarkness, since I just want the window on the right.
@@ -127,14 +109,10 @@ public class Plugin : BaseUnityPlugin
         //GUI.Label(new Rect(16, 16, 300, 20), ModDisplayInfo);
         GUI.depth = 0;
         ArchipelagoConsole.OnGUI();
-        if (ArchipelagoClient.Authenticated)
-        {
-            GUI.Window(69, new Rect(Screen.width - 300, 10, 300, 50), WindowContents, "Archipelago");
-        }
-        else
-        {
-            GUI.Window(69, new Rect(Screen.width - 300, 10, 300, 130), WindowContents, "Archipelago");
-        }
+        GUI.Window(69,
+            ArchipelagoClient.Authenticated
+                ? new Rect(Screen.width - 300, 10, 300, 50)
+                : new Rect(Screen.width - 300, 10, 300, 130), WindowContents, "Archipelago");
 
         // this is a good place to create and add a bunch of debug buttons
     }
@@ -142,7 +120,6 @@ public class Plugin : BaseUnityPlugin
     private void WindowContents(int id)
     {
         GUI.backgroundColor = Color.black;
-        string statusMessage;
         // show the Archipelago Version and whether we're connected or not
         if (ArchipelagoClient.Authenticated)
         {
@@ -157,7 +134,7 @@ public class Plugin : BaseUnityPlugin
             // if your game doesn't usually show the cursor this line may be necessary
             // Cursor.visible = true;
 
-            statusMessage = " Status: Disconnected";
+            var statusMessage = " Status: Disconnected";
             GUI.Label(new Rect(5, 20, 300, 20), APDisplayInfo + statusMessage);
             GUI.Label(new Rect(5, 40, 150, 20), "Host: ");
             GUI.Label(new Rect(5, 60, 150, 20), "Player Name: ");

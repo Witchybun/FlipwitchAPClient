@@ -14,27 +14,29 @@ public class ArchipelagoData
     public int TeamId;
     public string SlotName;
     public string Password;
-    public int Index;
-    public int InitialIndex;
     public List<long> CheckedLocations;
 
-    private string CLIENT_KEY = "client_version";
-    private string CHAOS_KEY = "shuffle_chaos_pieces";
-    private string SEED_KEY = "seed";
-    private string DEATH_KEY = "death_link";
-    private string GENDER_KEY = "starting_gender";
-    private string SHOP_KEY = "shopsanity";
-    private string PRICE_KEY = "shop_prices";
-    private string STAT_KEY = "stat_shuffle";
-    private string CRYSTAL_KEY = "crystal_teleports";
-    private string ANIMAL_KEY = "animal_order";
-    private string BUNNY_KEY = "bunny_order";
-    private string MONSTER_KEY = "monster_order";
-    private string ANGEL_KEY = "angel_order";
-    private string HINT_KEY = "hints";
-    private string GACHA_KEY = "gachapon_shuffle";
-    private string QUEST_KEY = "quest_for_sex";
-    private string FORTUNE_KEY = "path";
+    private const string CLIENT_KEY = "client_version";
+    private const string CHAOS_KEY = "shuffle_chaos_pieces";
+    private const string SEED_KEY = "seed";
+    private const string DEATH_KEY = "death_link";
+    private const string GENDER_KEY = "starting_gender";
+    private const string SHOP_KEY = "shopsanity";
+    private const string PRICE_KEY = "shop_prices";
+    private const string STAT_KEY = "stat_shuffle";
+    private const string CRYSTAL_KEY = "crystal_teleports";
+    private const string ANIMAL_KEY = "animal_order";
+    private const string BUNNY_KEY = "bunny_order";
+    private const string MONSTER_KEY = "monster_order";
+    private const string ANGEL_KEY = "angel_order";
+    private const string HINT_KEY = "hints";
+    private const string GACHA_KEY = "gachapon_shuffle";
+    private const string QUEST_KEY = "quest_for_sex";
+    private const string FORTUNE_KEY = "path";
+    private const string DOUBLE_KEY = "shuffle_double_jump";
+    private const string ROLL_KEY = "shuffle_dodge";
+    private const string STARTING_AREA_KEY = "starting_area";
+    private const string POTSANITY_KEY = "pottery_lottery";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
     public Gender StartingGender { get; private set; }
@@ -46,6 +48,10 @@ public class ArchipelagoData
     public bool Shopsanity { get; private set; }
     public bool Statshuffle { get; private set; }
     public bool DeathLink { get; private set; }
+    public bool ShuffleDoubleJump { get; private set; }
+    public bool ShuffleRoll { get; private set; }
+    public bool Potsanity { get; private set; }
+    public StartArea StartingArea { get; private set; }
     public List<int> AnimalGachaOrder { get; private set; }
     public List<int> BunnyGachaOrder { get; private set; }
     public List<int> MonsterGachaOrder { get; private set; }
@@ -71,7 +77,6 @@ public class ArchipelagoData
     public void InitializeOnNewGame()
     {
         CheckedLocations = new();
-        Index = 0;
     }
 
     public void SetupSession(Dictionary<string, object> roomSlotData)
@@ -90,6 +95,10 @@ public class ArchipelagoData
         Gachapon = GetSlotSetting(GACHA_KEY, Gacha.Off);
         Shopsanity = GetSlotSetting(SHOP_KEY, false);
         Statshuffle = GetSlotSetting(STAT_KEY, true);
+        ShuffleDoubleJump = GetSlotSetting(DOUBLE_KEY, false);
+        ShuffleRoll = GetSlotSetting(ROLL_KEY, false);
+        Potsanity = GetSlotSetting(POTSANITY_KEY, false);
+        StartingArea = GetSlotSettings(STARTING_AREA_KEY, StartArea.Beatrice);
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
@@ -125,31 +134,36 @@ public class ArchipelagoData
 
     private Gender GetSlotSetting(string key, Gender defaultValue)
     {
-        return (Gender)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Gender), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Gender)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gender), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
+    }
+
+    private StartArea GetSlotSettings(string key, StartArea defaultValue)
+    {
+        return (StartArea)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(StartArea), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
     private Gacha GetSlotSetting(string key, Gacha defaultValue)
     {
-        return (Gacha)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Gacha), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Gacha)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gacha), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
     private Quest GetSlotSetting(string key, Quest defaultValue)
     {
-        return (Quest)(slotData.ContainsKey(key) ? Enum.Parse(typeof(Quest), slotData[key].ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Quest)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Quest), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
 
     private string GetSlotSetting(string key, string defaultValue)
     {
-        return slotData.ContainsKey(key) ? slotData[key].ToString() : GetSlotDefaultValue(key, defaultValue);
+        return slotData.TryGetValue(key, out var value) ? value.ToString() : GetSlotDefaultValue(key, defaultValue);
     }
 
     public int GetSlotSetting(string key, int defaultValue)
     {
-        return slotData.ContainsKey(key) ? (int)(long)slotData[key] : GetSlotDefaultValue(key, defaultValue);
+        return slotData.TryGetValue(key, out var value) ? (int)(long)value : GetSlotDefaultValue(key, defaultValue);
     }
 
-    public bool GetSlotSetting(string key, bool defaultValue)
+    private bool GetSlotSetting(string key, bool defaultValue)
     {
         if (slotData.ContainsKey(key) && slotData[key] != null && slotData[key] is bool boolValue)
         {
@@ -212,4 +226,24 @@ public class ArchipelagoData
         Quest = 2,
         All = 3
     }
+
+    public enum StartArea
+    {
+        Beatrice = 0,
+        Goblin = 1,
+        Spirit = 2,
+        GhostCastle = 3,
+        Jigoku = 4,
+        ClubDemon = 5,
+        Tengoku = 6,
+        SlimeCitadel = 7,
+        UmiUmi = 8,
+        WitchyWoods = 11,
+        Alley = 12,
+        OutsideGhost = 13,
+        FungalForest = 14,
+        AngelicHallway = 15,
+        SlimyDepths = 16,
+    }
+    
 }
