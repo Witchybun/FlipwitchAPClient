@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace FlipwitchAP
 {
@@ -49,67 +48,60 @@ namespace FlipwitchAP
 
         [HarmonyPatch(typeof(SaveSlotSelection), "Update")]
         [HarmonyPrefix]
-        private static bool Update_DisallowLoadOfWrongSlot(SaveSlotSelection __instance)
+        private static bool Update_DisallowLoadOfWrongSlot(SaveSlotSelection __instance, 
+            ref SaveSlotSelection.Mode ____mode, ref int ____selectedItemIdx)
         {
             NewInputManager instance = NewInputManager.instance;
-            if (instance.Interact.pressedThisFrame || instance.Submit.pressedThisFrame)
-            {
-                var mode = (SaveSlotSelection.Mode)__instance.GetType().GetField("_mode", Flags)?.GetValue(__instance);
-                if (mode == SaveSlotSelection.Mode.Continue)
-                {
-
-                    var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags)?.GetValue(__instance);
-                    var loadedSave = SaveHelper.GrabSaveDataForSlot(select);
-                    if (loadedSave.Seed != ArchipelagoClient.ServerData.Seed)
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-            }
-            return true;
+            if (!instance.Interact.pressedThisFrame && !instance.Submit.pressedThisFrame) return true;
+            if (____mode != SaveSlotSelection.Mode.Continue) return true;
+            var loadedSave = SaveHelper.GrabSaveDataForSlot(____selectedItemIdx);
+            if (loadedSave.Seed == ArchipelagoClient.ServerData.Seed) return true;
+            Plugin.Logger.LogWarning($"Slot seed is {loadedSave.Seed}, but server suggests {ArchipelagoClient.ServerData.Seed}!");
+            return false;
         }
 
         [HarmonyPatch(typeof(MainMenu), "Update")]
         [HarmonyPrefix]
-        private static bool Update_DisallowPlayIfNoConnection(MainMenu __instance)
+        private static bool Update_DisallowPlayIfNoConnection(MainMenu __instance, ref int ____selectedItemIdx)
         {
             if (ArchipelagoClient.Authenticated)
             {
                 return true;
             }
-            NewInputManager instance = NewInputManager.instance;
-            if (instance.Interact.pressedThisFrame || instance.Submit.pressedThisFrame)
+            var instance = NewInputManager.instance;
+            if (!instance.Interact.pressedThisFrame && !instance.Submit.pressedThisFrame) return true;
+            switch (____selectedItemIdx)
             {
-                var select = (int)__instance.GetType().GetField("_selectedItemIdx", Flags)?.GetValue(__instance);
-
-                switch (select)
-                {
-                    case 0:
-                        AkSoundEngine.PostEvent("ui_fail", __instance.gameObject);
-                        return false;
-                    case 1:
-                        AkSoundEngine.PostEvent("ui_fail", __instance.gameObject);
-                        return false;
-                    case 5:
-                        Plugin.ArchipelagoClient.Cleanup();
-                        return true;
-                }
-                return true;
+                case 0:
+                case 1:
+                    AkSoundEngine.PostEvent("ui_fail", __instance.gameObject);
+                    return false;
+                case 5:
+                    Plugin.ArchipelagoClient.Cleanup();
+                    break;
             }
             return true;
         }
 
-        [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: [typeof(int), typeof(Transform)])]
+        [HarmonyPatch(typeof(LevelActivator), "OnTriggerStay2D")]
         [HarmonyPrefix]
-        private static void InflictDamage_ReduceDamageBasedOnBarrier(ref int damage, Transform enemy)
+        private static void OnTriggerStay2D_DocumentLevelForDamageCalculations(LevelActivator __instance,
+            Collider2D collision)
         {
-            if (enemy is not null)
+            if (__instance.levelActivated || !(collision.name == "player") || SwitchDatabase.instance.levelLoadInProgess)
             {
-                Plugin.Logger.LogInfo($"This enemy hit me!  {enemy.name}");
+                return;
             }
-            var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
-            damage -= amount * damage / 4;
+            if (SwitchDatabase.instance.currentScene == "MainMenu") return;
+            var area = EnemyDamageModifier.DetermineAreaGivenLevel();
+            if (area is "NONE" or "Chaos Castle")
+            {
+                return;
+            }
+            if (ArchipelagoClient.ServerData.AreaOrder.ContainsKey(area)) return;
+            var count = ArchipelagoClient.ServerData.AreaOrder.Count;
+            ArchipelagoClient.ServerData.AreaOrder[area] = count;
+            EnemyDamageModifier.AssignDamageMultiplierForAreaGivenOrder(area);
         }
         
         public static void HandleLocationDifference()
@@ -160,6 +152,31 @@ namespace FlipwitchAP
                         bestGirlSwitch.GetComponent<SetGameObjectEnabledOnSwitch>().switchName = "APCabaretComplete";
                         return;
                     }
+            }
+        }
+        
+        public static void CreateOrModifyHoneyBlocksForDifferentStarts(string scene)
+        {
+            switch (ArchipelagoClient.ServerData.StartingArea)
+            {
+                case ArchipelagoData.StartArea.Tengoku:
+                {
+                    if (scene != "FungalForest_Main") return;
+                    var honeyBlock = GameObject.Find("World/44_LargeTowerRoom/LevelData/Bouncy_Honey (3)");
+                    var bounce = honeyBlock.GetComponent<BouncyHoney>();
+                    bounce.force = 65f;
+                    break;
+                }
+                case ArchipelagoData.StartArea.SlimeCitadel:
+                {
+                    if (scene != "FungalForest_Main") return;
+                    var foundBlock = GameObject.Find("World/44_LargeTowerRoom/LevelData/Bouncy_Honey (3)");
+                    var plummet = GameObject.Find("World/44_LargeTowerRoom/LevelData");
+                    var plummetBouncy = Object.Instantiate(foundBlock, plummet.transform);
+                    plummetBouncy.transform.position = new Vector3(339.0535f, -49.2658f, 0f);
+                    plummetBouncy.GetComponent<BouncyHoney>().force = 80;
+                    return;
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using FlipwitchAP.Utils;
 using HarmonyLib;
+using Unity.TLS.LowLevel;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -15,7 +16,7 @@ public class Plugin : BaseUnityPlugin
 {
     public const string PluginGUID = "com.Albrekka.FlipwitchAP";
     public const string PluginName = "FlipwitchAP";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.0.1";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ArchipelagoClient ArchipelagoClient { get; private set; }
     public static int notifCounter = 0;
@@ -34,7 +35,6 @@ public class Plugin : BaseUnityPlugin
         ArchipelagoWindowToggle.Enable();
         ArchipelagoWindowToggle.performed += OnWindowTogglePressed;
         ArchipelagoClient = new ArchipelagoClient();
-        ArchipelagoClient.Setup();
         ArchipelagoConsole.Awake();
         SpriteSwapHelper.GenerateData();
         PatchAll();
@@ -54,7 +54,7 @@ public class Plugin : BaseUnityPlugin
         Harmony.CreateAndPatchAll(typeof(DialogueHelper));
         Harmony.CreateAndPatchAll(typeof(CutsceneHelper));
         Harmony.CreateAndPatchAll(typeof(SpriteSwapHelper));
-        
+        Harmony.CreateAndPatchAll(typeof(EnemyDamageModifier));
         Harmony.CreateAndPatchAll(typeof(TeleportHelper));
         Harmony.CreateAndPatchAll(typeof(BasicMovement));
 
@@ -84,7 +84,6 @@ public class Plugin : BaseUnityPlugin
         GenericMethods.PatchSceneSwitchTriggers(scene.name);
         if (!ArchipelagoClient.IsInGame)
         {
-            //ArchipelagoConsole.CreateArchipelagoMenu();
             ArchipelagoClient.Cleanup();
             ArchipelagoClient.ServerData.CheckedLocations = new();
         }
@@ -94,12 +93,18 @@ public class Plugin : BaseUnityPlugin
             {
                 ArchipelagoClient.SendCurrentScene(trueName);
             }
+            if (ArchipelagoClient.AP.FirstTimeWarp)
+            {
+                Logger.LogInfo("Doing first warp cleanup.");
+                SwitchDatabase.instance.setBool("APFirstTimeWarp", true);
+                SwitchDatabase.instance.setBool("TP_Beatrix", false);
+                ArchipelagoClient.AP.FirstTimeWarp = false;
+                SwitchDatabase.instance.saveGame(SwitchDatabase.instance.saveSlotIndex);
+            }
+            GenericMethods.CreateOrModifyHoneyBlocksForDifferentStarts(scene.name);
         }
         DialogueHelper.GenerateCurrentHintForFortuneTeller(scene.name);
-        if (ArchipelagoClient.AP.FirstTimeWarp)
-        {
-            SwitchDatabase.instance.setBool("TP_Beatrix", false);
-        }
+        
     }
 
     // Display was shamelessly used from Hunie Pop 2's implementation, by dotsofdarkness, since I just want the window on the right.

@@ -155,7 +155,26 @@ namespace FlipwitchAP
                         //Plugin.StartCutsceneTrapRoutine();  There's code there but...eh.
                         return;
                     }
+                case "Rose Ribbon":
+                {
+                    SwitchDatabase.instance.setBool("APCanDouble", true);
+                    return;
+                }
+                case "Orb of Avoidance":
+                {
+                    SwitchDatabase.instance.setBool("APCanRoll", true);
+                    return;
+                }
 
+            }
+
+            if (FlipwitchItems.WarpItems.Contains(name))
+            {
+                if (FlipwitchItems.WarpItemToSwitchName.TryGetValue(name, out var warpSwitch))
+                {
+                    SwitchDatabase.instance.setBool(warpSwitch, true);
+                    return;
+                }
             }
             if (name.Contains(" Figure #"))
             {

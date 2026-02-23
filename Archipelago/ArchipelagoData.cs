@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Archipelago.MultiClient.Net.Models;
 using FlipwitchAP.Data;
 using Newtonsoft.Json;
 
@@ -60,10 +59,11 @@ public class ArchipelagoData
     public Dictionary<string, string> FortuneTellerLookup { get; private set; }
     public bool IsTherePlaythroughGenerated { get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
+    public readonly Dictionary<string, int> AreaOrder = new();
 
-    private Dictionary<string, object> slotData;
+    private Dictionary<string, object> _slotData;
 
-    public bool NeedSlotData => slotData == null;
+    public bool NeedSlotData => _slotData == null;
 
     public ArchipelagoData()
     {
@@ -81,7 +81,8 @@ public class ArchipelagoData
 
     public void SetupSession(Dictionary<string, object> roomSlotData)
     {
-        slotData = roomSlotData;
+        Plugin.Logger.LogInfo("Building Session Data.  If you don't see \"TRANS RIGHTS\" this part has failed.");
+        _slotData = roomSlotData;
         Seed = GetSlotSetting(SEED_KEY, 0);
         ClientVersion = GetSlotSetting(CLIENT_KEY, "");
         DeathLink = GetSlotSetting(DEATH_KEY, false);
@@ -112,6 +113,7 @@ public class ArchipelagoData
         var pathData = GetSlotSetting(FORTUNE_KEY, "");
         FortuneTellerLookup = JsonConvert.DeserializeObject<Dictionary<string, string>>(pathData);
         IsTherePlaythroughGenerated = FortuneTellerLookup.Any();
+        Plugin.Logger.LogInfo("TRANS RIGHTS.");
     }
 
     // Why...?
@@ -134,54 +136,54 @@ public class ArchipelagoData
 
     private Gender GetSlotSetting(string key, Gender defaultValue)
     {
-        return (Gender)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gender), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Gender)(_slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gender), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
     private StartArea GetSlotSettings(string key, StartArea defaultValue)
     {
-        return (StartArea)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(StartArea), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (StartArea)(_slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(StartArea), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
     private Gacha GetSlotSetting(string key, Gacha defaultValue)
     {
-        return (Gacha)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gacha), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Gacha)(_slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Gacha), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
     private Quest GetSlotSetting(string key, Quest defaultValue)
     {
-        return (Quest)(slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Quest), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
+        return (Quest)(_slotData.TryGetValue(key, out var value) ? Enum.Parse(typeof(Quest), value.ToString()) : GetSlotDefaultValue(key, defaultValue));
     }
 
 
     private string GetSlotSetting(string key, string defaultValue)
     {
-        return slotData.TryGetValue(key, out var value) ? value.ToString() : GetSlotDefaultValue(key, defaultValue);
+        return _slotData.TryGetValue(key, out var value) ? value.ToString() : GetSlotDefaultValue(key, defaultValue);
     }
 
     public int GetSlotSetting(string key, int defaultValue)
     {
-        return slotData.TryGetValue(key, out var value) ? (int)(long)value : GetSlotDefaultValue(key, defaultValue);
+        return _slotData.TryGetValue(key, out var value) ? (int)(long)value : GetSlotDefaultValue(key, defaultValue);
     }
 
     private bool GetSlotSetting(string key, bool defaultValue)
     {
-        if (slotData.ContainsKey(key) && slotData[key] != null && slotData[key] is bool boolValue)
+        if (_slotData.ContainsKey(key) && _slotData[key] != null && _slotData[key] is bool boolValue)
         {
             return boolValue;
         }
-        if (slotData[key] is string strValue && bool.TryParse(strValue, out var parsedValue))
+        if (_slotData[key] is string strValue && bool.TryParse(strValue, out var parsedValue))
         {
             return parsedValue;
         }
-        if (slotData[key] is int intValue)
+        if (_slotData[key] is int intValue)
         {
             return intValue != 0;
         }
-        if (slotData[key] is long longValue)
+        if (_slotData[key] is long longValue)
         {
             return longValue != 0;
         }
-        if (slotData[key] is short shortValue)
+        if (_slotData[key] is short shortValue)
         {
             return shortValue != 0;
         }

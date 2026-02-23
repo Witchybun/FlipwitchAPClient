@@ -2,7 +2,6 @@ using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace FlipwitchAP;
 
@@ -15,10 +14,15 @@ public class TeleportHelper
     {
         if (SwitchDatabase.instance.currentLevel.name != "1_EntranceSpawn" ||
             __instance.transform.parent.name != "Intro Cutscene") return;
-        if (ArchipelagoClient.ServerData.StartingArea == ArchipelagoData.StartArea.Beatrice) return;
+        if (ArchipelagoClient.ServerData.StartingArea == ArchipelagoData.StartArea.Beatrice)
+        {
+            SwitchDatabase.instance.setBool("APFirstTimeWarp", true);
+            return;
+        }
         var destination = TeleportData.StartingAreaToWarpInfo[ArchipelagoClient.ServerData.StartingArea];
         ArchipelagoClient.AP.FirstTimeWarp = true;
         SwitchDatabase.instance.levelLoader.LoadNextLevel(destination.Scene, destination.Position, SwitchDatabase.instance.playerMov);
+        ArchipelagoClient.ServerData.AreaOrder.Remove("Witchy Woods");
     }
 
     [HarmonyPatch(typeof(Teleporter), "Update")]

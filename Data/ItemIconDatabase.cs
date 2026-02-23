@@ -28,7 +28,22 @@ namespace FlipwitchAP.Data
             {"Peachy Peach Charge", "PeachyPeach"},
             {"Sexual Experience", "GlassWand"},
             {"Rose Ribbon", "RoseCutters"},
-            {"Orb of Avoidance", "ArcaneCannon"}
+            {"Orb of Avoidance", "ArcaneCannon"},
+            { "Sensei's Hut Teleport", "PortablePortal" },
+            { "Witchy Woods Teleport", "PortablePortal" },
+            { "Goblin Caves Teleport", "PortablePortal" },
+            { "Spirit City Teleport", "PortablePortal" },
+            { "Shady Alley Teleport", "PortablePortal" },
+            { "Ghost Castle Entrance Teleport", "PortablePortal" },
+            { "Ghost Castle Teleport", "PortablePortal" },
+            { "Jigoku Teleport", "PortablePortal" },
+            { "Club Demon Teleport", "PortablePortal" },
+            { "Tengoku Teleport", "PortablePortal" },
+            { "Angelic Hallway Teleport", "PortablePortal" },
+            { "Fungal Forest Teleport", "PortablePortal" },
+            { "Slime Citadel Teleport", "PortablePortal" },
+            { "Slimy Depths Teleport", "PortablePortal" },
+            { "Umi Umi Teleport", "PortablePortal" }
         };
 
         private static readonly List<string> Rings = new()

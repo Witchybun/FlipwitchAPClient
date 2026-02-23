@@ -1,4 +1,5 @@
 using System.Linq;
+using FlipwitchAP.Archipelago;
 using FlipwitchAP.Data;
 using HarmonyLib;
 using UnityEngine;
@@ -13,6 +14,37 @@ namespace FlipwitchAP
         [HarmonyPostfix]
         private static void Start_FixQuests(NPCDialogueAdvanced __instance)
         {
+            if (__instance.gameObject.name == "FortuneTeller")
+            {
+                var madeUpShit = new NPCDialogueAdvanced.SwitchRequirement()
+                {
+                    switchName = "APMYFUGGENDICC",
+                    switchValue = 999,
+                    comparisonOperator = ComparisonOperators.IS_EQUAL_TO
+                };
+                var fortuneGroups = __instance.dialogueGroups;
+                if (fortuneGroups[0].switches.All(x => x.switchName != "APMYFUGGENDICC"))
+                {
+                    fortuneGroups[0].switches.Add(madeUpShit);
+                }
+                if (fortuneGroups[2].switches.All(x => x.switchName != "APMYFUGGENDICC"))
+                {
+                    fortuneGroups[2].itemRequirements.Clear();
+                }
+                for (var i = 3; i < 9; i++)
+                {
+                    if (fortuneGroups[i].switches.All(x => x.switchName != "APMYFUGGENDICC"))
+                    {
+                        fortuneGroups[i].switches.Add(madeUpShit);
+                    }
+                }
+                DialogueHelper.GenerateCurrentHintForFortuneTeller(__instance.gameObject.scene.name);
+                return;
+            }
+            if (ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Off || ArchipelagoClient.ServerData.QuestForSex == ArchipelagoData.Quest.Sensei)
+            {
+                return;
+            }
             switch (__instance.gameObject.name)
             {
                 case "Goblin Model - Quest 1":
@@ -53,7 +85,7 @@ namespace FlipwitchAP
                             goblianaGroups[1].itemRequirements.RemoveAt(0);
                             goblianaGroups[1].switches.Add(wasGivenHeadshot);
                         }
-                        if (!goblianaGroups[2].switches.Any(x => x.switchName == "APLegsGaveCard"))
+                        if (goblianaGroups[2].switches.All(x => x.switchName != "APLegsGaveCard"))
                         {
                             goblianaGroups[2].switches.Add(wasGivenBusinessCard);
                         }
@@ -101,7 +133,7 @@ namespace FlipwitchAP
                             legsGroups[0].itemRequirements.Clear();
                             legsGroups[0].switches.Add(wasNotGivenBusinessCard);
                         }
-                        if (!legsGroups[1].switches.Any(x => x.switchName == "APGoblianaGaveHeadshot"))
+                        if (legsGroups[1].switches.All(x => x.switchName != "APGoblianaGaveHeadshot"))
                         {
                             legsGroups[1].switches.Add(wasGivenHeadshot);
                         }
@@ -109,7 +141,7 @@ namespace FlipwitchAP
                         {
                             legsGroups[2].itemRequirements.RemoveAt(1);
                         }
-                        if (!legsGroups[3].switches.Any(x => x.switchName == "APGoblianaGaveHeadshot"))
+                        if (legsGroups[3].switches.All(x => x.switchName != "APGoblianaGaveHeadshot"))
                         {
                             legsGroups[3].switches.Add(wasGivenHeadshot);
                         }
@@ -192,7 +224,7 @@ namespace FlipwitchAP
                             comparisonOperator = ComparisonOperators.IS_EQUAL_TO
                         };
                         var angelGroups = __instance.dialogueGroups;
-                        if (!angelGroups[1].switches.Any(x => x.switchName == "APDemonGaveLetter"))
+                        if (angelGroups[1].switches.All(x => x.switchName != "APDemonGaveLetter"))
                         {
                             angelGroups[1].switches.Add(wasGivenDemonLetter);
                         }
@@ -206,7 +238,7 @@ namespace FlipwitchAP
                             angelGroups[3].itemRequirements.Clear();
                             angelGroups[3].switches.Add(wasGivenAngelLetter);
                         }
-                        if (!angelGroups[4].switches.Any(x => x.switchName == "APDemonGaveLetter"))
+                        if (angelGroups[4].switches.All(x => x.switchName != "APDemonGaveLetter"))
                         {
                             angelGroups[4].switches.Add(wasGivenAngelLetter);
                             angelGroups[4].switches.Add(wasGivenDemonLetter);
@@ -233,7 +265,7 @@ namespace FlipwitchAP
                             demonGroups[3].itemRequirements.Clear();
                             demonGroups[3].switches.Add(wasGivenDemonLetter);
                         }
-                        if (!demonGroups[4].switches.Any(x => x.switchName == "APAngelGaveLetter"))
+                        if (demonGroups[4].switches.All(x => x.switchName != "APAngelGaveLetter"))
                         {
                             demonGroups[4].switches.Add(wasGivenAngelLetter);
                         }
@@ -259,7 +291,7 @@ namespace FlipwitchAP
                             maidGroups[2].itemRequirements.Clear();
                             maidGroups[2].switches.Add(wasNotGivenDeed);
                         }
-                        if (!maidGroups[3].switches.Any(x => x.switchName == "APMushroomGaveDeed"))
+                        if (maidGroups[3].switches.All(x => x.switchName != "APMushroomGaveDeed"))
                         {
                             maidGroups[3].switches.Add(wasGivenDeed);
                         }
@@ -339,7 +371,7 @@ namespace FlipwitchAP
                             serverGroups[0].itemRequirements.Clear();
                             serverGroups[0].switches.Add(wasNotGivenPassword);
                         }
-                        if (!serverGroups[1].switches.Any(x => x.switchName == "APMomoGavePassword"))
+                        if (serverGroups[1].switches.All(x => x.switchName != "APMomoGavePassword"))
                         {
                             serverGroups[1].switches.Add(wasGivenPassword);
                         }
@@ -391,17 +423,15 @@ namespace FlipwitchAP
                             goblianaGroups[5].itemRequirements.Clear();
                             goblianaGroups[5].switches.Add(wasGivenKey);
                         }
-                        if (!goblianaGroups[6].switches.Any(x => x.switchName == "APExGaveLuggage"))
+                        if (goblianaGroups[6].switches.All(x => x.switchName != "APExGaveLuggage"))
                         {
                             goblianaGroups[6].switches.Add(wasGivenLuggage);
                         }
-                        if (!goblianaGroups[6].switches.Any(x => x.switchName == "APGoblianaGaveKey"))
+                        if (goblianaGroups[6].switches.All(x => x.switchName != "APGoblianaGaveKey"))
                         {
                             goblianaGroups[6].switches.Add(wasGivenKey);
                         }
-                        var swapPosition = goblianaGroups[4];
-                        goblianaGroups[4] = goblianaGroups[6];
-                        goblianaGroups[6] = swapPosition;
+                        (goblianaGroups[4], goblianaGroups[6]) = (goblianaGroups[6], goblianaGroups[4]);
                         return;
                     }
                 case "Flipwitch_Sensei":
@@ -429,19 +459,19 @@ namespace FlipwitchAP
                             comparisonOperator = ComparisonOperators.IS_LESS_THAN
                         };
 
-                        if (!senseiGroups[4].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (senseiGroups[4].switches.All(x => x.switchName != "APPlayerWand"))
                         {
                             senseiGroups[4].switches[1] = receivedNoWandUpgrade;
                         }
-                        if (!senseiGroups[5].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (senseiGroups[5].switches.All(x => x.switchName != "APPlayerWand"))
                         {
                             senseiGroups[5].switches[1] = receivedNoWandUpgrade;
                         }
-                        if (!senseiGroups[6].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (senseiGroups[6].switches.All(x => x.switchName != "APPlayerWand"))
                         {
                             senseiGroups[6].switches[1] = receivedFirstWandNotSecond;
                         }
-                        if (!senseiGroups[7].switches.Any(x => x.switchName == "APPlayerWand"))
+                        if (senseiGroups[7].switches.All(x => x.switchName != "APPlayerWand"))
                         {
                             senseiGroups[7].switches[1] = receivedFirstWandNotSecond;
                         }
@@ -461,7 +491,7 @@ namespace FlipwitchAP
                             comparisonOperator = ComparisonOperators.IS_MORE_THAN
                         };
                         var catGroups = __instance.dialogueGroups;
-                        if (!catGroups[1].switches.Any(x => x.switchName == "APCatStatueCount"))
+                        if (catGroups[1].switches.All(x => x.switchName != "APCatStatueCount"))
                         {
                             catGroups[1].switches.Add(receivedSouls);
                         }
@@ -476,39 +506,13 @@ namespace FlipwitchAP
                             comparisonOperator = ComparisonOperators.IS_MORE_THAN
                         };
                         var stoneGroups = __instance.dialogueGroups;
-                        if (!stoneGroups[1].switches.Any(x => x.switchName == "APNatashaCount"))
+                        if (stoneGroups[1].switches.All(x => x.switchName != "APNatashaCount"))
                         {
                             stoneGroups[1].switches.Add(receivedStones);
                         }
                         return;
                     }
-                case "FortuneTeller":
-                    {
-                        var madeUpShit = new NPCDialogueAdvanced.SwitchRequirement()
-                        {
-                            switchName = "APMYFUGGENDICC",
-                            switchValue = 999,
-                            comparisonOperator = ComparisonOperators.IS_EQUAL_TO
-                        };
-                        var fortuneGroups = __instance.dialogueGroups;
-                        if (!fortuneGroups[0].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
-                        {
-                            fortuneGroups[0].switches.Add(madeUpShit);
-                        }
-                        if (!fortuneGroups[2].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
-                        {
-                            fortuneGroups[2].itemRequirements.Clear();
-                        }
-                        for (var i = 3; i < 9; i++)
-                        {
-                            if (!fortuneGroups[i].switches.Any(x => x.switchName == "APMYFUGGENDICC"))
-                            {
-                                fortuneGroups[i].switches.Add(madeUpShit);
-                            }
-                        }
-                        DialogueHelper.GenerateCurrentHintForFortuneTeller(__instance.gameObject.scene.name);
-                        return;
-                    }
+                
             }
         }
     }

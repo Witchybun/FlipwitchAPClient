@@ -382,17 +382,32 @@ namespace FlipwitchAP
 
             var level = SwitchDatabase.instance.currentLevel.name;
             var potName = __instance.gameObject.name;
-            if (!FlipwitchLocations.PotLocations.TryGetValue(level, out var pots))
+            Plugin.Logger.LogInfo($"Breaking Pot {potName}");
+            if (!PotLocations.TryGetValue(level, out var pots))
             {
-                Plugin.Logger.LogWarning($"We couldn't find a level for this pot!  Info to give to dev: {level} : {potName}");
+                Plugin.Logger.LogWarning($"We couldn't find a level for this pot!  Info to give to dev: {level} : \"{potName}\"");
                 return true;
             }
             if (!pots.TryGetValue(potName, out var locationData))
             {
-                Plugin.Logger.LogWarning($"We couldn't find a location for this pot!  Info to give to dev: {level} : {potName}");
+                Plugin.Logger.LogWarning($"We couldn't find a location for this pot!  Info to give to dev: {level} : \"{potName}\"");
                 return true;
             }
+            // Two pots in this area have the same name.
+            if (level == "6_FlowerGarden" && potName == "pot_breakable_thin")
+            {
+                if (Vector3.Distance(__instance.transform.position, new Vector3(-21.503f, 245.939f, 0f)) < 0.1)
+                {
+                    if (ArchipelagoClient.ServerData.CheckedLocations.Contains(874))
+                    {
+                        return true;
+                    }
 
+                    var realLocation = IDToLocation[874];
+                    SendLocation(realLocation);
+                    return false;
+                }
+            }
             if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
             {
                 return true;
@@ -401,27 +416,77 @@ namespace FlipwitchAP
             return false;
         }
         
-        [HarmonyPatch(typeof(Teleporter), "OnEnable")]
+        [HarmonyPatch(typeof(Teleporter), "Update")]
         [HarmonyPrefix]
-        private static bool OnEnable_SendCheckInsteadOnCrystalTeleport(Teleporter __instance, ref string ___switchName)
+        private static bool Update_SendCheckInsteadOnCrystalTeleport(Teleporter __instance, ref string ___switchName, 
+            ref bool ___approached, ref bool ___menuActivated, ref bool ___portalEnabled, ref float ___openMenuCooldown,
+            ref Animator ___aim)
         {
             if (!ArchipelagoClient.ServerData.CrystalTeleport)
             {
                 return true;
             }
-            if (!WarpLocations.TryGetValue(___switchName, out var locationData))
+            if (!(Time.timeScale > 0f))
             {
-                Plugin.Logger.LogWarning($"The warp {___switchName} isn't sending a check.  Typo in code?");
-                return true;
+                return false;
             }
-
-            if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
+            bool flag = NewInputManager.instance.Interact.pressedThisFrame && !SwitchDatabase.instance.dialogueManager.dialogueOrCutsceneOrIngameCutsceneInProgress();
+            if (___approached && !___menuActivated && flag && WarpLocations.TryGetValue(___switchName, out var locationData))
             {
-                return true;
+                if (!ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
+                {
+                    SendLocation(locationData);
+                    CreateItemNotification(locationData, null);
+                    return false;
+                }
             }
-            SendLocation(locationData);
-            // do some stuff here so if the check hasn't been sent yet, send a check, otherwise, allow use if enabled.
+            SetWarpFlagIfStartingWarp(___switchName);
+            if (!___portalEnabled)
+            {
+                return false;
+            }
+            if (___openMenuCooldown > 0f)
+            {
+                ___openMenuCooldown -= Time.unscaledDeltaTime;
+                if (___openMenuCooldown <= 0f)
+                {
+                    ___openMenuCooldown = 0f;
+                    SwitchDatabase.instance.openTeleporterMenu(open: true, ___switchName);
+                    ___menuActivated = true;
+                }
+                return false;
+            }
+            if (___approached && !___menuActivated && flag)
+            {
+                AkSoundEngine.PostEvent("ui_teleport_menu", __instance.gameObject);
+                SwitchDatabase.instance.playerMov.disableMovement();
+                ___aim.Play("crystal_activate");
+                ___openMenuCooldown = 1f;
+            }
+            if (___menuActivated)
+            {
+                if (flag)
+                {
+                    ___aim.Play("crystal_activate");
+                }
+                if (!SwitchDatabase.instance.isTeleportMenuOpen())
+                {
+                    ___menuActivated = false;
+                }
+                else if (NewInputManager.instance.Cancel.pressedThisFrame || NewInputManager.instance.EscapeMenu.pressedThisFrame)
+                {
+                    ___menuActivated = false;
+                    SwitchDatabase.instance.playerMov.enableMovement();
+                }
+            }
             return false;
+        }
+
+        private static void SetWarpFlagIfStartingWarp(string switchName)
+        {
+            var startingWarp = TeleportData.TeleportSwitchLookup[ArchipelagoClient.ServerData.StartingArea];
+            if (startingWarp != switchName) return;
+            SwitchDatabase.instance.setBool(switchName, true);
         }
 
         private static void SendPeachyLocations(int sexExperience)
@@ -438,7 +503,6 @@ namespace FlipwitchAP
 
         public static void SendLocation(LocationData locationData)
         {
-
             var item = ArchipelagoClient.ServerData.ScoutedLocations[locationData.APLocationID];
             if (Plugin.ArchipelagoClient.IsLocationChecked(locationData.APLocationID))
             {

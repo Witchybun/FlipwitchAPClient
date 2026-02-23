@@ -9,7 +9,7 @@ public class BasicMovement
     // No roll unless ghost.
     [HarmonyPatch(typeof(PlayerMovement), "updateRollInput")]
     [HarmonyPrefix]
-    private static bool UpdateRollInput_DontRollIfNoItem(PlayerMovement __instance, ref bool ___HasDemonDashed, ref bool ___IsHealing, ref float ___RollTimer, 
+    private static bool UpdateRollInput_DontRollIfNoItem(PlayerMovement __instance, ref bool ___HasDemonDashed, ref float ___HealingTimer, ref float ___RollTimer, 
         ref bool ___IsAttacking, ref bool ___EnemyStruck, ref bool ___allowMovement, ref float ___rollCoolDown, ref bool ___IsRangeAttacking, 
         ref bool ___IsCrouching)
     {
@@ -17,7 +17,7 @@ public class BasicMovement
         {
             return true;
         }
-        if (___HasDemonDashed || ___IsHealing)
+        if (___HasDemonDashed || ___HealingTimer > 0f)
         {
             return false;
         }
@@ -30,19 +30,12 @@ public class BasicMovement
             (!___IsRangeAttacking || !___IsCrouching) && !SwitchDatabase.instance.dialogueManager.dialogueOrCutsceneOrIngameCutsceneInProgress() && 
             __instance.controller.isGrounded())
         {
-            if (__instance.IsGhost)
-            {
-                __instance.GetType().GetMethod("_StartRoll").Invoke(__instance, [true]);
-            }
-            else
-            {
-                var canRoll = SwitchDatabase.instance.getBool("APCanRoll");
-                if (canRoll) __instance.GetType().GetMethod("_StartRoll").Invoke(__instance, [true]);
-            }
+            var canRoll = SwitchDatabase.instance.getBool("APCanRoll");
+            if (canRoll) __instance.GetType().GetMethod("_StartRoll", GenericMethods.Flags).Invoke(__instance, [true]);
         }
         if (__instance.IsRolling && ___RollTimer <= 0f)
         {
-            __instance.GetType().GetMethod("endRoll").Invoke(__instance, null);
+            __instance.GetType().GetMethod("endRoll", GenericMethods.Flags).Invoke(__instance, null);
         }
 
         return false;

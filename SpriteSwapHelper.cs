@@ -115,7 +115,6 @@ namespace FlipwitchAP
             var archipelagoFolders = allFolders.Where(x => Path.GetFileName(x.TrimEnd(Path.DirectorySeparatorChar)) == "Archipelago");
             if (!archipelagoFolders.Any())
             {
-                Plugin.Logger.LogInfo("There is no generic icons to use to fall back on, returning.");
                 return;
             }
             MakeGenericArchipelagoItemsFirst(archipelagoFolders.First());
@@ -152,7 +151,6 @@ namespace FlipwitchAP
                 {
                     if (Path.GetExtension(picture).ToUpperInvariant() != ".PNG")
                     {
-                        Plugin.Logger.LogWarning($"{picture} is not a PNG, skipping.");
                         continue;
                     }
                     var picturePath = Path.Combine(folder, picture);
@@ -168,7 +166,6 @@ namespace FlipwitchAP
                     var lookup = CleanString(itemName);
                     if (itemGame != gameName)
                     {
-                        Plugin.Logger.LogWarning($"Picture {picture} is not named properly, skipping.");
                         continue;
                     }
 
@@ -220,7 +217,6 @@ namespace FlipwitchAP
             {
                 if (Path.GetExtension(picture).ToUpperInvariant() != ".PNG")
                 {
-                    Plugin.Logger.LogWarning($"{picture} is not a PNG, skipping.");
                     continue;
                 }
                 var picturePath = Path.Combine(path, picture);

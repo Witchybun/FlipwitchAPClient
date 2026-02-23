@@ -14,12 +14,11 @@ using FlipwitchAP.Utils;
 using FlipwitchAP.Data;
 using static FlipwitchAP.Data.FlipwitchLocations;
 using System.Collections.ObjectModel;
-using BepInEx.Logging;
 using UnityEngine;
 
 namespace FlipwitchAP.Archipelago;
 
-public class ArchipelagoClient: MonoBehaviour
+public class ArchipelagoClient
 {
     public const string APVersion = "0.6.5";
     public const string Game = "Flipwitch Forbidden Sex Hex";
@@ -30,7 +29,6 @@ public class ArchipelagoClient: MonoBehaviour
     public bool allowCoroutines;
 
     public static ArchipelagoClient AP;
-    private static GameObject Obj;
     public static readonly ArchipelagoData ServerData = new();
     private DeathLinkHandler _deathLinkHandler;
     private ArchipelagoSession _session;
@@ -41,16 +39,6 @@ public class ArchipelagoClient: MonoBehaviour
     public static bool IsInGame = false;
     public static bool PlayerWasDeathlinked = false;
     public bool FirstTimeWarp = false;
-
-    public static void Setup()
-    {
-        Obj = new()
-        {
-            name = "ArchipelagoClient"
-        };
-        DontDestroyOnLoad(Obj);
-        AP = Obj.AddComponent<ArchipelagoClient>();
-    }
     
     
     /// <summary>
@@ -123,6 +111,7 @@ public class ArchipelagoClient: MonoBehaviour
         string outText;
         if (result.Successful)
         {
+            Plugin.Logger.LogInfo("Initial connection.  If you don't see \"HUMAN RIGHTS\" this part failed.");
             var success = (LoginSuccessful)result;
             if (!APVersionIsAcceptable(success.SlotData, out var apworldVersion))
             {
@@ -136,6 +125,7 @@ public class ArchipelagoClient: MonoBehaviour
             ServerData.SetupSession(success.SlotData);
             ServerData.SlotId = _session.ConnectionInfo.Slot;
             ServerData.TeamId = _session.ConnectionInfo.Team;
+            if (ServerData.Seed != seedBeforeSetup) BuildLocationTable();
             BuildLocations(seedBeforeSetup);
             _deathLinkHandler = new(_session.CreateDeathLinkService(), ServerData.SlotName, ServerData.DeathLink);
             _session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
@@ -143,9 +133,12 @@ public class ArchipelagoClient: MonoBehaviour
             SaveHelper.SaveCurrentConnectionData(ServerData.Uri, ServerData.SlotName, ServerData.Password);
             DialogueHelper.UpdateDialogueToHaveHints(SwitchDatabase.instance.dialogueManager);
             //GrabAllTrapOrientedCutscenes();
+            Plugin.Logger.LogInfo("Starting Coroutines.");
             allowCoroutines = true;
-            StartCoroutine(HandleQueuedItems());
-            StartCoroutine(ReceiveViolation());
+            SwitchDatabase.instance.StartCoroutine(HandleQueuedItems());
+            SwitchDatabase.instance.StartCoroutine(ReceiveViolation());
+            AP = this;
+            Plugin.Logger.LogInfo("HUMAN RIGHTS!");
             Authenticated = true;
         }
         else
@@ -181,11 +174,11 @@ public class ArchipelagoClient: MonoBehaviour
     {
         if (ServerData.Seed != seed)
         {
-            BuildLocationTable();
             // Scout unchecked locations
             var uncheckedLocationIDs = from locationID in LocationTable.Keys select locationID;
             var locations = _session.Locations.AllLocations;
-            foreach (var location in uncheckedLocationIDs)
+            var locationIDs = uncheckedLocationIDs as long[] ?? uncheckedLocationIDs.ToArray();
+            foreach (var location in locationIDs)
             {
                 if (locations.Contains(location))
                 {
@@ -193,11 +186,12 @@ public class ArchipelagoClient: MonoBehaviour
                 }
                 Plugin.Logger.LogWarning($"There's a location you're trying to scout that isn't there!  Location: {location}");
             }
-            Task<Dictionary<long, ScoutedItemInfo>> scoutedInfoTask = Task.Run(async () => await _session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
+            Task<Dictionary<long, ScoutedItemInfo>> scoutedInfoTask = Task.Run(async () => await _session.Locations.ScoutLocationsAsync(false, locationIDs.ToArray()));
             //Task<LocationInfoPacket> locationInfoTask = Task.Run(async () => await Session.Locations.ScoutLocationsAsync(false, uncheckedLocationIDs.ToArray()));
             if (scoutedInfoTask.IsFaulted)
             {
-                Plugin.Logger.LogError(scoutedInfoTask.Exception.GetBaseException().Message);
+                if (scoutedInfoTask.Exception != null)
+                    Plugin.Logger.LogError(scoutedInfoTask.Exception.GetBaseException().Message);
                 return;
             }
             var scoutedInfo = scoutedInfoTask.Result;
@@ -209,11 +203,12 @@ public class ArchipelagoClient: MonoBehaviour
             }
             ServerData.ScoutedLocations = LocationTable;
         }
+        Plugin.Logger.LogInfo("Done.");
     }
 
     private void BuildLocationTable()
     {
-        List<int> locations = new();
+        List<long> locations = new();
         foreach (var location in APLocationData)
         {
             if (location.IgnoreLocationHandler)
@@ -261,6 +256,16 @@ public class ArchipelagoClient: MonoBehaviour
             }
 
             if (location.Type == STAT && !ServerData.Statshuffle)
+            {
+                continue;
+            }
+
+            if (location.Type == POT && !ServerData.Potsanity)
+            {
+                continue;
+            }
+
+            if (location.Type == WARP && !ServerData.CrystalTeleport)
             {
                 continue;
             }

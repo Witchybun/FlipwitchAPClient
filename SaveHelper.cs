@@ -4,7 +4,6 @@ using System.IO;
 using FlipwitchAP.Archipelago;
 using HarmonyLib;
 using Newtonsoft.Json;
-using UnityEngine;
 using BepInEx;
 
 namespace FlipwitchAP
@@ -27,7 +26,7 @@ namespace FlipwitchAP
             ReadSave(saveSlotIdx);
         }
 
-        public static void SaveData(int saveSlot)
+        private static void SaveData(int saveSlot)
         {
             var dir = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), $"Save{saveSlot}");
             if (!Directory.Exists(dir))
@@ -44,7 +43,7 @@ namespace FlipwitchAP
                 newGameVerification = loadedSave.Seed;
             }
             var newAPSaveData = new APSaveData(ArchipelagoClient.ServerData.Seed,
-            ArchipelagoClient.ServerData.CheckedLocations);
+            ArchipelagoClient.ServerData.CheckedLocations, ArchipelagoClient.ServerData.AreaOrder);
             string json = JsonConvert.SerializeObject(newAPSaveData);
             File.WriteAllText(savePath, json);
             Plugin.Logger.LogInfo("Save complete!");
@@ -57,12 +56,12 @@ namespace FlipwitchAP
             ArchipelagoClient.AP.allowOutsideItems = true;
         }
 
-        public static void ReadSave(int Save_Slot)
+        private static void ReadSave(int Save_Slot)
         {
             try
             {
                 Plugin.Logger.LogInfo($"Reading save {Save_Slot}");
-                var dir = Application.absoluteURL + "ArchSaves/";
+                var dir = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), $"Save{Save_Slot}");
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
@@ -89,12 +88,12 @@ namespace FlipwitchAP
 
         public static APSaveData GrabSaveDataForSlot(int slot)
         {
-            var dir = Application.absoluteURL + "ArchSaves/";
+            var dir = Path.Combine(Path.Combine(Paths.PluginPath, "FlipwitchAP"), $"Save{slot}");
             var savePath = Path.Combine(dir, $"Save{slot}.json");
             Plugin.Logger.LogInfo($"State of file existence: {File.Exists(savePath)}");
             if (!File.Exists(savePath))
             {
-                return new APSaveData(ArchipelagoClient.ServerData.Seed, new List<long>());
+                return new APSaveData(ArchipelagoClient.ServerData.Seed, new List<long>(), new Dictionary<string, int>());
             }
             using StreamReader reader = new StreamReader(savePath);
             string text = reader.ReadToEnd();
@@ -145,16 +144,19 @@ namespace FlipwitchAP
     {
         public readonly int Seed;
         public readonly List<long> CheckedLocations;
+        public readonly Dictionary<string, int> AreaOrder;
 
         public APSaveData()
         {
             Seed = -1;
             CheckedLocations = new();
+            AreaOrder = new();
         }
-        public APSaveData(int seed, List<long> checkedLocations)
+        public APSaveData(int seed, List<long> checkedLocations, Dictionary<string, int> areaOrder)
         {
             Seed = seed;
             CheckedLocations = checkedLocations;
+            AreaOrder = areaOrder;
         }
     }
 }
