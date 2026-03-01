@@ -23,9 +23,16 @@ public class EnemyDamageModifier
             if (!DamageMultiplierPerOrder.TryGetValue(area, out var multiplier))
             {
                 var lastOrder = ArchipelagoClient.ServerData.AreaOrder.Count - 1;
-                var lastArea = ArchipelagoClient.ServerData.AreaOrder.First(x => x.Value == lastOrder).Key;
-                multiplier = DamageMultiplierPerOrder[lastArea];
-                damage = (int)(damage * multiplier);
+                if (lastOrder == -1)
+                {
+                    Plugin.Logger.LogWarning($"Hit by damage in an area where there is no last.");
+                }
+                else
+                {
+                    var lastArea = ArchipelagoClient.ServerData.AreaOrder.First(x => x.Value == lastOrder).Key;
+                    multiplier = DamageMultiplierPerOrder[lastArea];
+                    damage = (int)(damage * multiplier);
+                }
             }
             else
             {

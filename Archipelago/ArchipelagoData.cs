@@ -59,7 +59,7 @@ public class ArchipelagoData
     public Dictionary<string, string> FortuneTellerLookup { get; private set; }
     public bool IsTherePlaythroughGenerated { get; private set; }
     public SortedDictionary<long, ArchipelagoItem> ScoutedLocations = new() { };
-    public readonly Dictionary<string, int> AreaOrder = new();
+    public Dictionary<string, int> AreaOrder = new();
 
     private Dictionary<string, object> _slotData;
 

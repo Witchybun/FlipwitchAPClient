@@ -70,6 +70,7 @@ namespace FlipwitchAP
                 var loadedSave = GrabSaveDataForSlot(Save_Slot);
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
+                ArchipelagoClient.ServerData.AreaOrder = loadedSave.AreaOrder;
 
                 GenericMethods.HandleLocationDifference();
                 if (CutsceneHelper.hasDied)
