@@ -36,31 +36,61 @@ namespace FlipwitchAP
                     }
                 case "Animal Coin":
                     {
+                        var totalCount = SwitchDatabase.instance.getInt("AllAPAnimalCoin");
+                        if (totalCount > 9)
+                        {
+                            return;
+                        }
                         var currentCount = SwitchDatabase.instance.getInt("APAnimalCoin");
+                        SwitchDatabase.instance.setInt("AllAPAnimalCoin", totalCount + 1);
                         SwitchDatabase.instance.setInt("APAnimalCoin", currentCount + 1);
                         return;
                     }
                 case "Bunny Coin":
                     {
+                        var totalCount = SwitchDatabase.instance.getInt("AllAPBunnyCoin");
+                        if (totalCount > 9)
+                        {
+                            return;
+                        }
                         var currentCount = SwitchDatabase.instance.getInt("APBunnyCoin");
+                        SwitchDatabase.instance.setInt("AllAPBunnyCoin", totalCount + 1);
                         SwitchDatabase.instance.setInt("APBunnyCoin", currentCount + 1);
                         return;
                     }
                 case "Monster Coin":
                     {
+                        var totalCount = SwitchDatabase.instance.getInt("AllAPMonsterCoin");
+                        if (totalCount > 9)
+                        {
+                            return;
+                        }
                         var currentCount = SwitchDatabase.instance.getInt("APMonsterCoin");
+                        SwitchDatabase.instance.setInt("AllAPMonsterCoin", totalCount + 1);
                         SwitchDatabase.instance.setInt("APMonsterCoin", currentCount + 1);
                         return;
                     }
                 case "Angel & Demon Coin":
                     {
+                        var totalCount = SwitchDatabase.instance.getInt("AllAPAngelDemonCoin");
+                        if (totalCount > 9)
+                        {
+                            return;
+                        }
                         var currentCount = SwitchDatabase.instance.getInt("APAngelDemonCoin");
+                        SwitchDatabase.instance.setInt("AllAPAngelDemonCoin", totalCount + 1);
                         SwitchDatabase.instance.setInt("APAngelDemonCoin", currentCount + 1);
                         return;
                     }
                 case "Promotional Coin":
                     {
+                        var totalCount = SwitchDatabase.instance.getInt("AllAPPromotionalCoin");
+                        if (totalCount > 1)
+                        {
+                            return;
+                        }
                         var currentCount = SwitchDatabase.instance.getInt("APPromotionalCoin");
+                        SwitchDatabase.instance.setInt("AllAPPromotionalCoin", totalCount + 1);
                         SwitchDatabase.instance.setInt("APPromotionalCoin", currentCount + 1);
                         return;
                     }
