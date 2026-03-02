@@ -398,12 +398,12 @@ namespace FlipwitchAP
             {
                 if (Vector3.Distance(__instance.transform.position, new Vector3(-21.503f, 245.939f, 0f)) < 0.1)
                 {
-                    if (ArchipelagoClient.ServerData.CheckedLocations.Contains(874))
+                    if (ArchipelagoClient.ServerData.CheckedLocations.Contains(886))
                     {
                         return true;
                     }
 
-                    var realLocation = IDToLocation[874];
+                    var realLocation = IDToLocation[886];
                     SendLocation(realLocation);
                     return false;
                 }
