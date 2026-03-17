@@ -28,7 +28,8 @@ namespace FlipwitchAP.Data
                 "Spirit City Sewers", new()
                 {
                     "2_PipeDrop", "3_SmallPipe", "4_PipeHall", "5_PipePlatforms", "6_PipeArches", "7_LongPipe", 
-                    "9_PipeStairs", "10_PipeSubBoss", "12_BottomPipe", "11_PipeChest", "7_LongPipe (1)", "ShadyInterior (1)"
+                    "9_PipeStairs", "10_PipeSubBoss", "12_BottomPipe", "11_PipeChest", "7_LongPipe (1)", "ShadyInterior (1)",
+                    "1_PipeEntrance"
                 }
             },
             {"Ghost Castle", new()
@@ -41,7 +42,8 @@ namespace FlipwitchAP.Data
                 "1_FungalEntrance", "2_DropLeft", "3_DropRight", "4_MiniBridge", "16_CuteHall", "40_MiniDrop", 
                 "41_ShroomRoom", "17_MovingPlatforms", "18_Plummet", "19_MushroomClimb", "31_MiniLadder", "30_OnTop", "23_MovingEast",
                 "29_MushroomAlter", "24_GenderLifts", "22_LongPuzzle", "35_LongCellar", "25_PinkMushrooms", "21_JournyDown", 
-                "20_FlatRoom", "33_JumpRoom", "34_MushroomPillars", "36_ClassicJumps", "6_VerticalJunction", "38_MushroomBridges"
+                "20_FlatRoom", "33_JumpRoom", "34_MushroomPillars", "36_ClassicJumps", "6_VerticalJunction", "38_MushroomBridges",
+                "27_MushroomTower", "26_LadderHall", "28_CircleBack"
             }},
             {"Tengoku", new()
             {
@@ -57,7 +59,7 @@ namespace FlipwitchAP.Data
                 "16_PeachEggplantRight", "36_CuteRoom", "14_ShroomPlatform", "15_SlimeGap", "38_Lanterns", "37_Picnic", 
                 "41_CuteRoom2", "27_MiniBridge", "28_MiddleRoom", "32_NatureHall", "26_TallRoom", "29_LongHallway", 
                 "31_EndRoom", "33_StatueSisters", "34_CandleHall", "35_Fruity", "40_LongSecret", "25_OrangeShrooms", 
-                "39_Secret", "20_Ramp", "21_ShroomZag", "22_StairsDown", "23_Hallway", "24_SlimyPrize"
+                "39_Secret", "20_Ramp", "21_ShroomZag", "22_StairsDown", "23_Hallway", "24_SlimyPrize", "30_TallRoom"
             }},
         };
     }

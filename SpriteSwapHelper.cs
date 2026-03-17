@@ -16,8 +16,8 @@ namespace FlipwitchAP
     {
         public class SpriteData
         {
-            public string Description;
-            public Sprite Sprite;
+            public readonly string Description;
+            public readonly Sprite Sprite;
             public SpriteData(string description, Sprite sprite)
             {
                 Description = description;
@@ -45,20 +45,20 @@ namespace FlipwitchAP
             }
         }
 
-        public class itemDescription
+        private class itemDescription
         {
             public string Name;
             public string Description;
         }
 
-        public static Dictionary<string, Dictionary<string, SpriteData>> GameToSpriteData = new() { };
+        private static readonly Dictionary<string, Dictionary<string, SpriteData>> GameToSpriteData = new() { };
 
         [HarmonyPatch(typeof(ItemCollectPopup), "popUpItem")]
         [HarmonyPrefix]
         private static void popUpItem_RenderCustomItemIfSpriteExists(ref string itemNameId, ref string itemDescId, string howToUseId, RuntimeAnimatorController animator, Action onPopupCloseCallback = null)
         {
             var itemPickupObject = SwitchDatabase.instance.transform.Find("Main UI").Find("Item Pickup Object");
-            if (!itemNameId.Contains("_"))
+            if (!itemNameId.Contains("###"))
             {
                 itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(true);
                 var apPicture = itemPickupObject.Find("ArchipelagoItemSprite");
@@ -68,38 +68,64 @@ namespace FlipwitchAP
                 }
                 return;
             }
-            var nameArray = itemNameId.Split("_");
+            var nameArray = itemNameId.Split("###");
             var game = nameArray[0];
+            if (game.Contains("Manual") && game.Contains("_"))
+            {
+                game = game.Split("_")[1];
+            }
+            var gameLookup = CleanString(game);
             var item = nameArray[1];
             var lookup = CleanString(item);
-            Int32.TryParse(nameArray[2], out var locationID);
+            int.TryParse(nameArray[2], out var locationID);
             var player = nameArray[3];
             itemNameId = $"{player}'s {item}";
-            if (!DoesSpriteExist(game, lookup))
+            Plugin.Logger.LogInfo($"Info: Item Name ID: {itemNameId}, Game: {game}, After Cleanup: {gameLookup}, Item: {item}, After Cleanup: {lookup}");
+            if (!DoesSpriteExist(gameLookup, lookup, out var lookupName))
             {
-                var type = ReturnClassificationEnd(locationID);
-                RenderArchipelagoSprite("Archipelago", type, itemPickupObject);
-                itemDescId = $"An item from the world of {game}.";
-                itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
-                return;
-            }
-            itemDescId = GameToSpriteData[game][lookup].Description;
-            RenderArchipelagoSprite(game, lookup, itemPickupObject);
-            itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
-        }
-
-        public static string CleanString(string str)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < str.Length; i++)
-            {
-                if ((str[i] >= '0' && str[i] <= '9')
-                    || (str[i] >= 'A' && str[i] <= 'z'))
+                if (lookupName == "ArchipelagoGeneric")
                 {
-                    sb.Append(str[i]);
+                    var type = ReturnClassificationEnd(locationID);
+                    RenderArchipelagoSprite("Archipelago", type, itemPickupObject);
+                    itemDescId = $"An item from the world of {game}.";
+                    itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
+                    return;
+                }
+
+                if (lookupName == "Generic")
+                {
+                    RenderArchipelagoSprite(game, lookupName, itemPickupObject);
+                    itemDescId = $"An item from the world of {game}.";
+                    itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
                 }
             }
 
+            if (GameToSpriteData[gameLookup].TryGetValue(lookup, out var spriteInfo))
+            {
+                itemDescId = spriteInfo.Description;
+                RenderArchipelagoSprite(game, lookup, itemPickupObject);
+                itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
+                
+            }
+            else
+            {
+                RenderArchipelagoSprite(game, "Generic", itemPickupObject);
+                itemDescId = $"An item from the world of {game}.";
+                itemPickupObject.Find("Item Pickup Image").gameObject.SetActive(false);
+                
+            }
+        }
+
+        private static string CleanString(string str)
+        {
+            var sb = new StringBuilder();
+            foreach (var t in str)
+            {
+                if ((t is >= '0' and <= '9' or >= 'A' and <= 'z' or ' '))
+                {
+                    sb.Append(t);
+                }
+            }
             return sb.ToString();
         }
 
@@ -124,15 +150,13 @@ namespace FlipwitchAP
                 var gameName = Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar));
                 var aliasPath = Path.Combine(folder, "aliases.json");
                 var descriptionPath = Path.Combine(folder, "descriptions.json");
-                var aliasText = "";
-                var descriptionText = "";
                 var aliasGroup = new ItemSpriteAliases();
                 var aliases = new Dictionary<string, List<string>>();
                 var descriptionList = new List<itemDescription>();
                 var descriptions = new Dictionary<string, string>();
                 if (File.Exists(aliasPath))
                 {
-                    aliasText = File.ReadAllText(aliasPath);
+                    var aliasText = File.ReadAllText(aliasPath);
                     aliasGroup = JsonConvert.DeserializeObject<ItemSpriteAliases>(aliasText);
                     foreach (var alias in aliasGroup.Aliases)
                     {
@@ -141,12 +165,13 @@ namespace FlipwitchAP
                 }
                 if (File.Exists(descriptionPath))
                 {
-                    descriptionText = File.ReadAllText(descriptionPath);
+                    var descriptionText = File.ReadAllText(descriptionPath);
                     descriptionList = JsonConvert.DeserializeObject<List<itemDescription>>(descriptionText);
-                    descriptions = CreateLookupForDescription(descriptionList);
+                    descriptions = CreateLookupForDescription(descriptionList, aliases);
                 }
                 var pictures = Directory.GetFiles(folder).Select(Path.GetFileName);
-                GameToSpriteData[gameName] = new();
+                var cleanGameName = CleanString(gameName);
+                GameToSpriteData[cleanGameName] = new();
                 foreach (var picture in pictures)
                 {
                     if (Path.GetExtension(picture).ToUpperInvariant() != ".PNG")
@@ -156,12 +181,12 @@ namespace FlipwitchAP
                     var picturePath = Path.Combine(folder, picture);
                     if (!picture.Contains("_"))
                     {
-
-                        TryMakeGenericIcon(gameName, picturePath);
+                        TryMakeGenericIcon(cleanGameName, picturePath);
                         continue;
                     }
                     var nameArray = Path.GetFileNameWithoutExtension(picture).Split("_");
                     var itemGame = nameArray[0];
+                    var gameLookup = CleanString(itemGame);
                     var itemName = nameArray[1];
                     var lookup = CleanString(itemName);
                     if (itemGame != gameName)
@@ -175,35 +200,42 @@ namespace FlipwitchAP
                     var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(texture.width / 2, texture.height / 2));
                     var itemDescription = $"An item from the world of {gameName}.";
                     var newSpriteData = new SpriteData("", new Sprite());
-                    if (aliases.ContainsKey(itemName))
+                    if (aliases.TryGetValue(itemName, out var alias))
                     {
-                        foreach (var item in aliases[itemName])
+                        foreach (var item in alias)
                         {
-                            itemDescription = $"An item from the world of {gameName}.";
                             descriptions.TryGetValue(itemName, out itemDescription);
                             descriptions.TryGetValue(item, out itemDescription);
                             newSpriteData = new SpriteData(itemDescription, sprite);
                             lookup = CleanString(item);
-                            GameToSpriteData[gameName][lookup] = newSpriteData;
+                            GameToSpriteData[gameLookup][lookup] = newSpriteData;
                         }
                         continue;
                     }
 
-                    if (!descriptions.TryGetValue(itemName, out itemDescription))
+                    if (!descriptions.TryGetValue(itemName, out itemDescription) && descriptions.TryGetValue("Generic", out var description))
                     {
-                        itemDescription = $"An item from the world of {gameName}.";
+                        itemDescription = description;
                     }
                     newSpriteData = new SpriteData(itemDescription, sprite);
-                    GameToSpriteData[gameName][lookup] = newSpriteData;
+                    GameToSpriteData[gameLookup][lookup] = newSpriteData;
                 }
             }
         }
 
-        private static Dictionary<string, string> CreateLookupForDescription(List<itemDescription> itemDescriptions)
+        private static Dictionary<string, string> CreateLookupForDescription(List<itemDescription> itemDescriptions, Dictionary<string, List<string>> aliases)
         {
             var result = new Dictionary<string, string>();
             foreach (var item in itemDescriptions)
             {
+                if (aliases.TryGetValue(item.Name, out var alias))
+                {
+                    foreach (var name in alias)
+                    {
+                        result[name] = item.Description;
+                    }
+                    continue;
+                }
                 result[item.Name] = item.Description;
             }
             return result;
@@ -250,21 +282,24 @@ namespace FlipwitchAP
             GameToSpriteData[gameName]["Generic"] = newSpriteData;
         }
 
-        private static bool DoesSpriteExist(string gameName, string itemName)
+        private static bool DoesSpriteExist(string gameName, string itemName, out string lookupName)
         {
-            if (!GameToSpriteData.ContainsKey(gameName))
+            if (!GameToSpriteData.TryGetValue(gameName, out var gameInfo))
             {
+                lookupName = "ArchipelagoGeneric";
                 return false;
             }
-            var gameInfo = GameToSpriteData[gameName];
+
             if (!gameInfo.ContainsKey(itemName))
             {
+                lookupName = "Generic";
                 return false;
             }
+            lookupName = itemName;
             return true;
         }
 
-        public static string ReturnClassificationEnd(long locationID)
+        private static string ReturnClassificationEnd(long locationID)
         {
             if (!ArchipelagoClient.ServerData.ScoutedLocations.TryGetValue(locationID, out var locationData))
             {
@@ -285,23 +320,19 @@ namespace FlipwitchAP
             return "FillerItem";
         }
 
-        public static SpriteData GetSpriteForItem(string gameName, string itemName)
+        private static SpriteData GetSpriteForItem(string gameName, string itemName)
         {
-            if (!GameToSpriteData.ContainsKey(gameName))
+            var gameLookup = CleanString(gameName);
+            if (!GameToSpriteData.ContainsKey(gameLookup))
             {
-                Plugin.Logger.LogWarning($"No game for {gameName}, returning Archipelago");
+                Plugin.Logger.LogWarning($"No game for {gameLookup}, returning Archipelago");
                 return GameToSpriteData["Archipelago"]["UsefulItem"];
             }
-            var gameInfo = GameToSpriteData[gameName];
-            if (!gameInfo.ContainsKey(itemName))
-            {
-                Plugin.Logger.LogWarning($"No item for {itemName} in {gameName}, returning Archipelago");
-                return GameToSpriteData["Archipelago"]["UsefulItem"];
-            }
-            return gameInfo[itemName];
+            var gameInfo = GameToSpriteData[gameLookup];
+            return !gameInfo.TryGetValue(itemName, out var item) ? gameInfo["Generic"] : item;
         }
 
-        public static void RenderArchipelagoSprite(string gameName, string itemName, Transform parent)
+        private static void RenderArchipelagoSprite(string gameName, string itemName, Transform parent)
         {
             var spriteData = GetSpriteForItem(gameName, itemName);
             var sprite = spriteData.Sprite;

@@ -59,6 +59,8 @@ public class EnemyDamageModifier
                 return "Umi Umi";
             case "Tengoku_Final":
                 return "Tengoku";
+            case "GhostCastle_Main":
+                return "Ghost Castle";
         }
         var level = "";
         try
@@ -76,11 +78,6 @@ public class EnemyDamageModifier
                 return "Witchy Woods";
             case "Spirit_City_Final" when GenericInformation.AreasToHelpDefineGivenRegion["Spirit City Sewers"].Contains(level):
                 return "Spirit City Sewers";
-            case "GhostCastle_Main" when
-                !GenericInformation.AreasToHelpDefineGivenRegion["Ghost Castle"].Contains(level):
-                return "Ghost Castle";
-            case "FungalForest_Main" when GenericInformation.AreasToHelpDefineGivenRegion["Tengoku"].Contains(level):
-                return "Tengoku";
             case "FungalForest_Main" when
                 GenericInformation.AreasToHelpDefineGivenRegion["Outside Fungal Forest"].Contains(level):
                 return "Outside Fungal Forest";

@@ -571,7 +571,7 @@ namespace FlipwitchAP
             }
             else
             {
-                name = $"{scoutedInformation.Game}_{scoutedInformation.Name}_{locationID}_{scoutedInformation.SlotName}";
+                name = $"{scoutedInformation.Game}###{scoutedInformation.Name}###{locationID}###{scoutedInformation.SlotName}";
                 swappedDesc = $"An item from the world of {scoutedInformation.Game}.  It vanishes upon you touching it.";
                 var singleClassification = ItemFlags.None;
 
