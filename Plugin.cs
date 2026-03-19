@@ -22,6 +22,9 @@ public class Plugin : BaseUnityPlugin
     public static int notifCounter = 0;
     private static bool _toggleGameActions;
     private static readonly InputAction ArchipelagoWindowToggle = new(binding: "<Keyboard>/f8");
+    private static string _currentScene;
+
+    public static bool WasLastSceneMainMenu;
 
     internal new static ManualLogSource Logger;
 
@@ -81,7 +84,9 @@ public class Plugin : BaseUnityPlugin
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         ArchipelagoClient.IsInGame = scene.name != "MainMenu";
-        GenericMethods.PatchSceneSwitchTriggers(scene.name);
+        WasLastSceneMainMenu = _currentScene == "MainMenu";
+        _currentScene = scene.name;
+        GenericMethods.PatchSceneSwitchTriggers(_currentScene);
         if (!ArchipelagoClient.IsInGame)
         {
             ArchipelagoClient.Cleanup();
@@ -89,7 +94,7 @@ public class Plugin : BaseUnityPlugin
         }
         else
         {
-            if (GenericInformation.SceneToAreaName.TryGetValue(scene.name, out var trueName))
+            if (GenericInformation.SceneToAreaName.TryGetValue(_currentScene, out var trueName))
             {
                 ArchipelagoClient.SendCurrentScene(trueName);
             }
@@ -101,9 +106,9 @@ public class Plugin : BaseUnityPlugin
                 ArchipelagoClient.AP.FirstTimeWarp = false;
                 SwitchDatabase.instance.saveGame(SwitchDatabase.instance.saveSlotIndex);
             }
-            GenericMethods.CreateOrModifyHoneyBlocksForDifferentStarts(scene.name);
+            GenericMethods.CreateOrModifyHoneyBlocksForDifferentStarts(_currentScene);
         }
-        DialogueHelper.GenerateCurrentHintForFortuneTeller(scene.name);
+        DialogueHelper.GenerateCurrentHintForFortuneTeller(_currentScene);
         
     }
 

@@ -53,7 +53,7 @@ namespace FlipwitchAP
                 GenericMethods.HandleLocationDifference();
                 ArchipelagoClient.AP.ReAddAllPreviousChecksToEnqueueDueToDying();
             }
-            ArchipelagoClient.AP.allowOutsideItems = true;
+            ArchipelagoClient.AP.AllowOutsideItems = true;
         }
 
         private static void ReadSave(int Save_Slot)
@@ -66,18 +66,18 @@ namespace FlipwitchAP
                 {
                     Directory.CreateDirectory(dir);
                 }
-                ArchipelagoClient.AP.allowOutsideItems = false;
+                ArchipelagoClient.AP.AllowOutsideItems = false;
                 var loadedSave = GrabSaveDataForSlot(Save_Slot);
                 ArchipelagoClient.ServerData.Seed = loadedSave.Seed;
                 ArchipelagoClient.ServerData.CheckedLocations = loadedSave.CheckedLocations;
                 ArchipelagoClient.ServerData.AreaOrder = loadedSave.AreaOrder;
 
                 GenericMethods.HandleLocationDifference();
-                if (CutsceneHelper.hasDied)
+                if (CutsceneHelper.hasDied || Plugin.WasLastSceneMainMenu)
                 {
                     ArchipelagoClient.AP.ReAddAllPreviousChecksToEnqueueDueToDying();
                 }
-                ArchipelagoClient.AP.allowOutsideItems = true;
+                ArchipelagoClient.AP.AllowOutsideItems = true;
 
             }
             catch (Exception ex)

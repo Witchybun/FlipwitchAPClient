@@ -25,16 +25,16 @@ public class ArchipelagoClient
 
     public static bool Authenticated;
     private bool _attemptingConnection;
-    public bool allowOutsideItems;
-    public bool allowCoroutines;
+    public bool AllowOutsideItems;
+    private bool _allowCoroutines;
 
     public static ArchipelagoClient AP;
     public static readonly ArchipelagoData ServerData = new();
     private DeathLinkHandler _deathLinkHandler;
     private ArchipelagoSession _session;
-    public static readonly Queue<ReceivedItem> ItemsToProcess = new();
-    public static List<ReceivedItem> AllReceivedItems = new();
-    public readonly SortedDictionary<long, ArchipelagoItem> LocationTable = new() { };
+    private static readonly Queue<ReceivedItem> ItemsToProcess = new();
+    private static readonly List<ReceivedItem> AllReceivedItems = new();
+    private readonly SortedDictionary<long, ArchipelagoItem> _locationTable = new() { };
     public readonly List<string> CutsceneIDsForTraps = new();
     public static bool IsInGame = false;
     public static bool PlayerWasDeathlinked = false;
@@ -134,7 +134,7 @@ public class ArchipelagoClient
             DialogueHelper.UpdateDialogueToHaveHints(SwitchDatabase.instance.dialogueManager);
             //GrabAllTrapOrientedCutscenes();
             Plugin.Logger.LogInfo("Starting Coroutines.");
-            allowCoroutines = true;
+            _allowCoroutines = true;
             SwitchDatabase.instance.StartCoroutine(HandleQueuedItems());
             SwitchDatabase.instance.StartCoroutine(ReceiveViolation());
             AP = this;
@@ -175,7 +175,7 @@ public class ArchipelagoClient
         if (ServerData.Seed != seed)
         {
             // Scout unchecked locations
-            var uncheckedLocationIDs = from locationID in LocationTable.Keys select locationID;
+            var uncheckedLocationIDs = from locationID in _locationTable.Keys select locationID;
             var locations = _session.Locations.AllLocations;
             var locationIDs = uncheckedLocationIDs as long[] ?? uncheckedLocationIDs.ToArray();
             foreach (var location in locationIDs)
@@ -199,9 +199,9 @@ public class ArchipelagoClient
             foreach (var item in scoutedInfo.Values)
             {
                 int locationID = (int)item.LocationId;
-                LocationTable[locationID] = new ArchipelagoItem(item, false);
+                _locationTable[locationID] = new ArchipelagoItem(item, false);
             }
-            ServerData.ScoutedLocations = LocationTable;
+            ServerData.ScoutedLocations = _locationTable;
         }
         Plugin.Logger.LogInfo("Done.");
     }
@@ -274,7 +274,7 @@ public class ArchipelagoClient
 
         foreach (var id in locations)
         {
-            LocationTable[id] = null;
+            _locationTable[id] = null;
         }
     }
 
@@ -286,7 +286,7 @@ public class ArchipelagoClient
         Plugin.Logger.LogDebug("disconnecting from server...");
         _session?.Socket.DisconnectAsync();
         _session = null;
-        allowCoroutines = false;
+        _allowCoroutines = false;
         Authenticated = false;
         AllReceivedItems.Clear();
     }
@@ -321,11 +321,11 @@ public class ArchipelagoClient
 
     private IEnumerator HandleQueuedItems()
     {
-        while (allowCoroutines)
+        while (_allowCoroutines)
         {
             while (!ItemsToProcess.Any())
             {
-                if (!allowCoroutines)
+                if (!_allowCoroutines)
                 {
                     ItemsToProcess.Clear();
                     yield break;
@@ -472,7 +472,7 @@ public class ArchipelagoClient
 
     public IEnumerator ReceiveViolation()
     {
-        while (allowCoroutines)
+        while (_allowCoroutines)
         {
             _deathLinkHandler.KillPlayer();
             yield return new WaitForSeconds(1f);
