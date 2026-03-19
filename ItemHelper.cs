@@ -8,11 +8,20 @@ namespace FlipwitchAP
 {
     public class ItemHelper
     {
-        public static void GiveFlipwitchItem(string name, bool skipPopup = false)
+        private static void GiveFlipwitchItem(string name, int index, bool skipPopup = false)
         {
-            var switchName = $"AP" + name.Replace(" ", "") + "ItemCount";
-            var currentValue = SwitchDatabase.instance.getInt(switchName);
-            SwitchDatabase.instance.setInt(switchName, currentValue + 1);
+            var switchName = $"AP_ItemReceived_{index}";
+            SwitchDatabase.instance.setBool(switchName, true);
+            if (index > 0)
+            {
+                var previousSwitch = $"AP_ItemReceived_{index-1}";
+                var previousBool = SwitchDatabase.instance.getBool(previousSwitch);
+                if (!previousBool)
+                {
+                    Plugin.Logger.LogWarning("Item check says the previous item wasn't received.");
+                    
+                }
+            }
             switch (name)
             {
                 case "Nothing":
@@ -320,7 +329,7 @@ namespace FlipwitchAP
 
         public static void GiveFlipwitchItem(ReceivedItem item)
         {
-            GiveFlipwitchItem(item.ItemName);
+            GiveFlipwitchItem(item.ItemName, item.Index);
         }
 
         private static void CustomGiveItemIfMethodIsOnUpdate(Item item, string itemName)

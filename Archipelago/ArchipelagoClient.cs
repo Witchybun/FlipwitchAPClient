@@ -348,7 +348,7 @@ public class ArchipelagoClient
                 continue;
             }
             SwitchDatabase.instance.setInt("RandoIndex", currentIndex + 1);
-            ItemHelper.GiveFlipwitchItem(item.ItemName);
+            ItemHelper.GiveFlipwitchItem(item);
             GachaHelper.RefreshGachaTokenCount_WriteSpecialGachaInstead(SwitchDatabase.instance);
             yield return new WaitForSeconds(0.2f);
         }
