@@ -11,37 +11,33 @@ namespace FlipwitchAP;
 public class EnemyDamageModifier
 
 {
-    private static readonly Dictionary<string, float> DamageMultiplierPerOrder = new();
+    private static string _previousArea = "";
     
     [HarmonyPatch(typeof(PlayerMovement), "inflictDamage", argumentTypes: [typeof(int), typeof(Transform)])]
     [HarmonyPrefix]
     private static void InflictDamage_ChangeDamageBasedOnAreaAndBarrier(ref int damage, Transform enemy)
     {
+        var healthCount = Math.Min(7, SwitchDatabase.instance.getInt("hpUpgradeLevel"));
         var area = DetermineAreaGivenLevel();
-        if (area != "Chaos Castle" && area != "NONE")
+        if (area == "NONE")
         {
-            if (!DamageMultiplierPerOrder.TryGetValue(area, out var multiplier))
+            area = "Witchy Woods";
+            if (_previousArea != "")
             {
-                var lastOrder = ArchipelagoClient.ServerData.AreaOrder.Count - 1;
-                if (lastOrder == -1)
-                {
-                    Plugin.Logger.LogWarning($"Hit by damage in an area where there is no last.");
-                }
-                else
-                {
-                    var lastArea = ArchipelagoClient.ServerData.AreaOrder.First(x => x.Value == lastOrder).Key;
-                    multiplier = DamageMultiplierPerOrder[lastArea];
-                    damage = (int)(damage * multiplier);
-                }
+                // If we can, use the previous area's area information.  Sometimes not accurate, but okay.
+                area = _previousArea;
             }
-            else
-            {
-                
-                damage = (int)(damage * multiplier);
-            }
+        }
+        if (area != "Chaos Castle")
+        {
+            var averageAreaDamage = DamageDatabase.OriginalOrderDamageLookup[DamageDatabase.AreaToOriginalOrder[area]];
+            var damageBasedOnHealth = DamageDatabase.OriginalOrderDamageLookup[healthCount];
+            var multiplier = damageBasedOnHealth / (float)averageAreaDamage;
+            damage = (int)multiplier * damage;
         }
         var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
         damage -= (int)((amount * damage) / 4f);
+        _previousArea = area;
     }
 
     public static string DetermineAreaGivenLevel()
@@ -67,7 +63,7 @@ public class EnemyDamageModifier
         {
             level = SwitchDatabase.instance.currentLevel.name;
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             return "NONE";
         }
@@ -88,15 +84,5 @@ public class EnemyDamageModifier
                 Plugin.Logger.LogWarning($"We couldn't find an area for {level}.  If this area has enemies in it, report it.");
                 return "NONE";
         }
-    }
-    
-    public static void AssignDamageMultiplierForAreaGivenOrder(string area)
-    {
-        var originalOrder = DamageDatabase.AreaToOriginalOrder[area];
-        var originalMaxDamage = (float)DamageDatabase.OriginalOrderDamageLookup[originalOrder];
-        var order = ArchipelagoClient.ServerData.AreaOrder[area];
-        var orderMaxDamage = DamageDatabase.OriginalOrderDamageLookup[order];
-        var multiplier = orderMaxDamage / originalMaxDamage;
-        DamageMultiplierPerOrder[area] = multiplier;
     }
 }

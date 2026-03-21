@@ -82,27 +82,6 @@ namespace FlipwitchAP
             }
             return true;
         }
-
-        [HarmonyPatch(typeof(LevelActivator), "OnTriggerStay2D")]
-        [HarmonyPrefix]
-        private static void OnTriggerStay2D_DocumentLevelForDamageCalculations(LevelActivator __instance,
-            Collider2D collision)
-        {
-            if (__instance.levelActivated || !(collision.name == "player") || SwitchDatabase.instance.levelLoadInProgess)
-            {
-                return;
-            }
-            if (SwitchDatabase.instance.currentScene == "MainMenu") return;
-            var area = EnemyDamageModifier.DetermineAreaGivenLevel();
-            if (area is "NONE" or "Chaos Castle")
-            {
-                return;
-            }
-            if (ArchipelagoClient.ServerData.AreaOrder.ContainsKey(area)) return;
-            var count = ArchipelagoClient.ServerData.AreaOrder.Count;
-            ArchipelagoClient.ServerData.AreaOrder[area] = count;
-            EnemyDamageModifier.AssignDamageMultiplierForAreaGivenOrder(area);
-        }
         
         public static void HandleLocationDifference()
         {

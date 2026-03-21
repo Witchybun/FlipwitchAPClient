@@ -47,8 +47,8 @@ namespace FlipwitchAP
 
         private class itemDescription
         {
-            public string Name;
-            public string Description;
+            public string Name = "";
+            public string Description = "";
         }
 
         private static readonly Dictionary<string, Dictionary<string, SpriteData>> GameToSpriteData = new() { };

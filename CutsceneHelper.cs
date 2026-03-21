@@ -11,7 +11,7 @@ namespace FlipwitchAP
     public class CutsceneHelper
     {
 
-        public static bool hasDied = false;
+        public static bool hasDied;
         public static bool currentlyCutsceneTrapped = false;
         public static bool trapRoutineRunning = false;
         public static Queue<string> cutsceneTrapQueue = new();

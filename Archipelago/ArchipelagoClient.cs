@@ -343,7 +343,7 @@ public class ArchipelagoClient
 
             var item = ItemsToProcess.Dequeue();
             var currentIndex = SwitchDatabase.instance.getInt("RandoIndex");
-            if (item.Index < currentIndex)
+            if (SwitchDatabase.instance.getBool($"AP_ItemReceived_{item.Index}"))
             {
                 continue;
             }
