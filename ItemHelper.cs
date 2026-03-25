@@ -16,9 +16,9 @@ namespace FlipwitchAP
             {
                 var previousSwitch = $"AP_ItemReceived_{index-1}";
                 var previousBool = SwitchDatabase.instance.getBool(previousSwitch);
-                if (!previousBool)
+                if (!previousBool && index-1 > 0)
                 {
-                    Plugin.Logger.LogWarning("Item check says the previous item wasn't received.");
+                    Plugin.Logger.LogWarning($"Item check says the previous item wasn't received, at index {index-1}.");
                     
                 }
             }
