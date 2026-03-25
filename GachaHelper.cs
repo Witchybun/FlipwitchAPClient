@@ -414,6 +414,13 @@ namespace FlipwitchAP
             }
         }
 
+        [HarmonyPatch(typeof(GachaSceneManager), "startPrizeAnimation")]
+        [HarmonyPrefix]
+        private static bool StartPrizeAnimation_Nah()
+        {
+            return false;
+        }
+
         private enum GachaPhase
         {
             INPUT_PAY,

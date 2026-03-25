@@ -50,6 +50,38 @@ namespace FlipwitchAP
             currentlyCutsceneTrapped = false;
         }
 
+        [HarmonyPatch(typeof(Cutscene), "startCutscene")]
+        [HarmonyPrefix]
+        private static bool StartCutscene_DontSickOfSexScenesTbh(Cutscene __instance, string name,
+            bool calledFromDialogue, ref List<CutsceneMetaData> ___cutscenes, ref bool ___cutsceneActive, 
+            ref AK.Wwise.Event ___previousMusic, ref DialogueManager ___dialogueManager, ref bool ___triggeredFromDialogue)
+        {
+            ___triggeredFromDialogue = calledFromDialogue;
+            
+            SwitchDatabase.instance.playerMovement.disableMovement();
+            foreach (CutsceneMetaData cutscene in ___cutscenes)
+            {
+                if (cutscene.animName == name)
+                {
+                    __instance.unlockCutscene(cutscene.cutsceneUnlockedID);
+                }
+            }
+            SwitchDatabase instance = SwitchDatabase.instance;
+            if (!calledFromDialogue)
+            {
+                SwitchDatabase.instance.playerMovement.enableMovement();
+                ___dialogueManager.reactivateDialogueAfterCutscene();
+            }
+            ___cutsceneActive = false;
+            if (___previousMusic != null)
+            {
+                instance.musicManager.changeMusic(___previousMusic);
+            }
+            AkSoundEngine.StopAll(__instance.gameObject);
+            __instance.transform.parent.gameObject.SetActive(value: false);
+            return false;
+        }
+
         [HarmonyPatch(typeof(Cutscene), "calculateUnlockedRewards")]
         [HarmonyPrefix]
         private static bool CalculateUnlockedRewards_CalculateUsingOwnUnlockCount(Cutscene __instance)

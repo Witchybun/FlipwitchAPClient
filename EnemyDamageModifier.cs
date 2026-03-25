@@ -33,7 +33,7 @@ public class EnemyDamageModifier
             var averageAreaDamage = DamageDatabase.OriginalOrderDamageLookup[DamageDatabase.AreaToOriginalOrder[area]];
             var damageBasedOnHealth = DamageDatabase.OriginalOrderDamageLookup[healthCount];
             var multiplier = damageBasedOnHealth / (float)averageAreaDamage;
-            damage = (int)multiplier * damage;
+            damage = (int)(multiplier * damage);
         }
         var amount = Math.Min(2, SwitchDatabase.instance.getInt("APBarrier"));
         damage -= (int)((amount * damage) / 4f);
@@ -57,6 +57,10 @@ public class EnemyDamageModifier
                 return "Tengoku";
             case "GhostCastle_Main":
                 return "Ghost Castle";
+            case "Spirit_City_Final":
+                return "Spirit City Sewers";
+            case "WitchyWoods_Final":
+                return "Witchy Woods";
         }
         var level = "";
         try
@@ -69,11 +73,6 @@ public class EnemyDamageModifier
         }
         switch (scene)
         {
-            case "WitchyWoods_Final" when
-                !GenericInformation.AreasToHelpDefineGivenRegion["Witchy Woods"].Contains(level):
-                return "Witchy Woods";
-            case "Spirit_City_Final" when GenericInformation.AreasToHelpDefineGivenRegion["Spirit City Sewers"].Contains(level):
-                return "Spirit City Sewers";
             case "FungalForest_Main" when
                 GenericInformation.AreasToHelpDefineGivenRegion["Outside Fungal Forest"].Contains(level):
                 return "Outside Fungal Forest";
