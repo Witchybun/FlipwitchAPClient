@@ -131,6 +131,13 @@ namespace FlipwitchAP
                         bestGirlSwitch.GetComponent<SetGameObjectEnabledOnSwitch>().switchName = "APCabaretComplete";
                         return;
                     }
+                case "Tengoku_Final":
+                {
+                    var stupidFuckingPot = GameObject.Find("World").transform.Find("Tengoku").Find("6_FlowerGarden")
+                        .Find("LevelData").GetChild(6);
+                    stupidFuckingPot.name = "pot_breakable_thin_evil";
+                    return;
+                }
             }
         }
         

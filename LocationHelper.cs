@@ -393,21 +393,6 @@ namespace FlipwitchAP
                 Plugin.Logger.LogWarning($"We couldn't find a location for this pot!  Info to give to dev: {level} : \"{potName}\"");
                 return true;
             }
-            // Two pots in this area have the same name.
-            if (level == "6_FlowerGarden" && potName == "pot_breakable_thin")
-            {
-                if (Vector3.Distance(__instance.transform.position, new Vector3(-21.503f, 245.939f, 0f)) < 0.1)
-                {
-                    if (ArchipelagoClient.ServerData.CheckedLocations.Contains(886))
-                    {
-                        return true;
-                    }
-
-                    var realLocation = IDToLocation[886];
-                    SendLocation(realLocation);
-                    return false;
-                }
-            }
             if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationData.APLocationID))
             {
                 return true;

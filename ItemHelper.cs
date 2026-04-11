@@ -46,6 +46,7 @@ namespace FlipwitchAP
                 case "Animal Coin":
                     {
                         var totalCount = SwitchDatabase.instance.getInt("AllAPAnimalCoin");
+                        Plugin.Logger.LogWarning($"Received coin total: {totalCount}");
                         if (totalCount > 9)
                         {
                             return;
@@ -58,6 +59,7 @@ namespace FlipwitchAP
                 case "Bunny Coin":
                     {
                         var totalCount = SwitchDatabase.instance.getInt("AllAPBunnyCoin");
+                        Plugin.Logger.LogWarning($"Received coin total: {totalCount}");
                         if (totalCount > 9)
                         {
                             return;
@@ -70,6 +72,7 @@ namespace FlipwitchAP
                 case "Monster Coin":
                     {
                         var totalCount = SwitchDatabase.instance.getInt("AllAPMonsterCoin");
+                        Plugin.Logger.LogWarning($"Received coin total: {totalCount}");
                         if (totalCount > 9)
                         {
                             return;
@@ -82,6 +85,7 @@ namespace FlipwitchAP
                 case "Angel & Demon Coin":
                     {
                         var totalCount = SwitchDatabase.instance.getInt("AllAPAngelDemonCoin");
+                        Plugin.Logger.LogWarning($"Received coin total: {totalCount}");
                         if (totalCount > 9)
                         {
                             return;
@@ -94,6 +98,7 @@ namespace FlipwitchAP
                 case "Promotional Coin":
                     {
                         var totalCount = SwitchDatabase.instance.getInt("AllAPPromotionalCoin");
+                        Plugin.Logger.LogWarning($"Received coin total: {totalCount}");
                         if (totalCount > 1)
                         {
                             return;
