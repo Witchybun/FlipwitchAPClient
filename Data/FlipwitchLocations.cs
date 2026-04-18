@@ -577,7 +577,7 @@ namespace FlipwitchAP.Data
             CreateLocation(883, "TG: Cloud Ramp Pot 4", "36_CloudRamp", POT, secondaryCallName: POT_THINMED + " (1)"),
             CreateLocation(884, "TG: Cloud Ramp Pot 5", "36_CloudRamp", POT, secondaryCallName: POT_THIN + " (1)"),
             CreateLocation(885, "TG: Flower Garden Pot 1", "6_FlowerGarden", POT, secondaryCallName: POT_LARGE),
-            CreateLocation(886, "TG: Flower Garden Pot 2", "6_FlowerGarden", POT, secondaryCallName: POT_THIN + "_evil"),
+            //CreateLocation(886, "TG: Flower Garden Pot 2", "6_FlowerGarden", POT, secondaryCallName: POT_THIN + "_evil"),
             CreateLocation(887, "TG: Flower Garden Pot 3", "6_FlowerGarden", POT, secondaryCallName: POT_MED + " 1"),
             CreateLocation(888, "TG: Flower Garden Pot 4", "6_FlowerGarden", POT, secondaryCallName: POT_MED),
             CreateLocation(889, "TG: Flower Garden Pot 5", "6_FlowerGarden", POT, secondaryCallName: POT_MED + " (1)"),
