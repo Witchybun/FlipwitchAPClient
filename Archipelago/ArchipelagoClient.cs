@@ -120,6 +120,7 @@ public class ArchipelagoClient
                 Authenticated = false;
                 Disconnect();
                 _attemptingConnection = false;
+                return;
             }
             var seedBeforeSetup = ServerData.Seed;
             ServerData.SetupSession(success.SlotData);
@@ -161,7 +162,7 @@ public class ArchipelagoClient
         var apworldVersion = (string)slotData["client_version"];
         var apworldVersionArray = apworldVersion.Split('.');
         var clientVersionArray = Plugin.PluginVersion.Split('.');
-        if (apworldVersionArray[1] != clientVersionArray[1])
+        if (apworldVersionArray[1] != clientVersionArray[1] || apworldVersionArray[0] != clientVersionArray[0])
         {
             version = apworldVersion;
             return false;

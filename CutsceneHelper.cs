@@ -56,6 +56,10 @@ namespace FlipwitchAP
             bool calledFromDialogue, ref List<CutsceneMetaData> ___cutscenes, ref bool ___cutsceneActive, 
             ref AK.Wwise.Event ___previousMusic, ref DialogueManager ___dialogueManager, ref bool ___triggeredFromDialogue)
         {
+            if (ArchipelagoClient.ServerData.IAmAGooner)
+            {
+                return true;
+            }
             ___triggeredFromDialogue = calledFromDialogue;
             
             SwitchDatabase.instance.playerMovement.disableMovement();

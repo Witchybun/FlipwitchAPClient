@@ -36,6 +36,7 @@ public class ArchipelagoData
     private const string ROLL_KEY = "shuffle_dodge";
     private const string STARTING_AREA_KEY = "starting_area";
     private const string POTSANITY_KEY = "pottery_lottery";
+    private const string GOONER_KEY = "i_am_a_gooner";
     public string ClientVersion { get; private set; }
     public int Seed { get; set; }
     public Gender StartingGender { get; private set; }
@@ -50,6 +51,7 @@ public class ArchipelagoData
     public bool ShuffleDoubleJump { get; private set; }
     public bool ShuffleRoll { get; private set; }
     public bool Potsanity { get; private set; }
+    public bool IAmAGooner { get; private set; }
     public StartArea StartingArea { get; private set; }
     public List<int> AnimalGachaOrder { get; private set; }
     public List<int> BunnyGachaOrder { get; private set; }
@@ -100,6 +102,7 @@ public class ArchipelagoData
         ShuffleRoll = GetSlotSetting(ROLL_KEY, false);
         Potsanity = GetSlotSetting(POTSANITY_KEY, false);
         StartingArea = GetSlotSettings(STARTING_AREA_KEY, StartArea.Beatrice);
+        IAmAGooner = GetSlotSetting(GOONER_KEY, false);
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");
@@ -160,7 +163,7 @@ public class ArchipelagoData
         return _slotData.TryGetValue(key, out var value) ? value.ToString() : GetSlotDefaultValue(key, defaultValue);
     }
 
-    public int GetSlotSetting(string key, int defaultValue)
+    private int GetSlotSetting(string key, int defaultValue)
     {
         return _slotData.TryGetValue(key, out var value) ? (int)(long)value : GetSlotDefaultValue(key, defaultValue);
     }
