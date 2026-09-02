@@ -332,23 +332,21 @@ namespace FlipwitchAP
                 return true;
             }
             var playerWandLocationCount = __instance.getInt("APPlayerWand");
+            __instance.setInt("APPlayerWand",  playerWandLocationCount + 1);
             switch (__instance.getInt("PendingWandLevel"))
             {
                 case 1:
                 {
                     var wandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
                     SendLocation(wandLocation);
-                    __instance.setInt("APPlayerWand",  playerWandLocationCount + 1);
                     break;
                 }
                 case 2:
-                default:
                 {
                     var wandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 2"];
                     SendLocation(wandLocation);
                     wandLocation = SexExperienceLocations["WW: Sexual Experience Reward - Wand Upgrade 1"];
                     SendLocation(wandLocation);
-                    __instance.setInt("APPlayerWand",  playerWandLocationCount + 1);
                     break;
                 }
             }

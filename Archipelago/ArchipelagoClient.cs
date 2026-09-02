@@ -20,7 +20,7 @@ namespace FlipwitchAP.Archipelago;
 
 public class ArchipelagoClient
 {
-    public const string APVersion = "0.6.5";
+    public const string APVersion = "0.6.7";
     public const string Game = "Flipwitch Forbidden Sex Hex";
 
     public static bool Authenticated;

@@ -1,5 +1,7 @@
 # FlipwitchAPClient
 
+This is the source for Flipwitch Archipelago, and includes a built version of the mod as well as the apworld as a repository.  If you want to verify the contents of the apworld, you may do so [here](https://github.com/Witchybun/Archipelago/tree/FlipwitchAP2), though note that if a new major version occurs this branch may be out of date.
+
 ## How to install
 
 - Download FlipwitchXXX.zip and flipwitch.apworld.

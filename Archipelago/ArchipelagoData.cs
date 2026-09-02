@@ -102,7 +102,14 @@ public class ArchipelagoData
         ShuffleRoll = GetSlotSetting(ROLL_KEY, false);
         Potsanity = GetSlotSetting(POTSANITY_KEY, false);
         StartingArea = GetSlotSettings(STARTING_AREA_KEY, StartArea.Beatrice);
-        IAmAGooner = GetSlotSetting(GOONER_KEY, false);
+        try
+        {
+            IAmAGooner = GetSlotSetting(GOONER_KEY, false);
+        }
+        catch (Exception e)
+        {
+            Plugin.Logger.LogError(e.Message);
+        }
         var animalOrderData = GetSlotSetting(ANIMAL_KEY, "");
         AnimalGachaOrder = ProcessGachaList(JsonConvert.DeserializeObject<List<string>>(animalOrderData));
         var bunnyOrderData = GetSlotSetting(BUNNY_KEY, "");

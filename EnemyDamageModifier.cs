@@ -79,9 +79,8 @@ public class EnemyDamageModifier
             case "FungalForest_Main" when
                 GenericInformation.AreasToHelpDefineGivenRegion["Slime Citadel"].Contains(level):
                 return "Slime Citadel";
-            default:
-                Plugin.Logger.LogWarning($"We couldn't find an area for {level}.  Its probably outside fungal.");
-                return "Outside Fungal Forest";
         }
+        Plugin.Logger.LogWarning($"We couldn't find an area for {level}.  Its probably outside fungal.");
+        return "Outside Fungal Forest";
     }
 }

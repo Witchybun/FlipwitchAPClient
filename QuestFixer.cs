@@ -475,6 +475,11 @@ namespace FlipwitchAP
                         {
                             senseiGroups[7].switches[1] = receivedFirstWandNotSecond;
                         }
+                        /*
+                        senseiGroups[4].switches.Remove(senseiGroups[4].switches[1]);
+                        senseiGroups[5].switches.Remove(senseiGroups[5].switches[1]);
+                        senseiGroups[6].switches.Remove(senseiGroups[6].switches[1]);
+                        senseiGroups[7].switches.Remove(senseiGroups[7].switches[1]);*/
 
                         // 4 is first wand upgrade but wrong
                         // 5 is first wand upgrade

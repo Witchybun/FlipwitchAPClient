@@ -102,10 +102,12 @@ namespace FlipwitchAP
             UnityEngine.Debug.Log("SexualExperienceCount: " + SwitchDatabase.instance.getInt("SexualExperienceCount"));
             if (num >= 2)
             {
+                Plugin.Logger.LogInfo("Giving PendingWandLevel 1");
                 SwitchDatabase.instance.setInt("PendingWandLevel", 1);
             }
             if (num >= 6)
             {
+                Plugin.Logger.LogInfo("Giving PendingWandLevel 2");
                 SwitchDatabase.instance.setInt("PendingWandLevel", 2);
             }
             if (@int < SwitchDatabase.instance.getInt("PendingPeachCharges"))
